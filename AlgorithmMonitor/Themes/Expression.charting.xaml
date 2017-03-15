@@ -1,0 +1,28 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf">
+
+    <!-- LiveCharts theme based upon the generic expression theme -->
+
+    <Style TargetType="{x:Type lvc:Separator}">
+        <Style.Setters>
+            <Setter Property="Stroke" Value="{StaticResource MenuSeparatorBrush}"/>
+        </Style.Setters>
+    </Style>
+
+    <Style TargetType="{x:Type lvc:CartesianChart}">
+        <Style.Setters>
+            <Setter Property="Background" Value="{StaticResource DataGridBackgroundBrush}"/>
+            <Setter Property="ScrollBarFill" Value="#44595959"/>
+        </Style.Setters>
+    </Style>
+
+    <Style TargetType="{x:Type lvc:DefaultTooltip}">
+        <Style.Setters>
+            <Setter Property="Background" Value="{StaticResource ButtonBackground}"></Setter>
+            <Setter Property="BorderBrush" Value="{StaticResource ButtonBorder}"></Setter>
+        </Style.Setters>
+    </Style>
+
+
+</ResourceDictionary>

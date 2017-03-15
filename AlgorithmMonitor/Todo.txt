@@ -1,0 +1,16 @@
+﻿
+TOOL BACKLOG
+
+IMPROVEMENT: Split series to seperate charts based upon their index. Currenly they are merged on the main chart, but put on a seperate Yaxis.
+https://rachel53461.wordpress.com/2011/09/17/wpf-itemscontrol-example/
+http://wpftutorial.net/DockPanel.html
+
+FEATURE: Statistics windows: Red background for bad values, just like in Trader Workstation X
+
+FEATURE: Functionality to save (export) data to .JSON
+
+FEATURE: Rolling Statistics
+
+FEATURE: Implement Live support
+
+BUG: Fix alignment issue for the vertical seperators on the Strategy Equity chart (between equity, and daily performance)

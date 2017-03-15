@@ -1,0 +1,148 @@
+﻿<Window x:Class="QuantConnect.Lean.Monitor.View.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:xcad="http://schemas.xceed.com/wpf/xaml/avalondock"
+        xmlns:charts="clr-namespace:QuantConnect.Lean.Monitor.ViewModel.Charts"
+        xmlns:charts1="clr-namespace:QuantConnect.Lean.Monitor.View.Charts"
+        xmlns:view="clr-namespace:QuantConnect.Lean.Monitor.View"
+        xmlns:panels="clr-namespace:QuantConnect.Lean.Monitor.View.Panels"
+        mc:Ignorable="d"
+        Background="{StaticResource WindowBackgroundBrush}"
+        Foreground="{StaticResource ForegroundBrush}"
+        DataContext="{Binding MainWindow, Source={StaticResource Locator}}"
+        Loaded="MainWindow_OnLoaded"
+        WindowStartupLocation="CenterOwner"
+        Title="LEAN Algorithm Monitor">
+    
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding ExitCommand}" Key="F4" Modifiers="Alt"/>
+        <KeyBinding Command="{Binding OpenSessionCommand}" Key="O" Modifiers="Control"/>
+    </Window.InputBindings>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="24"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="24"/>
+        </Grid.RowDefinitions>
+
+        <Menu Grid.Row="0" IsMainMenu="True">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open..." Command="{Binding OpenSessionCommand}" InputGestureText="Ctrl+O"/>
+                <Separator/>
+                <MenuItem Header="_Close" Command="{Binding CloseCommand}"/>
+                <Separator/>
+                <MenuItem Header="E_xit" Command="{Binding ExitCommand}" InputGestureText="Alt+F4"/>
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="_Charting documentation..." Click="BrowseChartingDocumentationMenuItem_OnClick"/>
+                <Separator/>
+                <MenuItem Header="_Monitor GitHub project..." Click="BrowseMonitorGithubMenuItem_OnClick"/>
+                <MenuItem Header="_LEAN Engine GitHub project..." Click="BrowseLeanGithubMenuItem_OnClick"/>
+                <Separator/>
+                <MenuItem Header="_About..." Click="ShowAboutButton_OnClick"/>
+            </MenuItem>
+        </Menu>
+
+        <xcad:DockingManager x:Name="DockingManager" Grid.Row="1" DocumentsSource="{Binding Charts}" BorderThickness="0">
+
+            <xcad:DockingManager.Resources>
+
+                <DataTemplate DataType="{x:Type charts:StrategyEquityChartViewModel}">
+                    <charts1:StrategyEquityChartPanel/>
+                </DataTemplate>
+
+                <DataTemplate DataType="{x:Type charts:BenchmarkChartViewModel}">
+                    <charts1:BenchmarkChartPanel DataContext="{Binding}"/>
+                </DataTemplate>
+
+                <DataTemplate DataType="{x:Type charts:ChartViewModel}">
+                    <charts1:ChartPanel/>
+                </DataTemplate>
+
+                <DataTemplate DataType="{x:Type charts:GridPanelViewModel}">
+                    <charts1:GridPanel/>
+                </DataTemplate>
+
+            </xcad:DockingManager.Resources>
+            
+            <xcad:DockingManager.LayoutItemContainerStyle>
+                <Style TargetType="{x:Type xcad:LayoutItem}">
+                    <Setter Property="Title" Value="{Binding Model.Title}"></Setter>
+                    <Setter Property="CanClose" Value="{Binding Model.CanClose}"></Setter>
+                    <Setter Property="IsSelected" Value="{Binding Model.IsSelected, Mode=TwoWay}"></Setter>
+                </Style>
+            </xcad:DockingManager.LayoutItemContainerStyle>
+
+            <xcad:LayoutRoot>
+                <xcad:LayoutPanel Orientation="Vertical">
+
+                    <xcad:LayoutPanel Orientation="Horizontal">
+
+                        <xcad:LayoutAnchorablePaneGroup DockWidth="300" Orientation="Vertical">
+
+                            <xcad:LayoutAnchorablePane DockHeight="200">
+
+                                <xcad:LayoutAnchorable CanClose="False" CanHide="False" Title="Runtime Statistics">
+                                    <panels:RuntimeStatisticsPanel/>
+                                </xcad:LayoutAnchorable>
+
+                            </xcad:LayoutAnchorablePane>
+
+                            <xcad:LayoutAnchorablePane>
+
+                                <xcad:LayoutAnchorable CanClose="False" CanHide="False" Title="Overall Statistics">
+                                    <panels:StatisticsPanel/>
+                                </xcad:LayoutAnchorable>
+
+                            </xcad:LayoutAnchorablePane>
+
+                        </xcad:LayoutAnchorablePaneGroup>
+
+                        <xcad:LayoutDocumentPaneGroup Orientation="Horizontal">
+                            <xcad:LayoutDocumentPane>
+                            </xcad:LayoutDocumentPane>
+                        </xcad:LayoutDocumentPaneGroup>
+
+                    </xcad:LayoutPanel>
+
+                    <xcad:LayoutAnchorablePaneGroup DockHeight="200" Orientation="Horizontal">
+
+                        <xcad:LayoutAnchorablePane>
+
+                            <xcad:LayoutAnchorable CanClose="False" CanHide="False" Title="Trades">
+                                <panels:TradesPanel/>
+                            </xcad:LayoutAnchorable>
+
+                            <xcad:LayoutAnchorable CanClose="False" CanHide="False" Title="Profit &amp; Loss">
+                                <panels:ProfitLossPanel/>
+                            </xcad:LayoutAnchorable>
+
+                            <!-- TODO: Fix the rolling statistics -->
+                            <!--<xcad:LayoutAnchorable x:Name="RollingStatisticsPane" CanClose="False" CanHide="False" Title="Rolling Statistics">
+                                <view:RollingStatisticsPanel/>
+                            </xcad:LayoutAnchorable>-->
+
+                            <xcad:LayoutAnchorable CanClose="False" CanHide="False" Title="Log">
+                                <panels:LogPanel/>
+                            </xcad:LayoutAnchorable>
+
+                        </xcad:LayoutAnchorablePane>
+
+                    </xcad:LayoutAnchorablePaneGroup>
+
+                </xcad:LayoutPanel>
+            </xcad:LayoutRoot>
+
+        </xcad:DockingManager>
+
+        <StatusBar Grid.Row="2">
+            <StatusBarItem>
+                <TextBlock Text="{Binding SessionName}"/>
+            </StatusBarItem>
+        </StatusBar>
+
+    </Grid>
+</Window>
