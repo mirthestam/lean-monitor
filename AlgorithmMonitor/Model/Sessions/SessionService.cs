@@ -8,16 +8,20 @@ namespace QuantConnect.Lean.Monitor.Model.Sessions
     public class SessionService : ISessionService, ISessionHandler
     {
         private readonly IMessenger _messenger;
-        private readonly IResultFactory _resultFactory;
+        private readonly IResultConverter _resultConverter;
+        private readonly IResultSerializer _resultSerializer;
 
         private ISession _session;
 
         public Result LastResult { get; private set; }
 
-        public SessionService(IMessenger messenger, IResultFactory resultFactory)
+        public bool IsSessionActive => _session != null;
+
+        public SessionService(IMessenger messenger, IResultConverter resultConverter, IResultSerializer resultSerializer)
         {
             _messenger = messenger;
-            _resultFactory = resultFactory;
+            _resultConverter = resultConverter;
+            _resultSerializer = resultSerializer;
         }
 
         public void HandleResult(Result result)
@@ -123,7 +127,7 @@ namespace QuantConnect.Lean.Monitor.Model.Sessions
             if (!parameters.Host.EndsWith(":")) parameters.Host = parameters.Host + ":";
 
             // Open a new session and open it
-            var session = new StreamSession(this, _resultFactory, parameters);
+            var session = new StreamSession(this, _resultConverter, parameters);
             OpenSession(session);
         }
 
@@ -136,7 +140,7 @@ namespace QuantConnect.Lean.Monitor.Model.Sessions
                 CloseSession();
             }
 
-            var session = new FileSession(this, _resultFactory, parameters);
+            var session = new FileSession(this, _resultSerializer, parameters);
             OpenSession(session);
         }
 

@@ -7,8 +7,6 @@ http://wpftutorial.net/DockPanel.html
 
 FEATURE: Statistics windows: Red background for bad values, just like in Trader Workstation X
 
-FEATURE: Functionality to save (export) data to .JSON
-
 FEATURE: Rolling Statistics
 
 FEATURE: Implement Live support

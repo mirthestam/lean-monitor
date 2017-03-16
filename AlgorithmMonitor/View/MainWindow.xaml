@@ -34,6 +34,8 @@
                 <Separator/>
                 <MenuItem Header="_Close" Command="{Binding CloseCommand}"/>
                 <Separator/>
+                <MenuItem Header="_Export..." Command="{Binding ExportCommand}"/>
+                <Separator/>
                 <MenuItem Header="E_xit" Command="{Binding ExitCommand}" InputGestureText="Alt+F4"/>
             </MenuItem>
             <MenuItem Header="_Help">

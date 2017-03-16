@@ -1,10 +1,12 @@
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
+using Microsoft.Win32;
 using QuantConnect.Lean.Monitor.Model;
 using QuantConnect.Lean.Monitor.Model.Messages;
 using QuantConnect.Lean.Monitor.Model.Sessions;
@@ -14,7 +16,7 @@ namespace QuantConnect.Lean.Monitor.ViewModel
 {
     public class MainWindowViewModel : ViewModelBase
     {
-        private readonly ISessionService _resultService;
+        private readonly ISessionService _sessionService;
         private readonly IMessenger _messenger;
 
         private ObservableCollection<DocumentViewModel> _charts = new ObservableCollection<DocumentViewModel>();
@@ -23,7 +25,8 @@ namespace QuantConnect.Lean.Monitor.ViewModel
 
         public RelayCommand ExitCommand { get; private set; }
         public RelayCommand OpenSessionCommand { get; private set; }
-        public RelayCommand CloseCommand { get; private set; }
+        public RelayCommand CloseCommand { get; }
+        public RelayCommand ExportCommand { get; }
 
         public ObservableCollection<DocumentViewModel> Charts
         {
@@ -48,7 +51,7 @@ namespace QuantConnect.Lean.Monitor.ViewModel
 
         public MainWindowViewModel(ISessionService resultService, IMessenger messenger)
         {
-            _resultService = resultService;
+            _sessionService = resultService;
             _messenger = messenger;
 
             if (IsInDesignMode)
@@ -57,15 +60,21 @@ namespace QuantConnect.Lean.Monitor.ViewModel
             }
 
             ExitCommand = new RelayCommand(() => Application.Current.Shutdown());
-            CloseCommand = new RelayCommand(() => _resultService.CloseSession());
+            CloseCommand = new RelayCommand(() => _sessionService.CloseSession(), () => _sessionService.IsSessionActive);
             OpenSessionCommand = new RelayCommand(() => _messenger.Send(new ShowNewSessionWindowMessage()));
+            ExportCommand = new RelayCommand(Export, () => _sessionService.IsSessionActive);
 
-            _messenger.Register<SessionOpenedMessage>(this, message => SessionName = message.Name);
+            _messenger.Register<SessionOpenedMessage>(this, message =>
+            {
+                SessionName = message.Name;
+                InvalidateCommands();
+            });
 
             _messenger.Register<SessionClosedMessage>(this, message =>
             {
-                SessionName = string.Empty;
                 Charts.Clear();
+                SessionName = string.Empty;
+                InvalidateCommands();
             });
 
             _messenger.Register<SessionUpdateMessage>(this, message =>
@@ -97,14 +106,14 @@ namespace QuantConnect.Lean.Monitor.ViewModel
                 chartTableViewModel.IsSelected = true;
 
                 // Get the latest data for this tab and inject it
-                var chart = _resultService.LastResult.Charts[message.Key];
+                var chart = _sessionService.LastResult.Charts[message.Key];
                 chartTableViewModel.ParseChart(chart);
             });
         }
 
         public void Initialize()
         {
-            _resultService.Initialize();
+            _sessionService.Initialize();
         }
 
         private void ParseResult(Result messageResult)
@@ -138,7 +147,7 @@ namespace QuantConnect.Lean.Monitor.ViewModel
                                 // Normal series. Use the special strategy equity tab
                                 chartDrawViewModel = new StrategyEquityChartViewModel();
                             }
-                            
+
                             break;
 
                         case "Benchmark":
@@ -153,7 +162,7 @@ namespace QuantConnect.Lean.Monitor.ViewModel
                                 // use the special benchmark tab
                                 chartDrawViewModel = new BenchmarkChartViewModel();
                             }
-                                
+
                             break;
 
                         default:
@@ -185,6 +194,29 @@ namespace QuantConnect.Lean.Monitor.ViewModel
             }
 
             RaisePropertyChanged(() => Charts);
+        }
+
+        private void Export()
+        {
+            var exportDialog = new SaveFileDialog
+            {
+                FileName = DateTime.Now.ToString("yyyyMMddHHmm") + "_export",
+                DefaultExt = ".json",
+                Filter = "Json documents (.json)|*.json"
+            };
+
+            var dialogResult = exportDialog.ShowDialog();
+            if (dialogResult != true) return;
+            
+            var serializer = new ResultSerializer(new ResultConverter());
+            var serialized = serializer.Serialize(_sessionService.LastResult);
+            File.WriteAllText(exportDialog.FileName, serialized);
+        }
+
+        private void InvalidateCommands()
+        {
+            CloseCommand.RaiseCanExecuteChanged();
+            ExportCommand.RaiseCanExecuteChanged();
         }
     }
 }
