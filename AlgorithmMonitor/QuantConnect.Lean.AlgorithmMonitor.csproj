@@ -158,6 +158,7 @@
     <Compile Include="Utils\SeriesExt.cs" />
     <Compile Include="Model\Charting\ChartResolution.cs" />
     <Compile Include="Model\Messages\GridRequestMessage.cs" />
+    <Compile Include="ViewModel\Charts\ChartSeriesCollectionViewModel.cs" />
     <Compile Include="ViewModel\Charts\GridPanelViewModelBase.cs" />
     <Compile Include="ViewModel\Charts\GridPoint.cs" />
     <Compile Include="ViewModel\Charts\GridSerie.cs" />

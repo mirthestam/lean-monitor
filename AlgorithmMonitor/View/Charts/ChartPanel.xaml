@@ -7,7 +7,7 @@
              xmlns:charts="clr-namespace:QuantConnect.Lean.Monitor.ViewModel.Charts"
              Background="{StaticResource WindowBackgroundBrush}"
             Foreground="{StaticResource ForegroundBrush}"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"              
              d:DataContext="{d:DesignInstance Type=charts:ChartViewModel,IsDesignTimeCreatable=False}"
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
@@ -23,29 +23,49 @@
         <Grid Grid.Row="1">
 
             <Grid.RowDefinitions>
+                <!-- Charts -->
                 <RowDefinition Height="*"></RowDefinition>
+
+                <!-- Zoom -->
                 <RowDefinition Height="100"></RowDefinition>
             </Grid.RowDefinitions>
 
             <!-- Equity chart -->
-            <!-- DataTooltip="{x:Null}" -->                       
-            <wpf:CartesianChart Grid.Row="0"
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ItemsControl Name="DataSource" ItemsSource="{Binding GroupedSeries}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Columns="1"></UniformGrid>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter Property="DataContext" Value="{Binding}"></Setter>
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <wpf:CartesianChart 
                             DisableAnimations="True"
                             Zoom="X"                            
-                            AxisY="{Binding YAxesCollection}" 
+                            AxisY="{Binding YAxesCollection}"
                             Series="{Binding SeriesCollection}"
                             LegendLocation="Top"
                 Hoverable="False">
-                <wpf:CartesianChart.AxisX>
-                    <wpf:Axis MinValue="{Binding ZoomFrom, Mode=TwoWay}"
-                          MaxValue="{Binding ZoomTo, Mode=TwoWay}"
-                          ShowLabels="True"              
-                          Position="RightTop"
-                          LabelFormatter="{Binding XFormatter}"
-                          Separator="{x:Static wpf:DefaultAxes.CleanSeparator}"/>
-                </wpf:CartesianChart.AxisX>
-            </wpf:CartesianChart>
-
+                                <wpf:CartesianChart.AxisX>
+                                    <wpf:Axis
+                                    MinValue="{Binding Path=Chart.ZoomFrom, Mode=TwoWay}"
+                                    MaxValue="{Binding Path=Chart.ZoomTo, Mode=TwoWay}"
+                                    LabelFormatter="{Binding Chart.XFormatter, Mode=TwoWay}"
+                                    ShowLabels="true"              
+                                    Position="RightTop"                                    
+                                    Separator="{x:Static wpf:DefaultAxes.CleanSeparator}"/>
+                                </wpf:CartesianChart.AxisX>
+                            </wpf:CartesianChart>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
             <!-- Overview chart -->
             <wpf:CartesianChart Grid.Row="1" 
                             ScrollMode="X"
@@ -67,7 +87,7 @@
         </Grid>
 
     </Grid>
-        
+
 </UserControl>
 
 
