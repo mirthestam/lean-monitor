@@ -14,7 +14,7 @@ namespace QuantConnect.Lean.Monitor.Model.Sessions
     public class StreamSession : ISession
     {
         private readonly ISessionHandler _sessionHandler;
-        private readonly IResultFactory _resultFactory;
+        private readonly IResultConverter _resultConverter;
 
         private readonly BackgroundWorker _eternalQueueListener = new BackgroundWorker();
         private readonly BackgroundWorker _queueReader = new BackgroundWorker();
@@ -29,12 +29,12 @@ namespace QuantConnect.Lean.Monitor.Model.Sessions
 
         public string Name => $"{_host}:{_port}";
 
-        public StreamSession(ISessionHandler sessionHandler, IResultFactory resultFactory, StreamSessionParameters parameters)
+        public StreamSession(ISessionHandler sessionHandler, IResultConverter resultConverter, StreamSessionParameters parameters)
         {
             if (parameters == null) throw new ArgumentNullException(nameof(parameters));
 
             _sessionHandler = sessionHandler;
-            _resultFactory = resultFactory;            
+            _resultConverter = resultConverter;            
 
             _host = parameters.Host;
             _port = parameters.Port;
@@ -145,7 +145,7 @@ namespace QuantConnect.Lean.Monitor.Model.Sessions
         private void HandleBacktestResultPacket(Packet packet)
         {
             var backtestResultEventModel = (BacktestResultPacket) packet;
-            var backtestResultUpdate = _resultFactory.FromBacktestResult(backtestResultEventModel.Results);
+            var backtestResultUpdate = _resultConverter.FromBacktestResult(backtestResultEventModel.Results);
             _result.Add(backtestResultUpdate);
             _syncContext.Send(o => _sessionHandler.HandleResult(_result), null);
         }
@@ -153,7 +153,7 @@ namespace QuantConnect.Lean.Monitor.Model.Sessions
         private void HandleLiveResultPacket(Packet packet)
         {
             var liveResultEventModel = (LiveResultPacket) packet;
-            var liveResultUpdate = _resultFactory.FromLiveResult(liveResultEventModel.Results);
+            var liveResultUpdate = _resultConverter.FromLiveResult(liveResultEventModel.Results);
             _result.Add(liveResultUpdate);
             _syncContext.Send(o => _sessionHandler.HandleResult(_result), null);
         }

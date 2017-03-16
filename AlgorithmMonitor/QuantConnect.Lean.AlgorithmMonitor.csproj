@@ -124,14 +124,16 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppRegistry.cs" />
+    <Compile Include="Model\IResultSerializer.cs" />
     <Compile Include="Model\LogItemType.cs" />
     <Compile Include="Model\Messages\SessionClosedMessage.cs" />
     <Compile Include="Model\Messages\SessionOpenedMessage.cs" />
     <Compile Include="Model\Messages\SessionUpdateMessage.cs" />
     <Compile Include="Model\Messages\ShowNewSessionWindowMessage.cs" />
     <Compile Include="Model\Charting\ITimeStampChartPoint.cs" />
-    <Compile Include="Model\IResultFactory.cs" />
-    <Compile Include="Model\ResultFactory.cs" />
+    <Compile Include="Model\IResultConverter.cs" />
+    <Compile Include="Model\ResultConverter.cs" />
+    <Compile Include="Model\ResultSerializer.cs" />
     <Compile Include="Model\ResultUpdater.cs" />
     <Compile Include="Utils\DateTimeExt.cs" />
     <Compile Include="Model\Sessions\FileSessionParameters.cs" />

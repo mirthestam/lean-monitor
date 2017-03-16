@@ -1,10 +1,12 @@
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
+using Microsoft.Win32;
 using QuantConnect.Lean.Monitor.Model;
 using QuantConnect.Lean.Monitor.Model.Messages;
 using QuantConnect.Lean.Monitor.Model.Sessions;
@@ -24,6 +26,7 @@ namespace QuantConnect.Lean.Monitor.ViewModel
         public RelayCommand ExitCommand { get; private set; }
         public RelayCommand OpenSessionCommand { get; private set; }
         public RelayCommand CloseCommand { get; private set; }
+        public RelayCommand ExportCommand { get; private set; }
 
         public ObservableCollection<DocumentViewModel> Charts
         {
@@ -59,6 +62,7 @@ namespace QuantConnect.Lean.Monitor.ViewModel
             ExitCommand = new RelayCommand(() => Application.Current.Shutdown());
             CloseCommand = new RelayCommand(() => _resultService.CloseSession());
             OpenSessionCommand = new RelayCommand(() => _messenger.Send(new ShowNewSessionWindowMessage()));
+            ExportCommand = new RelayCommand(Export);
 
             _messenger.Register<SessionOpenedMessage>(this, message => SessionName = message.Name);
 
@@ -100,6 +104,27 @@ namespace QuantConnect.Lean.Monitor.ViewModel
                 var chart = _resultService.LastResult.Charts[message.Key];
                 chartTableViewModel.ParseChart(chart);
             });
+        }
+
+        private void Export()
+        {
+            var exportDialog = new SaveFileDialog
+            {
+                FileName = DateTime.Now.ToString("yyyyMMddHHmm") + "_export",
+                DefaultExt = ".json",
+                Filter = "Json documents (.json)|*.json"
+            };
+
+            // TODO: show from main window to be able to set the owner. it is also Mvvm violation to show dialog here.
+            // I.e. solution as defined here http://stackoverflow.com/questions/1619505/wpf-openfiledialog-with-the-mvvm-pattern
+            var dialogResult = exportDialog.ShowDialog();
+
+            if (dialogResult == true)
+            {
+                var serializer = new ResultSerializer(new ResultConverter());
+                var serialized = serializer.Serialize(_resultService.LastResult);
+                File.WriteAllText(exportDialog.FileName, serialized);
+            }
         }
 
         public void Initialize()

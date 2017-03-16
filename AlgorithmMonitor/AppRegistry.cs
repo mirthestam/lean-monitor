@@ -14,7 +14,8 @@ namespace QuantConnect.Lean.Monitor
 
             // Model
             For<ISessionService>().Singleton().Use<SessionService>();
-            For<IResultFactory>().Singleton().Use<ResultFactory>();
+            For<IResultConverter>().Singleton().Use<ResultConverter>();
+            For<IResultSerializer>().Singleton().Use<ResultSerializer>();
         }
     }
 }
