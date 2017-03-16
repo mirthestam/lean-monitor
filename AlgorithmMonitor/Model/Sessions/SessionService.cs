@@ -15,6 +15,8 @@ namespace QuantConnect.Lean.Monitor.Model.Sessions
 
         public Result LastResult { get; private set; }
 
+        public bool IsSessionActive => _session != null;
+
         public SessionService(IMessenger messenger, IResultConverter resultConverter, IResultSerializer resultSerializer)
         {
             _messenger = messenger;
