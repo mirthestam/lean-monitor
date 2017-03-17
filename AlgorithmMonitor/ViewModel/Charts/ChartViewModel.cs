@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Media;
 using LiveCharts;
@@ -7,6 +8,7 @@ using LiveCharts.Geared;
 using LiveCharts.Wpf;
 using QuantConnect.Lean.Monitor.Model.Charting;
 using QuantConnect.Lean.Monitor.Utils;
+using Color = System.Drawing.Color;
 using LiveChartSeries = LiveCharts.Wpf.Series;
 using QuantChartSeries = QuantConnect.Series;
 
@@ -17,9 +19,8 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
     /// </summary>
     public class ChartViewModel : ChartViewModelBase, IChartParser
     {
-        private SeriesCollection _seriesCollection = new SeriesCollection();
+        private ObservableCollection<ChartSeriesCollectionViewModel> _seriesCollections = new ObservableCollection<ChartSeriesCollectionViewModel>();
         private SeriesCollection _summarySeriesCollection = new SeriesCollection();
-        private AxesCollection _yAxesCollection = new AxesCollection();
         
         public override bool CanClose => false;
 
@@ -58,74 +59,70 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
             // Validate the chart
             if (chart.Series.Count == 0) return;
 
-            // Build YAxes
-            if (YAxesCollection.Count == 0)
+            var lastUpdate = TimeStamp.FromDays(0);
+
+            // Group series by their Index.
+            // This index is the index of a chart they need to be drawn upon.
+            foreach (var seriesGroup in chart.Series.OrderByDescending(s => s.Value.Index).GroupBy(s => s.Value.Index))            
             {
-                // Chart series have indexes, and can share an yaxis.
-                var axesCount = chart.Series.Values.Max(v => v.Index + 1);
-                for (int axis = 0; axis < axesCount; axis++)
+                // Get the model representing this index
+                var model = GroupedSeries.FirstOrDefault(g => g.Index == seriesGroup.Key);
+                if (model == null)
                 {
-                    // Get the series shown on this axis
-                    var series = chart.Series.Values.Where(v => v.Index == axis);
+                    // Build a new model
+                    model = new ChartSeriesCollectionViewModel(seriesGroup.Key, this);
+                    GroupedSeries.Add(model);
+                    model.Index = seriesGroup.Key;
 
                     // Create Y axis for the series
-                    YAxesCollection.Add(new Axis
+                    model.YAxesCollection.Add(new Axis
                     {
                         // Title is with combined series
-                        Title = string.Join(", ", series.Select(s => s.Name).ToArray()),
+                        Title = string.Join(", ", seriesGroup.Select(s => s.Value.Name).ToArray()),
                         Position = AxisPosition.RightTop
                     });
+
+                    // Build the series
+                    foreach (var quantSeries in seriesGroup.Select(sg => sg.Value))
+                    {
+                        var series = BuildSeries(quantSeries);
+                        model.SeriesCollection.Add(series);
+                    }
+                }
+
+                // Update the series
+                var seriesIndex = 0;
+                foreach (var quantSeries in seriesGroup.Select(sg => sg.Value))
+                {
+                    var series = model.SeriesCollection[seriesIndex];
+
+                    var updates = quantSeries.Since(LastUpdated);
+                    UpdateSeries(series, updates);
+                    seriesIndex++;
+
+                    lastUpdate = TimeStamp.FromSeconds(quantSeries.Values[quantSeries.Values.Count - 1].x);                    
                 }
             }
 
-            // Build Series
-            var yAxeIndex = 0;
 
-            var isNewSeries = SeriesCollection.Count == 0;
-            if (isNewSeries)
+            // Build summary series
+            if (SummarySeriesCollection.Count == 0)
             {
-                // Build the series
-                foreach (var quantSeries in chart.Series.Values)
-                {
-                    var series = BuildSeries(quantSeries);
-                    series.ScalesYAt = quantSeries.Index;
-                    SeriesCollection.Add(series);
-                    yAxeIndex++;
-                }
-
-                // Build the summary series
-                var summarySeries = BuildSeries(chart.Series.Values.First());
-                SummarySeriesCollection.Add(summarySeries);
+                var newSummarySeries = BuildSeries(chart.Series.OrderBy(s => s.Value.Index).Select(s => s.Value).First());
+                SummarySeriesCollection.Add(newSummarySeries);
             }
 
-            // Update the series
-            yAxeIndex = 0;
-            var lastUpdate = TimeStamp.FromDays(0);
-            foreach (var quantSeries in chart.Series.Values)
+            // Update summary series
+            var summarySeries = SummarySeriesCollection.First();
+            var summarySeriesSource = chart.Series.First().Value;
+            var summaryUpdates = summarySeriesSource.Since(LastUpdated);
+            UpdateSeries(summarySeries, summaryUpdates);
+
+
+            if (ZoomTo == 1)
             {
-                var series = SeriesCollection[yAxeIndex];
-
-                var updates = quantSeries.Since(LastUpdated);
-                UpdateSeries(series, updates);
-                if (yAxeIndex == 0)
-                {
-                    var summarySeries = SummarySeriesCollection.First();
-                    UpdateSeries(summarySeries, updates);
-                }
-
-                if (isNewSeries && yAxeIndex == 0)
-                {
-                    // Use this first series for the from and to view
-                    ZoomFrom = 0;
-                    ZoomTo = quantSeries.Values.Count - 1;
-                    lastUpdate = TimeStamp.FromSeconds(quantSeries.Values[quantSeries.Values.Count - 1].x);
-                }
-                else
-                {
-                    lastUpdate = TimeStamp.FromSeconds(quantSeries.Values[quantSeries.Values.Count - 1].x);
-                }
-
-                yAxeIndex++;
+                // Zoom to the known number of values.
+                ZoomTo = SummarySeriesCollection[0].Values.Count;
             }
 
             // Update the last update
@@ -158,6 +155,14 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
             series.Configuration = ChartPointMapper;
             series.Title = qSeries.Name;
             series.PointGeometry = GetPointGeometry(qSeries.ScatterMarkerSymbol);
+            
+            // Default color is '0'.Do not replace the stroke in this case
+            if (qSeries.Color.Name != "0")  
+            {                
+                var color = System.Windows.Media.Color.FromArgb(qSeries.Color.A, qSeries.Color.R, qSeries.Color.G, qSeries.Color.B);
+                series.Stroke = new SolidColorBrush(color);
+                //series.Fill = new SolidColorBrush(System.Windows.Media.Color.FromArgb(50, color.R, color.G, color.B));
+            }
             series.Fill = Brushes.Transparent;
 
             return series;
@@ -208,22 +213,12 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
             }
         }
 
-        public AxesCollection YAxesCollection
+        public ObservableCollection<ChartSeriesCollectionViewModel> GroupedSeries
         {
-            get { return _yAxesCollection; }
+            get { return _seriesCollections; }
             set
             {
-                _yAxesCollection = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        public SeriesCollection SeriesCollection
-        {
-            get { return _seriesCollection; }
-            set
-            {
-                _seriesCollection = value;
+                _seriesCollections = value;
                 RaisePropertyChanged();
             }
         }
@@ -243,7 +238,7 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
             switch (symbol)
             {
                 case ScatterMarkerSymbol.None:
-                    return DefaultGeometries.Circle;
+                    return DefaultGeometries.None;
 
                 case ScatterMarkerSymbol.Circle:
                     return DefaultGeometries.Circle;
@@ -266,9 +261,11 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
 
         protected override TimeStamp GetXTimeStamp(int index)
         {
-            var refCollection = _seriesCollection[0];
-            index = Math.Min(index, refCollection.Values.Count - 1);
-            var timeStampSource = (ITimeStampChartPoint)refCollection.Values[index];
+            var referenceSeries = SummarySeriesCollection.FirstOrDefault();
+            if (referenceSeries == null) return new TimeStamp();
+
+            index = Math.Min(index, referenceSeries.Values.Count - 1);
+            var timeStampSource = (ITimeStampChartPoint)referenceSeries.Values[index];
             return timeStampSource.X;
         }
     }

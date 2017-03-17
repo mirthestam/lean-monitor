@@ -124,6 +124,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppRegistry.cs" />
+    <None Include="Demo\DemoAlgorithm.cs" />
     <Compile Include="Model\IResultSerializer.cs" />
     <Compile Include="Model\LogItemType.cs" />
     <Compile Include="Model\Messages\SessionClosedMessage.cs" />
@@ -158,6 +159,7 @@
     <Compile Include="Utils\SeriesExt.cs" />
     <Compile Include="Model\Charting\ChartResolution.cs" />
     <Compile Include="Model\Messages\GridRequestMessage.cs" />
+    <Compile Include="ViewModel\Charts\ChartSeriesCollectionViewModel.cs" />
     <Compile Include="ViewModel\Charts\GridPanelViewModelBase.cs" />
     <Compile Include="ViewModel\Charts\GridPoint.cs" />
     <Compile Include="ViewModel\Charts\GridSerie.cs" />
@@ -309,7 +311,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="demo.json">
+    <None Include="Demo\DemoAlgorithm.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />

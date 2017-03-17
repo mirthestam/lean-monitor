@@ -17,7 +17,7 @@ namespace QuantConnect.Lean.Monitor.ViewModel
         // TODO: Use provider for default / last used parameters
         private readonly FileSessionParameters _fileSessionParameters = new FileSessionParameters
         {
-            FileName = "demo.json",
+            FileName = "Demo\\DemoAlgorithm.json",
             Watch = true
         };
 
