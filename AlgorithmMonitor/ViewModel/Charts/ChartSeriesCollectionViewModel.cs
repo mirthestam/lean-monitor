@@ -57,5 +57,9 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
                 RaisePropertyChanged();
             }
         }
+
+        public bool ShowLabels => Index == 0;
+
+        public bool ShowLegend => false;
     }
 }

@@ -63,7 +63,7 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
 
             // Group series by their Index.
             // This index is the index of a chart they need to be drawn upon.
-            foreach (var seriesGroup in chart.Series.OrderBy(s => s.Value.Index).GroupBy(s => s.Value.Index))            
+            foreach (var seriesGroup in chart.Series.OrderByDescending(s => s.Value.Index).GroupBy(s => s.Value.Index))            
             {
                 // Get the model representing this index
                 var model = GroupedSeries.FirstOrDefault(g => g.Index == seriesGroup.Key);

@@ -35,12 +35,14 @@
                 <ItemsControl Name="DataSource" ItemsSource="{Binding GroupedSeries}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <UniformGrid Columns="1"></UniformGrid>
+                            <DockPanel LastChildFill="True"/>
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemContainerStyle>
                         <Style TargetType="ContentPresenter">
-                            <Setter Property="DataContext" Value="{Binding}"></Setter>
+                            <Setter Property="DockPanel.Dock" Value="Bottom"/>
+                            <Setter Property="MinHeight" Value="200"/>
+                            <Setter Property="DataContext" Value="{Binding}"/>
                         </Style>
                     </ItemsControl.ItemContainerStyle>
                     <ItemsControl.ItemTemplate>
@@ -50,8 +52,17 @@
                             Zoom="X"                            
                             AxisY="{Binding YAxesCollection}"
                             Series="{Binding SeriesCollection}"
-                            LegendLocation="Top"
+                            LegendLocation="None"
                 Hoverable="False">
+                                <wpf:CartesianChart.Resources>
+                                    <Style TargetType="{x:Type wpf:CartesianChart}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ShowLegend}" Value="True">
+                                                <Setter Property="LegendLocation" Value="Top"></Setter>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </wpf:CartesianChart.Resources>
                                 <wpf:CartesianChart.AxisX>
                                     <wpf:Axis
                                     MinValue="{Binding Path=Chart.ZoomFrom, Mode=TwoWay}"
@@ -59,7 +70,20 @@
                                     LabelFormatter="{Binding Chart.XFormatter, Mode=TwoWay}"
                                     ShowLabels="true"              
                                     Position="RightTop"                                    
-                                    Separator="{x:Static wpf:DefaultAxes.CleanSeparator}"/>
+                                    Separator="{x:Static wpf:DefaultAxes.CleanSeparator}">
+                                        <wpf:Axis.Resources>
+                                            <Style TargetType="{x:Type wpf:Axis}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ShowLabels}" Value="False">
+                                                        <!-- The Axis contains a showlabels property. However when disabling, the chart will be drawn differently. -->
+                                                        <!-- By making it inivisible, it still sizes like the other charts -->
+                                                        <Setter Property="Foreground" Value="Transparent"/>
+                                                        <Setter Property="Height" Value="0"></Setter>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </wpf:Axis.Resources>
+                                    </wpf:Axis>
                                 </wpf:CartesianChart.AxisX>
                             </wpf:CartesianChart>
                         </DataTemplate>
