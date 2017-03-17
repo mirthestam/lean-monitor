@@ -79,7 +79,16 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
                     {
                         // Title is with combined series
                         Title = string.Join(", ", seriesGroup.Select(s => s.Value.Name).ToArray()),
-                        Position = AxisPosition.RightTop
+                        Position = AxisPosition.RightTop,
+                        Sections = new SectionsCollection
+                        {
+                            new AxisSection
+                            {
+                                Value = 0,
+                                Stroke = Brushes.Gray,
+                                StrokeThickness = 1,
+                            }
+                        }
                     });
 
                     // Build the series
