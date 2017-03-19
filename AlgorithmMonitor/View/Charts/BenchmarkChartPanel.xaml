@@ -41,7 +41,7 @@
                             Hoverable="False">
                 <lvc:CartesianChart.Series>
                     <geared:GLineSeries Title="Benchmark"
-                                    Configuration="{Binding ChartPointMapper}"
+                                    Configuration="{Binding ChartPointEvaluator}"
                                     Fill="Transparent"                                                           
                                     Visibility="{Binding IsBenchmarkVisible, Converter={StaticResource BooleanToVisibilityConverter}}"                                    
                                     Values="{Binding BenchmarkChartValues}"/>
@@ -71,7 +71,7 @@
                     <geared:GLineSeries Title="Benchmark"
                                     Fill="Transparent"                                    
                                     PointGeometry="{x:Null}"
-                                    Configuration="{Binding ChartPointMapper}"
+                                    Configuration="{Binding ChartPointEvaluator}"
                                     Visibility="{Binding IsBenchmarkVisible, Converter={StaticResource BooleanToVisibilityConverter}}"                                    
                                     Values="{Binding BenchmarkChartValues}"/>
                 </lvc:CartesianChart.Series>

@@ -7,7 +7,7 @@ namespace QuantConnect.Lean.Monitor.Utils
     /// <summary>
     /// Represents a moment in time, expressed in units elasped since Thursday, 1 January 1970
     /// </summary>
-    public struct TimeStamp : IComparable, IComparable<TimeStamp>
+    public struct TimeStamp : IComparable, IComparable<TimeStamp>, IEquatable<TimeStamp>
     {
         private TimeSpan _timeSpan;
 
@@ -107,6 +107,22 @@ namespace QuantConnect.Lean.Monitor.Utils
         public int CompareTo(object obj)
         {
             return obj == null ? 1 : CompareTo((TimeStamp)obj);
+        }
+
+        public bool Equals(TimeStamp other)
+        {
+            return _timeSpan.Equals(other._timeSpan);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            return obj is TimeStamp && Equals((TimeStamp) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return _timeSpan.GetHashCode();
         }
     }
 }

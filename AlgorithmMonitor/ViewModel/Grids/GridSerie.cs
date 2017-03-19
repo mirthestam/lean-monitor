@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace QuantConnect.Lean.Monitor.ViewModel.Charts
+namespace QuantConnect.Lean.Monitor.ViewModel.Grids
 {
     public class GridSerie : List<GridPoint>
     {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Media;
@@ -18,11 +19,37 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
     /// View model for generic charts
     /// </summary>
     public class ChartViewModel : ChartViewModelBase, IChartParser
-    {
-        private ObservableCollection<ChartSeriesCollectionViewModel> _seriesCollections = new ObservableCollection<ChartSeriesCollectionViewModel>();
-        private SeriesCollection _summarySeriesCollection = new SeriesCollection();
-        
+    {        
+        private ObservableCollection<ChildChartViewModel> _children = new ObservableCollection<ChildChartViewModel>();
+        private SeriesCollection _scrollSeriesCollection = new SeriesCollection();        
+
         public override bool CanClose => false;
+
+        /// <summary>
+        /// Gets or sets the children of this chart
+        /// </summary>
+        public ObservableCollection<ChildChartViewModel> Children
+        {
+            get { return _children; }
+            set
+            {
+                _children = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the seriesCollection of the horizontal scroll bar chart
+        /// </summary>
+        public SeriesCollection ScrollSeriesCollection
+        {
+            get { return _scrollSeriesCollection; }
+            set
+            {
+                _scrollSeriesCollection = value;
+                RaisePropertyChanged();
+            }
+        }
 
         public static ChartResolution DetectResolution(QuantChartSeries series)
         {
@@ -51,37 +78,40 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
             throw new Exception("Resolution is below second which is not supported.");
         }
 
-        public void ParseChart(Chart chart)
+        public void ParseChart(Chart sourceChart)
         {
             // Update the title
-            Title = chart.Name;
+            Title = sourceChart.Name;
 
             // Validate the chart
-            if (chart.Series.Count == 0) return;
+            if (sourceChart.Series.Count == 0) return;
 
             var lastUpdate = TimeStamp.FromDays(0);
 
             // Group series by their Index.
             // This index is the index of a chart they need to be drawn upon.
-            foreach (var seriesGroup in chart.Series.OrderByDescending(s => s.Value.Index).GroupBy(s => s.Value.Index))            
+            foreach (var sourceSeriesGroup in sourceChart.Series
+                .OrderByDescending(s => s.Value.Index)
+                .GroupBy(s => s.Value.Index))            
             {
                 // Get the model representing this index
-                var model = GroupedSeries.FirstOrDefault(g => g.Index == seriesGroup.Key);
-                if (model == null)
+                var childModel = Children.FirstOrDefault(g => g.Index == sourceSeriesGroup.Key);
+                if (childModel == null)
                 {
                     // Build a new model
-                    model = new ChartSeriesCollectionViewModel(seriesGroup.Key, this);
-                    GroupedSeries.Add(model);
-                    model.Index = seriesGroup.Key;
+                    childModel = new ChildChartViewModel(sourceSeriesGroup.Key, this);
+                    Children.Add(childModel);
+                    childModel.Index = sourceSeriesGroup.Key;
 
                     // Create Y axis for the series
-                    model.YAxesCollection.Add(new Axis
+                    childModel.YAxesCollection.Add(new Axis
                     {
                         // Title is with combined series
-                        Title = string.Join(", ", seriesGroup.Select(s => s.Value.Name).ToArray()),
+                        Title = string.Join(", ", sourceSeriesGroup.Select(s => s.Value.Name).ToArray()),
                         Position = AxisPosition.RightTop,
                         Sections = new SectionsCollection
                         {
+                            // Horizontal 0 value line
                             new AxisSection
                             {
                                 Value = 0,
@@ -92,18 +122,22 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
                     });
 
                     // Build the series
-                    foreach (var quantSeries in seriesGroup.Select(sg => sg.Value))
+                    foreach (var quantSeries in sourceSeriesGroup
+                        .OrderByDescending(sg => sg.Value.Values.Count)
+                        .Select(sg => sg.Value))
                     {
                         var series = BuildSeries(quantSeries);
-                        model.SeriesCollection.Add(series);
+                        childModel.SeriesCollection.Add(series);
                     }
                 }
 
                 // Update the series
                 var seriesIndex = 0;
-                foreach (var quantSeries in seriesGroup.Select(sg => sg.Value))
+                foreach (var quantSeries in sourceSeriesGroup
+                    .OrderByDescending(sg => sg.Value.Values.Count)
+                    .Select(sg => sg.Value))
                 {
-                    var series = model.SeriesCollection[seriesIndex];
+                    var series = childModel.SeriesCollection[seriesIndex];
 
                     var updates = quantSeries.Since(LastUpdated);
                     UpdateSeries(series, updates);
@@ -114,24 +148,29 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
             }
 
 
-            // Build summary series
-            if (SummarySeriesCollection.Count == 0)
+            var sourceScrollSeries = sourceChart.Series
+                .Select(s => s.Value)
+                .OrderByDescending(s => s.SeriesType == SeriesType.Line)
+                .ThenByDescending(s => s.SeriesType == SeriesType.Candle)
+                .First(s => s.Index == 0);
+
+            var scrollSeries = (LiveChartSeries) ScrollSeriesCollection.FirstOrDefault();
+            if (scrollSeries == null)
             {
-                var newSummarySeries = BuildSeries(chart.Series.OrderBy(s => s.Value.Index).Select(s => s.Value).First());
-                SummarySeriesCollection.Add(newSummarySeries);
+                scrollSeries = BuildSeries(sourceScrollSeries);
+                ScrollSeriesCollection.Add(scrollSeries);
             }
 
-            // Update summary series
-            var summarySeries = SummarySeriesCollection.First();
-            var summarySeriesSource = chart.Series.First().Value;
-            var summaryUpdates = summarySeriesSource.Since(LastUpdated);
-            UpdateSeries(summarySeries, summaryUpdates);
+            var scrollSeriesUpdates = sourceScrollSeries.Since(LastUpdated);
+            UpdateSeries(scrollSeries, scrollSeriesUpdates);
 
+            // Update our timestamps based upon the new updates for the scroll series
+            TimeStamps.AddRange(scrollSeriesUpdates.Values.Select(v => v.ToTimeStampChartPoint().X));
 
             if (ZoomTo == 1)
             {
                 // Zoom to the known number of values.
-                ZoomTo = SummarySeriesCollection[0].Values.Count;
+                ZoomTo = ScrollSeriesCollection[0].Values.Count;
             }
 
             // Update the last update
@@ -139,72 +178,86 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
 
         }
 
-        private LiveChartSeries BuildSeries(QuantChartSeries qSeries)
+        private LiveChartSeries BuildSeries(QuantChartSeries sourceSeries)
         {
             LiveChartSeries series;
 
-            switch (qSeries.SeriesType)
+            switch (sourceSeries.SeriesType)
             {
                 case SeriesType.Line:
-                    series = new GLineSeries();
+                    series = new GLineSeries
+                    {
+                        Configuration = ChartPointEvaluator,
+                        Fill = Brushes.Transparent
+                    };
                     break;
 
                 case SeriesType.Bar:
-                    series = new GColumnSeries();
+                    series = new GColumnSeries
+                    {
+                        Configuration = ChartPointEvaluator,
+                        Fill = Brushes.Transparent
+                    };
                     break;
 
                 case SeriesType.Candle:
-                    series = new GOhlcSeries();
+                    series = new GOhlcSeries
+                    {
+                        Configuration = OhlcChartPointEvaluator,
+                        Fill = Brushes.Transparent
+                    };
+                    break;
+
+                case SeriesType.Scatter:
+                    series = new GScatterSeries
+                    {
+                        Configuration = ChartPointEvaluator,
+                        StrokeThickness = 1
+                    };
                     break;
 
                 default:
                     throw new NotSupportedException();
             }
 
-            series.Configuration = ChartPointMapper;
-            series.Title = qSeries.Name;
-            series.PointGeometry = GetPointGeometry(qSeries.ScatterMarkerSymbol);
+            series.Title = sourceSeries.Name;
+            series.PointGeometry = GetPointGeometry(sourceSeries.ScatterMarkerSymbol);
             
             // Default color is '0'.Do not replace the stroke in this case
-            if (qSeries.Color.Name != "0")  
+            if (sourceSeries.Color.Name != "0")  
             {                
-                var color = System.Windows.Media.Color.FromArgb(qSeries.Color.A, qSeries.Color.R, qSeries.Color.G, qSeries.Color.B);
+                var color = System.Windows.Media.Color.FromArgb(sourceSeries.Color.A, sourceSeries.Color.R, sourceSeries.Color.G, sourceSeries.Color.B);
                 series.Stroke = new SolidColorBrush(color);
-                //series.Fill = new SolidColorBrush(System.Windows.Media.Color.FromArgb(50, color.R, color.G, color.B));
+                if (!Equals(series.Fill, Brushes.Transparent))
+                {
+                    series.Fill = new SolidColorBrush(System.Windows.Media.Color.FromArgb(50, color.R, color.G, color.B));    
+                }
             }
-            series.Fill = Brushes.Transparent;
 
             return series;
         }
 
-        private void UpdateSeries(ISeriesView series, QuantChartSeries qSeries)
+        private void UpdateSeries(ISeriesView targetSeries, QuantChartSeries sourceSeries)
         {
-            var detectedResolution = DetectResolution(qSeries);
-            if (Resolution > detectedResolution)
-            {
-                Resolution = detectedResolution;
-            }
+            // Detect the data resolution of the source series.
+            // Use it as chart resolution if needed.
+            var detectedResolution = DetectResolution(sourceSeries);
+            if (Resolution > detectedResolution) Resolution = detectedResolution;
 
             // QuantChart series are unix timestamp
-            switch (qSeries.SeriesType)
+            switch (sourceSeries.SeriesType)
             {
-                case SeriesType.Line:
-                    var existingLineValues = (GearedValues<TimeStampChartPoint>) (series.Values ?? (series.Values = new GearedValues<TimeStampChartPoint>()));
-                    existingLineValues.AddRange(qSeries.Values.Select(cp => cp.ToTimeStampChartPoint()));
-
-                    // Update range
-                    break;
-
+                case SeriesType.Scatter:
                 case SeriesType.Bar:
-                    var existingBarValues = (GearedValues<TimeStampChartPoint>)(series.Values ?? (series.Values = new GearedValues<TimeStampChartPoint>()));
-                    existingBarValues.AddRange(qSeries.Values.Select(cp => cp.ToTimeStampChartPoint()));
+                case SeriesType.Line:
+                    var existingCommonValues = (GearedValues<TimeStampChartPoint>) (targetSeries.Values ?? (targetSeries.Values = new GearedValues<TimeStampChartPoint>()));
+                    existingCommonValues.AddRange(sourceSeries.Values.Select(cp => cp.ToTimeStampChartPoint()));
                     break;
 
                 case SeriesType.Candle:
                     // Build daily candles
-                    // TODO: Candle allows for custom resolution
-                    var existingCandleValues = (GearedValues<TimeStampOhlcChartPoint>)(series.Values ?? (series.Values = new GearedValues<TimeStampOhlcChartPoint>()));
-                    var newValues = qSeries.Values.Select(cp => cp.ToTimeStampChartPoint()).GroupBy(cp => cp.X).Select(
+                    var existingCandleValues = (GearedValues<TimeStampOhlcChartPoint>)(targetSeries.Values ?? (targetSeries.Values = new GearedValues<TimeStampOhlcChartPoint>()));
+                    var newValues = sourceSeries.Values.Select(cp => cp.ToTimeStampChartPoint()).GroupBy(cp => cp.X.ElapsedDays).Select(
                         g =>
                         {
                             return new TimeStampOhlcChartPoint
@@ -219,26 +272,9 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
 
                     existingCandleValues.AddRange(newValues);
                     break;
-            }
-        }
 
-        public ObservableCollection<ChartSeriesCollectionViewModel> GroupedSeries
-        {
-            get { return _seriesCollections; }
-            set
-            {
-                _seriesCollections = value;
-                RaisePropertyChanged();
-            }
-        }
-
-        public SeriesCollection SummarySeriesCollection
-        {
-            get { return _summarySeriesCollection; }
-            set
-            {
-                _summarySeriesCollection = value;
-                RaisePropertyChanged();
+                default:
+                    throw new Exception($"SeriesType {sourceSeries.SeriesType} is not supported.");
             }
         }
 
@@ -266,16 +302,6 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
                     return DefaultGeometries.Circle;
 
             }
-        }
-
-        protected override TimeStamp GetXTimeStamp(int index)
-        {
-            var referenceSeries = SummarySeriesCollection.FirstOrDefault();
-            if (referenceSeries == null) return new TimeStamp();
-
-            index = Math.Min(index, referenceSeries.Values.Count - 1);
-            var timeStampSource = (ITimeStampChartPoint)referenceSeries.Values[index];
-            return timeStampSource.X;
         }
     }
 }

@@ -89,13 +89,6 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
             LastUpdated = EquityChartValues[EquityChartValues.Count - 1].X;
         }
 
-        protected override TimeStamp GetXTimeStamp(int index)
-        {
-            // Our X index is based upon the Ohlc chart values.
-            index = Math.Min(index, _equityOhlcChartValues.Count - 1);
-            return _equityOhlcChartValues[index].X;
-        }
-
         private void ParseDailyPerformance(Result result)
         {
             Chart chart;
@@ -148,6 +141,7 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
                     }).ToList();
 
             EquityOhlcChartValues.AddRange(values);
+            TimeStamps.AddRange(values.Select(v => v.X));
 
             // Update normal chart with only the close values
             EquityChartValues.AddRange(values.Select(v => new TimeStampChartPoint
@@ -161,7 +155,7 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
             {
                 ZoomFrom = 0;
                 ZoomTo = EquityChartValues.Count - 1;
-            }
+            }            
         }
 
         private void ParseBenchmark(Result result)
@@ -194,7 +188,7 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
                 }
                 else
                 {
-                    y = relValues[i - 1].Y * (curBenchmarkValue / prefBenchmarkValue);
+                    y = relValues[i - 1].Y* (curBenchmarkValue / prefBenchmarkValue);
                 }
                 relValues.Add(new TimeStampChartPoint(x, y));
             }

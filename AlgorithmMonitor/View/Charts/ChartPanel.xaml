@@ -32,7 +32,7 @@
 
             <!-- Equity chart -->
             <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <ItemsControl Name="DataSource" ItemsSource="{Binding GroupedSeries}">
+                <ItemsControl Name="DataSource" ItemsSource="{Binding Children}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <DockPanel LastChildFill="True"/>
@@ -65,9 +65,9 @@
                                 </wpf:CartesianChart.Resources>
                                 <wpf:CartesianChart.AxisX>
                                     <wpf:Axis
-                                    MinValue="{Binding Path=Chart.ZoomFrom, Mode=TwoWay}"
-                                    MaxValue="{Binding Path=Chart.ZoomTo, Mode=TwoWay}"
-                                    LabelFormatter="{Binding Chart.XFormatter, Mode=TwoWay}"
+                                    MinValue="{Binding Path=Parent.ZoomFrom, Mode=TwoWay}"
+                                    MaxValue="{Binding Path=Parent.ZoomTo, Mode=TwoWay}"
+                                    LabelFormatter="{Binding Parent.XFormatter, Mode=TwoWay}"
                                     ShowLabels="true"              
                                     Position="RightTop"                                    
                                     Separator="{x:Static wpf:DefaultAxes.CleanSeparator}">
@@ -96,7 +96,7 @@
                             ScrollHorizontalFrom="{Binding ZoomFrom, Mode=TwoWay}"
                             ScrollHorizontalTo="{Binding ZoomTo, Mode=TwoWay}"
                             DisableAnimations="True" 
-                            Series="{Binding SummarySeriesCollection}"
+                            Series="{Binding ScrollSeriesCollection}"
                             DataTooltip="{x:Null}">
 
                 <wpf:CartesianChart.AxisX>

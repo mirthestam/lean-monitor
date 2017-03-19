@@ -1,6 +1,7 @@
 using System.Collections.Generic;
+using QuantConnect.Lean.Monitor.ViewModel.Charts;
 
-namespace QuantConnect.Lean.Monitor.ViewModel.Charts
+namespace QuantConnect.Lean.Monitor.ViewModel.Grids
 {
     /// <summary>
     /// Abstract view model for grid views (i.e. Generic grid, Strategy Equity grid)

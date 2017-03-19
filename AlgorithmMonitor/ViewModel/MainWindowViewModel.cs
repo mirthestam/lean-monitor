@@ -11,6 +11,7 @@ using QuantConnect.Lean.Monitor.Model;
 using QuantConnect.Lean.Monitor.Model.Messages;
 using QuantConnect.Lean.Monitor.Model.Sessions;
 using QuantConnect.Lean.Monitor.ViewModel.Charts;
+using QuantConnect.Lean.Monitor.ViewModel.Grids;
 
 namespace QuantConnect.Lean.Monitor.ViewModel
 {

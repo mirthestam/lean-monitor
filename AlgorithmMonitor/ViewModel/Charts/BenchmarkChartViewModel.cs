@@ -50,14 +50,6 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
             LastUpdated = BenchmarkChartValues[BenchmarkChartValues.Count - 1].X;
         }
 
-        protected override TimeStamp GetXTimeStamp(int index)
-        {
-            index = Math.Min(index, _benchmarkChartValues.Count - 1);
-            return _benchmarkChartValues.Count < index
-                ? new TimeStamp()
-                : _benchmarkChartValues[index].X;
-        }
-
         private void ParseBenchmark(Result result)
         {
             Chart chart;
@@ -67,8 +59,9 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
             if (!chart.Series.TryGetValue("Benchmark", out series)) return;
             series = series.Since(LastUpdated);
 
-            var values = series.Values.Select(cp => cp.ToTimeStampChartPoint());
+            var values = series.Values.Select(cp => cp.ToTimeStampChartPoint()).ToList();
             BenchmarkChartValues.AddRange(values);
+            TimeStamps.AddRange(values.Select(v => v.X));
 
             // Update the view window for the chart
             ZoomFrom = 0;

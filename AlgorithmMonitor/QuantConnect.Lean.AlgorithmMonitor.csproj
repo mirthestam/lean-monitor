@@ -125,6 +125,8 @@
     </ApplicationDefinition>
     <Compile Include="AppRegistry.cs" />
     <None Include="Demo\DemoAlgorithm.cs" />
+    <Compile Include="Model\Charting\FinancialMapperBase.cs" />
+    <Compile Include="Model\Charting\OhlcTimeStampChartPointMapper.cs" />
     <Compile Include="Model\IResultSerializer.cs" />
     <Compile Include="Model\LogItemType.cs" />
     <Compile Include="Model\Messages\SessionClosedMessage.cs" />
@@ -159,17 +161,20 @@
     <Compile Include="Utils\SeriesExt.cs" />
     <Compile Include="Model\Charting\ChartResolution.cs" />
     <Compile Include="Model\Messages\GridRequestMessage.cs" />
-    <Compile Include="ViewModel\Charts\ChartSeriesCollectionViewModel.cs" />
-    <Compile Include="ViewModel\Charts\GridPanelViewModelBase.cs" />
-    <Compile Include="ViewModel\Charts\GridPoint.cs" />
-    <Compile Include="ViewModel\Charts\GridSerie.cs" />
+    <Compile Include="Model\Charting\CartesianMapperBase.cs" />
+    <Compile Include="ViewModel\Charts\ChildChartViewModel.cs" />
+    <Compile Include="ViewModel\Grids\GridPanelViewModelBase.cs" />
+    <Compile Include="ViewModel\Grids\GridPoint.cs" />
+    <Compile Include="ViewModel\Grids\GridSerie.cs" />
     <Compile Include="ViewModel\Charts\IChartParser.cs" />
     <Compile Include="ViewModel\Charts\IResultParser.cs" />
+    <Compile Include="Model\Charting\ITimeStampSource.cs" />
     <Compile Include="ViewModel\Charts\StrategyEquityChartViewModel.cs" />
     <Compile Include="ViewModel\Charts\ChartViewModelBase.cs" />
-    <Compile Include="ViewModel\Charts\GridPanelViewModel.cs" />
+    <Compile Include="ViewModel\Grids\GridPanelViewModel.cs" />
     <Compile Include="ViewModel\Charts\ChartViewModel.cs" />
     <Compile Include="Model\Charting\TimeStampOhlcChartPoint.cs" />
+    <Compile Include="Model\Charting\TimeStampChartPointMapper.cs" />
     <Compile Include="ViewModel\Panels\LogPanelItemViewModel.cs" />
     <Compile Include="ViewModel\Panels\LogPanelViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
@@ -179,7 +184,7 @@
     <Compile Include="ViewModel\Panels\RollingStatisticsItemViewModel.cs" />
     <Compile Include="ViewModel\Panels\RollingStatisticsPanelViewModel.cs" />
     <Compile Include="ViewModel\Panels\RuntimeStatisticsPanelViewModel.cs" />
-    <Compile Include="ViewModel\Charts\DocumentViewModel.cs" />
+    <Compile Include="ViewModel\DocumentViewModel.cs" />
     <Compile Include="ViewModel\NewSessionWindowViewModel.cs" />
     <Compile Include="ViewModel\Panels\StatisticsPanelViewModel.cs" />
     <Compile Include="ViewModel\Panels\StatisticViewModel.cs" />

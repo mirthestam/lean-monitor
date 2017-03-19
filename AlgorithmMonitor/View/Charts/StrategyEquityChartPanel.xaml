@@ -46,7 +46,7 @@
                     <geared:GLineSeries Title="Benchmark"
                                     Fill="Transparent"
                                     Stroke="LightBlue"
-                                    Configuration="{Binding ChartPointMapper}"
+                                    Configuration="{Binding ChartPointEvaluator}"
                                     Visibility="{Binding IsBenchmarkSeriesVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
                                     Values="{Binding BenchmarkChartValues}"/>
                     <geared:GOhlcSeries Title="Equity"
@@ -54,7 +54,7 @@
                                     IncreaseBrush="PaleVioletRed"                                        
                                     DecreaseBrush="LightGreen"
                                     StrokeThickness="2"
-                                    Configuration="{Binding OhlcChartPointMapper}"
+                                    Configuration="{Binding OhlcChartPointEvaluator}"
                                     Values="{Binding EquityOhlcChartValues}"/>
                 </lvc:CartesianChart.Series>
                 <lvc:CartesianChart.AxisX>
@@ -79,7 +79,7 @@
                             Visibility="{Binding IsDailyPerformanceSeriesVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <lvc:CartesianChart.Series>
                     <geared:GColumnSeries Title="Daily Performance"
-                                    Configuration="{Binding ChartPointMapper}"
+                                    Configuration="{Binding ChartPointEvaluator}"
                                     Values="{Binding DailyPerformanceChartValues}"/>
                 </lvc:CartesianChart.Series>
                 <lvc:CartesianChart.AxisX>
@@ -105,7 +105,7 @@
                 <lvc:CartesianChart.Series>
                     <geared:GLineSeries Title="Equity"
                                     PointGeometry="{x:Null}"
-                                    Configuration="{Binding ChartPointMapper}"
+                                    Configuration="{Binding ChartPointEvaluator}"
                                     Fill="Transparent"
                                     Values="{Binding EquityChartValues}"/>
                 </lvc:CartesianChart.Series>

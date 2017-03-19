@@ -1,8 +1,8 @@
 using System.Linq;
-using QuantConnect.Lean.Monitor.Model.Charting;
 using QuantConnect.Lean.Monitor.Utils;
+using QuantConnect.Lean.Monitor.ViewModel.Charts;
 
-namespace QuantConnect.Lean.Monitor.ViewModel.Charts
+namespace QuantConnect.Lean.Monitor.ViewModel.Grids
 {
     /// <summary>
     /// View model for generic chart grid
@@ -26,19 +26,13 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
                 holder.AddRange(s.Values.Select(p => new GridPoint
                 {
                     // Use the actual timestamp as the X value
-                    X = DateTimeExt.FromTimeStamp(p.x).ToString("yy-MM-dd HH:mm"),
+                    X = DateTimeExt.FromTimeStamp(p.x).ToString("yy-MM-dd HH:mm:ss"),
                     Y = p.y
                 }));
                 return holder;
             }).ToList();
 
             SelectedSeries = Series.First();
-        }
-
-        protected override TimeStamp GetXTimeStamp(int index)
-        {
-            // TODO: Review whether this is needed for grid panels
-            return TimeStamp.FromDays(index);
         }
     }
 }

@@ -8,6 +8,7 @@
         xmlns:charts1="clr-namespace:QuantConnect.Lean.Monitor.View.Charts"
         xmlns:view="clr-namespace:QuantConnect.Lean.Monitor.View"
         xmlns:panels="clr-namespace:QuantConnect.Lean.Monitor.View.Panels"
+        xmlns:grids="clr-namespace:QuantConnect.Lean.Monitor.ViewModel.Grids"
         mc:Ignorable="d"
         Background="{StaticResource WindowBackgroundBrush}"
         Foreground="{StaticResource ForegroundBrush}"
@@ -64,7 +65,7 @@
                     <charts1:ChartPanel/>
                 </DataTemplate>
 
-                <DataTemplate DataType="{x:Type charts:GridPanelViewModel}">
+                <DataTemplate DataType="{x:Type grids:GridPanelViewModel}">
                     <charts1:GridPanel/>
                 </DataTemplate>
 

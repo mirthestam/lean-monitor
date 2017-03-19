@@ -4,26 +4,26 @@ using LiveCharts.Wpf;
 
 namespace QuantConnect.Lean.Monitor.ViewModel.Charts
 {
-    public class ChartSeriesCollectionViewModel : ViewModelBase
+    public class ChildChartViewModel : ViewModelBase
     {
         private SeriesCollection _seriesCollection = new SeriesCollection();
         private AxesCollection _yAxesCollection = new AxesCollection();
         private int _index;
 
-        public ChartSeriesCollectionViewModel(int index, ChartViewModel chart)
+        public ChildChartViewModel(int index, ChartViewModel chart)
         {
             _index = index;
-            _chart = chart;
+            _parent = chart;
         }
 
-        private ChartViewModel _chart;
+        private ChartViewModel _parent;
 
-        public ChartViewModel Chart
+        public ChartViewModel Parent
         {
-            get { return _chart; }
+            get { return _parent; }
             set
             {
-                _chart = value;
+                _parent = value;
                 RaisePropertyChanged();
             }
         }
