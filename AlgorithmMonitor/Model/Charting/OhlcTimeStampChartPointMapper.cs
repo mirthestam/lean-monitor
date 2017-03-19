@@ -1,4 +1,4 @@
-namespace QuantConnect.Lean.Monitor.Model.Charting
+namespace Monitor.Model.Charting
 {
     public class OhlcTimeStampChartPointMapper : FinancialMapperBase<TimeStampOhlcChartPoint>
     {

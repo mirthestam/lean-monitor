@@ -1,9 +1,9 @@
 ﻿using GalaSoft.MvvmLight.Messaging;
-using QuantConnect.Lean.Monitor.Model;
-using QuantConnect.Lean.Monitor.Model.Sessions;
+using Monitor.Model;
+using Monitor.Model.Sessions;
 using StructureMap;
 
-namespace QuantConnect.Lean.Monitor
+namespace Monitor
 {
     public class AppRegistry : Registry
     {

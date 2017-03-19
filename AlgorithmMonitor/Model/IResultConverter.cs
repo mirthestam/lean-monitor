@@ -1,6 +1,6 @@
 using QuantConnect.Packets;
 
-namespace QuantConnect.Lean.Monitor.Model
+namespace Monitor.Model
 {
     public interface IResultConverter
     {

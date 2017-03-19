@@ -8,19 +8,21 @@ using LiveCharts.Definitions.Series;
 using LiveCharts.Geared;
 using LiveCharts.Geared.Geometries;
 using LiveCharts.Wpf;
-using QuantConnect.Lean.Monitor.Model.Charting;
-using QuantConnect.Lean.Monitor.Utils;
-using Color = System.Drawing.Color;
-using LiveChartSeries = LiveCharts.Wpf.Series;
-using QuantChartSeries = QuantConnect.Series;
+using Monitor.Model;
+using Monitor.Model.Charting;
+using Monitor.Utils;
 
-namespace QuantConnect.Lean.Monitor.ViewModel.Charts
+namespace Monitor.ViewModel.Charts
 {
     /// <summary>
     /// View model for generic charts
     /// </summary>
     public class ChartViewModel : ChartViewModelBase, IChartParser
-    {        
+    {
+        private readonly Dictionary<string, TimeStamp> _lastUpdates = new Dictionary<string, TimeStamp>();
+
+        private Color _defaultColor = Color.FromArgb(0, 0, 0, 0);
+
         private ObservableCollection<ChildChartViewModel> _children = new ObservableCollection<ChildChartViewModel>();
         private SeriesCollection _scrollSeriesCollection = new SeriesCollection();        
 
@@ -52,34 +54,34 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
             }
         }
 
-        public static ChartResolution DetectResolution(QuantChartSeries series)
+        public static Resolution DetectResolution(SeriesDefinition series)
         {
             if (series.SeriesType == SeriesType.Candle)
             {
                 // Candle data is supposed to be grouped.
                 // Currently we group candle data by day.
-                return ChartResolution.Day;
+                return Resolution.Day;
             }
 
-            var chartPoints = series.Values.Select(cp => cp.ToTimeStampChartPoint()).ToList();
+            var chartPoints = series.Values;
 
             // Check whether we have duplicates in day mode
             var dayDuplicates = chartPoints.GroupBy(cp => cp.X.ElapsedDays).Any(g => g.Count() > 1);
-            if (!dayDuplicates) return ChartResolution.Day;
+            if (!dayDuplicates) return Resolution.Day;
 
             var hourDuplicates = chartPoints.GroupBy(cp => cp.X.ElapsedHours).Any(g => g.Count() > 1);
-            if (!hourDuplicates) return ChartResolution.Hour;
+            if (!hourDuplicates) return Resolution.Hour;
 
             var minuteDuplicates = chartPoints.GroupBy(cp => cp.X.ElapsedMinutes).Any(g => g.Count() > 1);
-            if (!minuteDuplicates) return ChartResolution.Minute;
+            if (!minuteDuplicates) return Resolution.Minute;
 
             var secondDuplicates = chartPoints.GroupBy(cp => cp.X.ElapsedSeconds).Any(g => g.Count() > 1);
-            if (!secondDuplicates) return ChartResolution.Second;
+            if (!secondDuplicates) return Resolution.Second;
 
             throw new Exception("Resolution is below second which is not supported.");
         }
 
-        public void ParseChart(Chart sourceChart)
+        public void ParseChart(ChartDefinition sourceChart)
         {
             // Update the title
             Title = sourceChart.Name;
@@ -87,7 +89,7 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
             // Validate the chart
             if (sourceChart.Series.Count == 0) return;
 
-            var lastUpdate = TimeStamp.FromDays(0);
+            var lastUpdate = TimeStamp.MinValue;
 
             // Group series by their Index.
             // This index is the index of a chart they need to be drawn upon.
@@ -117,15 +119,13 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
                             {
                                 Value = 0,
                                 Stroke = Brushes.Gray,
-                                StrokeThickness = 1,
+                                StrokeThickness = 1
                             }
                         }
                     });
 
                     // Build the series
-                    foreach (var quantSeries in sourceSeriesGroup
-                        .OrderByDescending(sg => sg.Value.Values.Count)
-                        .Select(sg => sg.Value))
+                    foreach (var quantSeries in sourceSeriesGroup.Select(sg => sg.Value))
                     {
                         var series = BuildSeries(quantSeries);
                         childModel.SeriesCollection.Add(series);
@@ -134,20 +134,28 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
 
                 // Update the series
                 var seriesIndex = 0;
+
                 foreach (var quantSeries in sourceSeriesGroup
-                    .OrderByDescending(sg => sg.Value.Values.Count)
-                    .Select(sg => sg.Value))
+                    .Select(sg => sg.Value)
+                    .Where(v => v.Values.Count > 0))
                 {
                     var series = childModel.SeriesCollection[seriesIndex];
 
-                    var updates = quantSeries.Since(LastUpdated);
+                    if (!childModel.LastUpdates.ContainsKey(series.Title)) childModel.LastUpdates[series.Title] = TimeStamp.MinValue;
+
+                    var updates = quantSeries.Since(childModel.LastUpdates[series.Title]);
                     UpdateSeries(series, updates);
+                    if (updates.Values.Any()) childModel.LastUpdates[series.Title] = updates.Values.Last().X;
                     seriesIndex++;
 
-                    lastUpdate = TimeStamp.FromSeconds(quantSeries.Values[quantSeries.Values.Count - 1].x);                    
+                    var lastTimeStamp = quantSeries.Values[quantSeries.Values.Count - 1].X;
+                    if (lastTimeStamp.ElapsedSeconds > lastUpdate.ElapsedSeconds)
+                    {
+                        // This way we always take the biggest last update value from the series
+                        lastUpdate = lastTimeStamp;
+                    }
                 }
             }
-
 
             var sourceScrollSeries = sourceChart.Series
                 .Select(s => s.Value)
@@ -155,33 +163,31 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
                 .ThenByDescending(s => s.SeriesType == SeriesType.Candle)
                 .First(s => s.Index == 0);
 
-            var scrollSeries = (LiveChartSeries) ScrollSeriesCollection.FirstOrDefault();
+            var scrollSeries = (Series) ScrollSeriesCollection.FirstOrDefault();
             if (scrollSeries == null)
             {
                 scrollSeries = BuildSeries(sourceScrollSeries);
                 ScrollSeriesCollection.Add(scrollSeries);
             }
 
-            var scrollSeriesUpdates = sourceScrollSeries.Since(LastUpdated);
+            if (!_lastUpdates.ContainsKey("Scroll")) _lastUpdates["Scroll"] = TimeStamp.MinValue;            
+            var scrollSeriesUpdates = sourceScrollSeries.Since(_lastUpdates["Scroll"]);
             UpdateSeries(scrollSeries, scrollSeriesUpdates);
+            if (scrollSeriesUpdates.Values.Any()) _lastUpdates["Scroll"] = scrollSeriesUpdates.Values.Last().X;
 
             // Update our timestamps based upon the new updates for the scroll series
-            TimeStamps.AddRange(scrollSeriesUpdates.Values.Select(v => v.ToTimeStampChartPoint().X));
+            TimeStamps.AddRange(scrollSeriesUpdates.Values.Select(v => v.X));
 
             if (ZoomTo == 1)
             {
                 // Zoom to the known number of values.
                 ZoomTo = ScrollSeriesCollection[0].Values.Count;
             }
-
-            // Update the last update
-            LastUpdated = lastUpdate;
-
         }
 
-        private LiveChartSeries BuildSeries(QuantChartSeries sourceSeries)
+        private Series BuildSeries(SeriesDefinition sourceSeries)
         {
-            LiveChartSeries series;
+            Series series;
 
             switch (sourceSeries.SeriesType)
             {
@@ -205,7 +211,7 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
                     series = new GOhlcSeries
                     {
                         Configuration = OhlcChartPointEvaluator,
-                        Fill = Brushes.Transparent,
+                        Fill = Brushes.Transparent
                     };
                     break;
 
@@ -225,21 +231,17 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
             series.Title = sourceSeries.Name;
             series.PointGeometry = GetPointGeometry(sourceSeries.ScatterMarkerSymbol);
             
-            // Default color is '0'.Do not replace the stroke in this case
-            if (sourceSeries.Color.Name != "0")  
+            // Check whether the series has a color configured
+            if (!sourceSeries.Color.Equals(_defaultColor))
             {                
-                var color = System.Windows.Media.Color.FromArgb(sourceSeries.Color.A, sourceSeries.Color.R, sourceSeries.Color.G, sourceSeries.Color.B);
-                series.Stroke = new SolidColorBrush(color);
-                if (!Equals(series.Fill, Brushes.Transparent))
-                {
-                    series.Fill = new SolidColorBrush(System.Windows.Media.Color.FromArgb(50, color.R, color.G, color.B));    
-                }
+                // No default color present. use it for the stroke
+                series.Stroke = new SolidColorBrush(sourceSeries.Color);
             }
 
             return series;
         }
 
-        private void UpdateSeries(ISeriesView targetSeries, QuantChartSeries sourceSeries)
+        private void UpdateSeries(ISeriesView targetSeries, SeriesDefinition sourceSeries)
         {
             // Detect the data resolution of the source series.
             // Use it as chart resolution if needed.
@@ -253,13 +255,13 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
                 case SeriesType.Bar:
                 case SeriesType.Line:
                     var existingCommonValues = (GearedValues<TimeStampChartPoint>) (targetSeries.Values ?? (targetSeries.Values = new GearedValues<TimeStampChartPoint>()));
-                    existingCommonValues.AddRange(sourceSeries.Values.Select(cp => cp.ToTimeStampChartPoint()));
+                    existingCommonValues.AddRange(sourceSeries.Values);
                     break;
 
                 case SeriesType.Candle:
                     // Build daily candles
                     var existingCandleValues = (GearedValues<TimeStampOhlcChartPoint>)(targetSeries.Values ?? (targetSeries.Values = new GearedValues<TimeStampOhlcChartPoint>()));
-                    var newValues = sourceSeries.Values.Select(cp => cp.ToTimeStampChartPoint()).GroupBy(cp => cp.X.ElapsedDays).Select(
+                    var newValues = sourceSeries.Values.GroupBy(cp => cp.X.ElapsedDays).Select(
                         g =>
                         {
                             return new TimeStampOhlcChartPoint
@@ -279,7 +281,6 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
                     throw new Exception($"SeriesType {sourceSeries.SeriesType} is not supported.");
             }
         }
-
 
         private static GeometryShape GetGearedPointGeometry(ScatterMarkerSymbol symbol)
         {

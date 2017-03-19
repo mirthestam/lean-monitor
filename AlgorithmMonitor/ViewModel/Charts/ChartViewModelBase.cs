@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using LiveCharts.Configurations;
-using QuantConnect.Lean.Monitor.Model.Charting;
-using QuantConnect.Lean.Monitor.Model.Messages;
-using QuantConnect.Lean.Monitor.Utils;
+using Monitor.Model.Charting;
+using Monitor.Model.Messages;
+using Monitor.Utils;
 
-namespace QuantConnect.Lean.Monitor.ViewModel.Charts
+namespace Monitor.ViewModel.Charts
 {
     /// <summary>
     /// Base view model for charts (i.e. generic, Strategy Equity, Benchmark)
@@ -21,7 +21,6 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
 
         private int _zoomFrom;
         private int _zoomTo = 1;
-        private TimeStamp _lastUpdated = new TimeStamp(TimeSpan.Zero);
 
         /// <summary>
         /// Gets the list of TimeStamps. TimeStamps are our primarily X axis upon which all series indexes are mapped
@@ -33,7 +32,7 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
 
         public RelayCommand ShowGridCommand { get; private set; }
 
-        public ChartResolution Resolution { get; set; } = ChartResolution.Day;
+        public Model.Resolution Resolution { get; set; } = Model.Resolution.Day;
 
         public int ZoomTo
         {
@@ -55,16 +54,6 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
             }
         }
 
-        public TimeStamp LastUpdated
-        {
-            get { return _lastUpdated; }
-            set
-            {
-                _lastUpdated = value;
-                RaisePropertyChanged();
-            }
-        }
-
         public Func<double, string> XFormatter { get; set; }
         
         public IPointEvaluator<TimeStampChartPoint> ChartPointEvaluator => _chartPointEvaluator ?? (_chartPointEvaluator = new TimeStampChartPointMapper(this));
@@ -81,16 +70,16 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
         {
             switch (Resolution)
             {
-                case ChartResolution.Second:
+                case Model.Resolution.Second:
                     return TimeStamps.FindIndex(ts => ts.ElapsedSeconds == item.ElapsedSeconds);
 
-                case ChartResolution.Minute:
+                case Model.Resolution.Minute:
                     return TimeStamps.FindIndex(ts => ts.ElapsedMinutes == item.ElapsedMinutes);
 
-                case ChartResolution.Hour:
+                case Model.Resolution.Hour:
                     return TimeStamps.FindIndex(ts => ts.ElapsedHours == item.ElapsedHours);
 
-                case ChartResolution.Day:
+                case Model.Resolution.Day:
                     return TimeStamps.FindIndex(ts => ts.ElapsedDays == item.ElapsedDays);
 
                 default:
@@ -101,7 +90,7 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
         public TimeStamp GetTimeStamp(int index)
         {
             index = Math.Min(index, TimeStamps.Count - 1);
-            return TimeStamps[index];
+            return index < 0 ? TimeStamp.MinValue : TimeStamps[index];
         }
 
         private string FormatXLabel(int x)
@@ -118,19 +107,19 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
             string format;
             switch (Resolution)
             {
-                case ChartResolution.Second:
+                case Model.Resolution.Second:
                     format = SecondLabelFormat;
                     break;
 
-                case ChartResolution.Minute:
+                case Model.Resolution.Minute:
                     format = MinuteLabelFormat;
                     break;
 
-                case ChartResolution.Hour:
+                case Model.Resolution.Hour:
                     format = HourLabelFormat;
                     break;
 
-                case ChartResolution.Day:
+                case Model.Resolution.Day:
                     format = DayLabelFormat;
                     break;
 

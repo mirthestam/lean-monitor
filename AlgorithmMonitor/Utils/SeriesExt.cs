@@ -1,21 +1,29 @@
 ﻿using System.Linq;
-using QuantConnect.Lean.Monitor.Model.Charting;
+using Monitor.Model.Charting;
 
-namespace QuantConnect.Lean.Monitor.Utils
+namespace Monitor.Utils
 {
     public static class SeriesExt
     {
-        public static Series Since(this Series series, TimeStamp x)
+        public static SeriesDefinition Since(this SeriesDefinition series, TimeStamp x)
         {
             // Create a new empty series based upon the source settings
-            var copy = new Series(series.Name, series.SeriesType, series.Index, series.Unit)
+            var copy = new SeriesDefinition
             {
+                Name =  series.Name,
+                SeriesType = series.SeriesType,
+                Index = series.Index,
+                Unit = series.Unit,
                 Color = series.Color,
                 ScatterMarkerSymbol = series.ScatterMarkerSymbol
             };
 
             // Add all values since the provided timestamp
-            copy.Values.AddRange(series.Values.OrderBy(cp => cp.x).SkipWhile(cp => cp.x <= x.ElapsedSeconds));
+            var newValues = series.Values
+                .OrderBy(cp => cp.X)
+                .SkipWhile(cp => cp.X.ElapsedSeconds <= x.ElapsedSeconds);
+
+            copy.Values.AddRange(newValues);
 
             return copy;
         }

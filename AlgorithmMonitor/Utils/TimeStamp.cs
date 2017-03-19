@@ -1,8 +1,6 @@
 ﻿using System;
-using QuantConnect.Lean.Monitor.Model.Charting;
-using QuantConnect.Lean.Monitor.ViewModel.Charts;
 
-namespace QuantConnect.Lean.Monitor.Utils
+namespace Monitor.Utils
 {
     /// <summary>
     /// Represents a moment in time, expressed in units elasped since Thursday, 1 January 1970
@@ -11,41 +9,43 @@ namespace QuantConnect.Lean.Monitor.Utils
     {
         private TimeSpan _timeSpan;
 
+        public static TimeStamp MinValue => FromDays(0);
+
         public static TimeStamp FromSeconds(double elapsedSeconds)
         {
-            return From(elapsedSeconds, ChartResolution.Second);
+            return From(elapsedSeconds, Model.Resolution.Second);
         }
         public static TimeStamp FromMinutes(double elapsedMinutes)
         {
-            return From(elapsedMinutes, ChartResolution.Minute);
+            return From(elapsedMinutes, Model.Resolution.Minute);
         }
         public static TimeStamp FromHours(double elapsedHours)
         {
-            return From(elapsedHours, ChartResolution.Hour);
+            return From(elapsedHours, Model.Resolution.Hour);
         }
         public static TimeStamp FromDays(double elapsedDays)
         {
-            return From(elapsedDays, ChartResolution.Day);
+            return From(elapsedDays, Model.Resolution.Day);
         }
-        public static TimeStamp From(double elapsedUnit, ChartResolution resolution)
+        public static TimeStamp From(double elapsedUnit, Model.Resolution resolution)
         {
             var epochDateTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             DateTime dateTime;
             switch (resolution)
             {
-                case ChartResolution.Day:
+                case Model.Resolution.Day:
                     dateTime = epochDateTime.AddDays(elapsedUnit);
                     break;
 
-                case ChartResolution.Hour:
+                case Model.Resolution.Hour:
                     dateTime = epochDateTime.AddHours(elapsedUnit);
                     break;
 
-                case ChartResolution.Minute:
+                case Model.Resolution.Minute:
                     dateTime = epochDateTime.AddMinutes(elapsedUnit);
                     break;
 
-                case ChartResolution.Second:
+                case Model.Resolution.Second:
                     dateTime = epochDateTime.AddSeconds(elapsedUnit);
                     break;
 
@@ -128,6 +128,11 @@ namespace QuantConnect.Lean.Monitor.Utils
         public override int GetHashCode()
         {
             return ElapsedSeconds.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return $"{DateTime} - {ElapsedSeconds}";
         }
     }
 }

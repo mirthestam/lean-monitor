@@ -1,6 +1,6 @@
-﻿using System.Windows.Media;
+using System.Windows.Media;
 
-namespace QuantConnect.Lean.Monitor.Model.Charting
+namespace Monitor.Model.Charting
 {
     public class Geometries
     {

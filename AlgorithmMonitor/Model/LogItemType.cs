@@ -1,4 +1,4 @@
-namespace QuantConnect.Lean.Monitor.Model
+namespace Monitor.Model
 {
     public enum LogItemType
     {

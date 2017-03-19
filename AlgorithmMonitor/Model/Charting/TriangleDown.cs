@@ -4,7 +4,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using LiveCharts.Geared.Geometries;
 
-namespace QuantConnect.Lean.Monitor.Model.Charting
+namespace Monitor.Model.Charting
 {
     public class TriangleDown : GeometryShape
     {

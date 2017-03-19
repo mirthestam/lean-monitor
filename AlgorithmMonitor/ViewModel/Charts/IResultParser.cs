@@ -1,6 +1,6 @@
-using QuantConnect.Lean.Monitor.Model;
+using Monitor.Model;
 
-namespace QuantConnect.Lean.Monitor.ViewModel.Charts
+namespace Monitor.ViewModel.Charts
 {
     public interface IResultParser
     {

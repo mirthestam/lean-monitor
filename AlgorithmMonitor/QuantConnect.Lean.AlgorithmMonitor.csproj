@@ -6,7 +6,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{0C12991C-5BF1-4ABE-978C-41652C7FA942}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>QuantConnect.Lean.Monitor</RootNamespace>
+    <RootNamespace>Monitor</RootNamespace>
     <AssemblyName>Monitor</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -52,7 +52,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>QuantConnect.Lean.Monitor.App</StartupObject>
+    <StartupObject>Monitor.App</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AsyncIO, Version=0.1.25.0, Culture=neutral, PublicKeyToken=44a94435bd6f33f8, processorArchitecture=MSIL">
@@ -125,7 +125,8 @@
     </ApplicationDefinition>
     <Compile Include="AppRegistry.cs" />
     <None Include="Demo\DemoAlgorithm.cs" />
-    <Compile Include="Model\Charting\ExtraGeometries.cs" />
+    <Compile Include="Model\Charting\ChartDefinition.cs" />
+    <Compile Include="Model\Charting\Geometries.cs" />
     <Compile Include="Model\Charting\FinancialMapperBase.cs" />
     <Compile Include="Model\Charting\OhlcTimeStampChartPointMapper.cs" />
     <Compile Include="Model\Charting\TriangleDown.cs" />
@@ -137,9 +138,13 @@
     <Compile Include="Model\Messages\ShowNewSessionWindowMessage.cs" />
     <Compile Include="Model\Charting\ITimeStampChartPoint.cs" />
     <Compile Include="Model\IResultConverter.cs" />
+    <Compile Include="Model\QuantConnectExt.cs" />
     <Compile Include="Model\ResultConverter.cs" />
     <Compile Include="Model\ResultSerializer.cs" />
     <Compile Include="Model\ResultUpdater.cs" />
+    <Compile Include="Model\Charting\ScatterMarkerSymbol.cs" />
+    <Compile Include="Model\Charting\SeriesDefinition.cs" />
+    <Compile Include="Model\Charting\SeriesType.cs" />
     <Compile Include="Utils\DateTimeExt.cs" />
     <Compile Include="Model\Sessions\FileSessionParameters.cs" />
     <Compile Include="Model\Sessions\FileSession.cs" />
@@ -156,12 +161,11 @@
     <Compile Include="Themes\LeftMarginMultiplierConverter.cs" />
     <Compile Include="Themes\TreeViewItemExtensions.cs" />
     <Compile Include="ViewModel\AboutWindowViewModel.cs" />
-    <Compile Include="ViewModel\Charts\BenchmarkChartViewModel.cs" />
     <Compile Include="Utils\TimeStamp.cs" />
     <Compile Include="Utils\ChartPointExt.cs" />
     <Compile Include="Model\Charting\TimeStampChartPoint.cs" />
     <Compile Include="Utils\SeriesExt.cs" />
-    <Compile Include="Model\Charting\ChartResolution.cs" />
+    <Compile Include="Model\Resolution.cs" />
     <Compile Include="Model\Messages\GridRequestMessage.cs" />
     <Compile Include="Model\Charting\CartesianMapperBase.cs" />
     <Compile Include="ViewModel\Charts\ChildChartViewModel.cs" />
@@ -193,9 +197,6 @@
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Compile Include="View\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="View\Charts\BenchmarkChartPanel.xaml.cs">
-      <DependentUpon>BenchmarkChartPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Charts\StrategyEquityChartPanel.xaml.cs">
       <DependentUpon>StrategyEquityChartPanel.xaml</DependentUpon>
@@ -254,10 +255,6 @@
     <Page Include="View\AboutWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="View\Charts\BenchmarkChartPanel.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="View\Charts\StrategyEquityChartPanel.xaml">
       <SubType>Designer</SubType>

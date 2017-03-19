@@ -1,6 +1,6 @@
 using LiveCharts.Configurations;
 
-namespace QuantConnect.Lean.Monitor.Model.Charting
+namespace Monitor.Model.Charting
 {
     public abstract class FinancialMapperBase<T> : FinancialMapper<T>
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace QuantConnect.Lean.Monitor.ViewModel.Panels
+namespace Monitor.ViewModel.Panels
 {
     public class ProfitLossItemViewModel
     {

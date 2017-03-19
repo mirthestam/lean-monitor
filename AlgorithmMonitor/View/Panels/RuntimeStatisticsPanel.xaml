@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="QuantConnect.Lean.Monitor.View.Panels.RuntimeStatisticsPanel"
+﻿<UserControl x:Class="Monitor.View.Panels.RuntimeStatisticsPanel"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 

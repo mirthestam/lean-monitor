@@ -1,9 +1,8 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using QuantConnect.Lean.Monitor.Model;
-using QuantConnect.Lean.Monitor.Model.Sessions;
+using Monitor.Model.Sessions;
 
-namespace QuantConnect.Lean.Monitor.ViewModel
+namespace Monitor.ViewModel
 {
     public class NewSessionWindowViewModel : ViewModelBase
     {

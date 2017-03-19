@@ -1,8 +1,7 @@
 using System;
-using QuantConnect.Lean.Monitor.Model;
-using QuantConnect.Lean.Monitor.Model.Messages;
+using Monitor.Model;
 
-namespace QuantConnect.Lean.Monitor.ViewModel.Panels
+namespace Monitor.ViewModel.Panels
 {
     public class LogPanelItemViewModel
     {

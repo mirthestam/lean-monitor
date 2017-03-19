@@ -1,8 +1,8 @@
 ﻿using System.Windows;
 using GalaSoft.MvvmLight.Messaging;
-using QuantConnect.Lean.Monitor.Model.Messages;
+using Monitor.Model.Messages;
 
-namespace QuantConnect.Lean.Monitor.View
+namespace Monitor.View
 {
     /// <summary>
     /// Interaction logic for NewSessionWindow.xaml

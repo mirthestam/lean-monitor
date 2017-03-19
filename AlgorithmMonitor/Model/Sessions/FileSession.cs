@@ -1,13 +1,8 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using QuantConnect.Orders;
-using QuantConnect.Packets;
 
-namespace QuantConnect.Lean.Monitor.Model.Sessions
+namespace Monitor.Model.Sessions
 {
     public class FileSession : ISession
     {

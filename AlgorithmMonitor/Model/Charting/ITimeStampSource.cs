@@ -1,6 +1,6 @@
-using QuantConnect.Lean.Monitor.Utils;
+using Monitor.Utils;
 
-namespace QuantConnect.Lean.Monitor.Model.Charting
+namespace Monitor.Model.Charting
 {
     public interface ITimeStampSource
     {

@@ -1,14 +1,18 @@
+using System.Collections.Generic;
 using GalaSoft.MvvmLight;
 using LiveCharts;
 using LiveCharts.Wpf;
+using Monitor.Utils;
 
-namespace QuantConnect.Lean.Monitor.ViewModel.Charts
+namespace Monitor.ViewModel.Charts
 {
     public class ChildChartViewModel : ViewModelBase
     {
         private SeriesCollection _seriesCollection = new SeriesCollection();
         private AxesCollection _yAxesCollection = new AxesCollection();
         private int _index;
+
+        public Dictionary<string, TimeStamp> LastUpdates { get; } = new Dictionary<string, TimeStamp>();
 
         public ChildChartViewModel(int index, ChartViewModel chart)
         {

@@ -1,10 +1,6 @@
-using System;
-using System.Globalization;
 using GalaSoft.MvvmLight;
-using QuantConnect.Lean.Monitor.Model.Charting;
-using QuantConnect.Lean.Monitor.Utils;
 
-namespace QuantConnect.Lean.Monitor.ViewModel.Charts
+namespace Monitor.ViewModel
 {    
     /// <summary>
     /// Abstract view model for document tabs. Documents are based upon chart data (i.e. charts, grids)
