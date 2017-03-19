@@ -51,7 +51,7 @@
                             DisableAnimations="True"
                             Zoom="X"                            
                             AxisY="{Binding YAxesCollection}"
-                            Series="{Binding SeriesCollection}"
+                            Series="{Binding SeriesCollection}"                            
                             LegendLocation="None"
                 Hoverable="False">
                                 <wpf:CartesianChart.Resources>

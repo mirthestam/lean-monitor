@@ -20,8 +20,7 @@ namespace Monitor.ViewModel.Charts
     public class ChartViewModel : ChartViewModelBase, IChartParser
     {
         private readonly Dictionary<string, TimeStamp> _lastUpdates = new Dictionary<string, TimeStamp>();
-
-        private Color _defaultColor = Color.FromArgb(0, 0, 0, 0);
+        private readonly Color _defaultColor = Color.FromArgb(0, 0, 0, 0);
 
         private ObservableCollection<ChildChartViewModel> _children = new ObservableCollection<ChildChartViewModel>();
         private SeriesCollection _scrollSeriesCollection = new SeriesCollection();        
@@ -89,10 +88,11 @@ namespace Monitor.ViewModel.Charts
             // Validate the chart
             if (sourceChart.Series.Count == 0) return;
 
-            var lastUpdate = TimeStamp.MinValue;
-
             // Group series by their Index.
             // This index is the index of a chart they need to be drawn upon.
+
+            var timeStamps = new List<TimeStamp>();
+
             foreach (var sourceSeriesGroup in sourceChart.Series
                 .OrderByDescending(s => s.Value.Index)
                 .GroupBy(s => s.Value.Index))            
@@ -134,7 +134,6 @@ namespace Monitor.ViewModel.Charts
 
                 // Update the series
                 var seriesIndex = 0;
-
                 foreach (var quantSeries in sourceSeriesGroup
                     .Select(sg => sg.Value)
                     .Where(v => v.Values.Count > 0))
@@ -142,18 +141,12 @@ namespace Monitor.ViewModel.Charts
                     var series = childModel.SeriesCollection[seriesIndex];
 
                     if (!childModel.LastUpdates.ContainsKey(series.Title)) childModel.LastUpdates[series.Title] = TimeStamp.MinValue;
-
+                    
                     var updates = quantSeries.Since(childModel.LastUpdates[series.Title]);
                     UpdateSeries(series, updates);
+                    timeStamps.AddRange(updates.Values.Select(u => u.X));
                     if (updates.Values.Any()) childModel.LastUpdates[series.Title] = updates.Values.Last().X;
                     seriesIndex++;
-
-                    var lastTimeStamp = quantSeries.Values[quantSeries.Values.Count - 1].X;
-                    if (lastTimeStamp.ElapsedSeconds > lastUpdate.ElapsedSeconds)
-                    {
-                        // This way we always take the biggest last update value from the series
-                        lastUpdate = lastTimeStamp;
-                    }
                 }
             }
 
@@ -176,7 +169,10 @@ namespace Monitor.ViewModel.Charts
             if (scrollSeriesUpdates.Values.Any()) _lastUpdates["Scroll"] = scrollSeriesUpdates.Values.Last().X;
 
             // Update our timestamps based upon the new updates for the scroll series
-            TimeStamps.AddRange(scrollSeriesUpdates.Values.Select(v => v.X));
+
+            var newStamps = timeStamps.Distinct().OrderBy(t => t.ElapsedSeconds);
+            TimeStamps.AddRange(newStamps);
+            RebuildTimeStampIndex();
 
             if (ZoomTo == 1)
             {
@@ -235,7 +231,9 @@ namespace Monitor.ViewModel.Charts
             if (!sourceSeries.Color.Equals(_defaultColor))
             {                
                 // No default color present. use it for the stroke
-                series.Stroke = new SolidColorBrush(sourceSeries.Color);
+                var brush = new SolidColorBrush(sourceSeries.Color);
+                brush.Freeze();
+                series.Stroke = brush;
             }
 
             return series;

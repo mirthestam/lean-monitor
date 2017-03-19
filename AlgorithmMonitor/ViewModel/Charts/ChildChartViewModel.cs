@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Windows.Controls;
 using GalaSoft.MvvmLight;
 using LiveCharts;
 using LiveCharts.Wpf;
@@ -10,6 +11,7 @@ namespace Monitor.ViewModel.Charts
     {
         private SeriesCollection _seriesCollection = new SeriesCollection();
         private AxesCollection _yAxesCollection = new AxesCollection();
+
         private int _index;
 
         public Dictionary<string, TimeStamp> LastUpdates { get; } = new Dictionary<string, TimeStamp>();

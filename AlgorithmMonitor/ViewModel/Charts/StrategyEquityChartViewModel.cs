@@ -153,6 +153,7 @@ namespace Monitor.ViewModel.Charts
 
             EquityOhlcChartValues.AddRange(values);
             TimeStamps.AddRange(values.Select(v => v.X));
+            RebuildTimeStampIndex();
 
             // Update normal chart with only the close values
             EquityChartValues.AddRange(values.Select(v => new TimeStampChartPoint

@@ -26,6 +26,7 @@ namespace Monitor.ViewModel.Charts
         /// Gets the list of TimeStamps. TimeStamps are our primarily X axis upon which all series indexes are mapped
         /// </summary>
         protected List<TimeStamp> TimeStamps { get; } = new List<TimeStamp>();
+        protected Dictionary<TimeStamp, int> TimeStampIndexes { get; } = new Dictionary<TimeStamp, int>();
 
         private IPointEvaluator<TimeStampOhlcChartPoint> _ohlcChartPointEvaluator;
         private IPointEvaluator<TimeStampChartPoint> _chartPointEvaluator;
@@ -68,29 +69,63 @@ namespace Monitor.ViewModel.Charts
 
         public int IndexOf(TimeStamp item)
         {
-            switch (Resolution)
+            int index;
+            if (!TimeStampIndexes.TryGetValue(item, out index))
             {
-                case Model.Resolution.Second:
-                    return TimeStamps.FindIndex(ts => ts.ElapsedSeconds == item.ElapsedSeconds);
+                return -1;
+            }
+            return index;
+            //var index = TimeStamps.IndexOf(item);
+            //return index;
 
-                case Model.Resolution.Minute:
-                    return TimeStamps.FindIndex(ts => ts.ElapsedMinutes == item.ElapsedMinutes);
+            //var index = 0;
+            //switch (Resolution)
+            //{
+            //    case Model.Resolution.Second:
+            //        index = TimeStamps.FindIndex(ts => ts.ElapsedSeconds == item.ElapsedSeconds);
+            //        break;
 
-                case Model.Resolution.Hour:
-                    return TimeStamps.FindIndex(ts => ts.ElapsedHours == item.ElapsedHours);
+            //    case Model.Resolution.Minute:
+            //        index = TimeStamps.FindIndex(ts => ts.ElapsedMinutes == item.ElapsedMinutes);
+            //        break;
 
-                case Model.Resolution.Day:
-                    return TimeStamps.FindIndex(ts => ts.ElapsedDays == item.ElapsedDays);
+            //    case Model.Resolution.Hour:
+            //        index = TimeStamps.FindIndex(ts => ts.ElapsedHours == item.ElapsedHours);
+            //        break;
 
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }            
+            //    case Model.Resolution.Day:
+            //        index = TimeStamps.FindIndex(ts => ts.ElapsedDays == item.ElapsedDays);
+            //        break;
+
+            //    default:
+            //        throw new ArgumentOutOfRangeException();
+            //}
+
+            //if (index == -1)
+            //{
+            //    // No index could be found for this item.
+            //    // This could be the case if the reference series exceeded the maximum amount of points, and data has been truncated.
+            //    index = TimeStamps.Count;
+            //}
+
+            //return index;
         }
 
         public TimeStamp GetTimeStamp(int index)
         {
             index = Math.Min(index, TimeStamps.Count - 1);
             return index < 0 ? TimeStamp.MinValue : TimeStamps[index];
+        }
+
+        protected void RebuildTimeStampIndex()
+        {
+            // The TimeStampIndex is used to quickly find the X index for timestamps.
+            TimeStampIndexes.Clear();
+            for (var i = 0; i < TimeStamps.Count - 1; i++)
+            {
+                var ts = TimeStamps[i];
+                TimeStampIndexes[ts] = i;
+            }
         }
 
         private string FormatXLabel(int x)
