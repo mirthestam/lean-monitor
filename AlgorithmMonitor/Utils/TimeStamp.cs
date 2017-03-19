@@ -7,7 +7,7 @@ namespace QuantConnect.Lean.Monitor.Utils
     /// <summary>
     /// Represents a moment in time, expressed in units elasped since Thursday, 1 January 1970
     /// </summary>
-    public struct TimeStamp : IComparable, IComparable<TimeStamp>, IEquatable<TimeStamp>
+    public class TimeStamp : IComparable, IComparable<TimeStamp>, IEquatable<TimeStamp>
     {
         private TimeSpan _timeSpan;
 
@@ -68,27 +68,32 @@ namespace QuantConnect.Lean.Monitor.Utils
         public TimeStamp(TimeSpan timeSpan)
         {
             _timeSpan = timeSpan;
+
+            ElapsedDays = (int) Math.Floor(_timeSpan.TotalDays);
+            ElapsedSeconds = (int)Math.Floor(_timeSpan.TotalSeconds);
+            ElapsedHours = (int)Math.Floor(_timeSpan.TotalHours);
+            ElapsedMinutes = (int)Math.Floor(_timeSpan.TotalMinutes);
         }
 
         /// <summary>
         /// Gets or sets the number of days that have elapsed since Thursday, 1 January 1970
         /// </summary>
-        public int ElapsedDays => (int)Math.Floor(_timeSpan.TotalDays);
+        public int ElapsedDays { get; private set; }
 
         /// <summary>
         /// Gets or sets the number of seconds that have elapsed since Thursday, 1 January 1970
         /// </summary>
-        public int ElapsedSeconds => (int)Math.Floor(_timeSpan.TotalSeconds);
+        public int ElapsedSeconds { get; private set; }
 
         /// <summary>
         /// Gets or sets the number of hours that have elapsed since Thursday, 1 January 1970
         /// </summary>
-        public int ElapsedHours => (int)Math.Floor(_timeSpan.TotalHours);
+        public int ElapsedHours { get; private set; }
 
         /// <summary>
         /// Gets or sets the number of minutes that have elapsed since Thursday, 1 January 1970
         /// </summary>
-        public int ElapsedMinutes => (int)Math.Floor(_timeSpan.TotalMinutes);
+        public int ElapsedMinutes { get; private set; }
 
         public DateTime DateTime
         {
@@ -111,7 +116,7 @@ namespace QuantConnect.Lean.Monitor.Utils
 
         public bool Equals(TimeStamp other)
         {
-            return _timeSpan.Equals(other._timeSpan);
+            return ElapsedSeconds.Equals(other.ElapsedSeconds);
         }
 
         public override bool Equals(object obj)
@@ -122,7 +127,7 @@ namespace QuantConnect.Lean.Monitor.Utils
 
         public override int GetHashCode()
         {
-            return _timeSpan.GetHashCode();
+            return ElapsedSeconds.GetHashCode();
         }
     }
 }

@@ -21,7 +21,7 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
 
         private int _zoomFrom;
         private int _zoomTo = 1;
-        private TimeStamp _lastUpdated;
+        private TimeStamp _lastUpdated = new TimeStamp(TimeSpan.Zero);
 
         /// <summary>
         /// Gets the list of TimeStamps. TimeStamps are our primarily X axis upon which all series indexes are mapped
@@ -79,13 +79,11 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
 
         public int IndexOf(TimeStamp item)
         {
-            // We switch by resolution, because sometimes series differ a bit from the master series. Find the nearest point based upon the resolution
-            // TODO: Investigate whether this is the best approach. Alternative could be to merge all series relative to each other.
             switch (Resolution)
             {
                 case ChartResolution.Second:
                     return TimeStamps.FindIndex(ts => ts.ElapsedSeconds == item.ElapsedSeconds);
-                    
+
                 case ChartResolution.Minute:
                     return TimeStamps.FindIndex(ts => ts.ElapsedMinutes == item.ElapsedMinutes);
 
@@ -114,7 +112,7 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
 
             // Use a dummy timestamp in design time mode.
             // Otherwise let the derived implementation determine a timestamp for the X index
-            var timeStamp = IsInDesignMode ? new TimeStamp() : GetTimeStamp(x);
+            var timeStamp = IsInDesignMode ? new TimeStamp(TimeSpan.Zero) : GetTimeStamp(x);
 
             // Pick a format string based upon the resolution of the data.
             string format;

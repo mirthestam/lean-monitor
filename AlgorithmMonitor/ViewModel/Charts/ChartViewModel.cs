@@ -6,6 +6,7 @@ using System.Windows.Media;
 using LiveCharts;
 using LiveCharts.Definitions.Series;
 using LiveCharts.Geared;
+using LiveCharts.Geared.Geometries;
 using LiveCharts.Wpf;
 using QuantConnect.Lean.Monitor.Model.Charting;
 using QuantConnect.Lean.Monitor.Utils;
@@ -204,7 +205,7 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
                     series = new GOhlcSeries
                     {
                         Configuration = OhlcChartPointEvaluator,
-                        Fill = Brushes.Transparent
+                        Fill = Brushes.Transparent,
                     };
                     break;
 
@@ -212,7 +213,8 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
                     series = new GScatterSeries
                     {
                         Configuration = ChartPointEvaluator,
-                        StrokeThickness = 1
+                        StrokeThickness = 1,
+                        GearedPointGeometry = GetGearedPointGeometry(sourceSeries.ScatterMarkerSymbol)
                     };
                     break;
 
@@ -278,6 +280,34 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
             }
         }
 
+
+        private static GeometryShape GetGearedPointGeometry(ScatterMarkerSymbol symbol)
+        {
+            switch (symbol)
+            {
+                case ScatterMarkerSymbol.None:
+                    return null;
+                    
+                case ScatterMarkerSymbol.Circle:
+                    return new Circle(); 
+                    
+                case ScatterMarkerSymbol.Square:
+                    return new Square();
+                    
+                case ScatterMarkerSymbol.Diamond:
+                    return new Diamond();
+                    
+                case ScatterMarkerSymbol.Triangle:
+                    return new Triangle();
+                    
+                case ScatterMarkerSymbol.TriangleDown:
+                    return new TriangleDown();
+                    
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(symbol), symbol, null);
+            }
+        }
+
         private static Geometry GetPointGeometry(ScatterMarkerSymbol symbol)
         {
             switch (symbol)
@@ -295,8 +325,10 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
                     return DefaultGeometries.Square;
 
                 case ScatterMarkerSymbol.Triangle:
-                case ScatterMarkerSymbol.TriangleDown:
                     return DefaultGeometries.Triangle;
+
+                case ScatterMarkerSymbol.TriangleDown:
+                    return Geometries.TriangleDown;
 
                 default:
                     return DefaultGeometries.Circle;

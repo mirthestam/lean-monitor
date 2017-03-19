@@ -125,8 +125,10 @@
     </ApplicationDefinition>
     <Compile Include="AppRegistry.cs" />
     <None Include="Demo\DemoAlgorithm.cs" />
+    <Compile Include="Model\Charting\ExtraGeometries.cs" />
     <Compile Include="Model\Charting\FinancialMapperBase.cs" />
     <Compile Include="Model\Charting\OhlcTimeStampChartPointMapper.cs" />
+    <Compile Include="Model\Charting\TriangleDown.cs" />
     <Compile Include="Model\IResultSerializer.cs" />
     <Compile Include="Model\LogItemType.cs" />
     <Compile Include="Model\Messages\SessionClosedMessage.cs" />
