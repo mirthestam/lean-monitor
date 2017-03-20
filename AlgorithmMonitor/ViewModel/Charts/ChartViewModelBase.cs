@@ -121,7 +121,7 @@ namespace Monitor.ViewModel.Charts
         {
             // The TimeStampIndex is used to quickly find the X index for timestamps.
             TimeStampIndexes.Clear();
-            for (var i = 0; i < TimeStamps.Count - 1; i++)
+            for (var i = 0; i < TimeStamps.Count; i++)
             {
                 var ts = TimeStamps[i];
                 TimeStampIndexes[ts] = i;

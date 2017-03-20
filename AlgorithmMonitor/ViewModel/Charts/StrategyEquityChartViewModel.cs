@@ -111,7 +111,7 @@ namespace Monitor.ViewModel.Charts
                     {
                         return new TimeStampChartPoint
                         {
-                            X = g.First().X,
+                            X = TimeStamp.FromDays(g.First().X.ElapsedDays),
                             Y = g.Max(a => a.Y)
                         };
                     }).ToList();
@@ -143,7 +143,7 @@ namespace Monitor.ViewModel.Charts
                     {
                         return new TimeStampOhlcChartPoint
                         {
-                            X = g.First().X,
+                            X = TimeStamp.FromDays(g.First().X.ElapsedDays), // The FromDays creates a new timestamp ignoring known hours, minutes etc
                             Open = (double)g.First().Y,
                             Close = (double)g.Last().Y,
                             Low = (double)g.Min(z => z.Y),
@@ -197,7 +197,9 @@ namespace Monitor.ViewModel.Charts
             relValues.Add(new TimeStampChartPoint(benchmarkValues[0].X, equityOpenValue));
             for (var i = 1; i < benchmarkValues.Count; i++)
             {
-                var x = benchmarkValues[i].X;
+                var originalX = benchmarkValues[i].X;
+                var x = TimeStamp.FromDays(originalX.ElapsedDays);
+
                 decimal y;
 
                 var curBenchmarkValue = benchmarkValues[i].Y;
