@@ -75,40 +75,6 @@ namespace Monitor.ViewModel.Charts
                 return -1;
             }
             return index;
-            //var index = TimeStamps.IndexOf(item);
-            //return index;
-
-            //var index = 0;
-            //switch (Resolution)
-            //{
-            //    case Model.Resolution.Second:
-            //        index = TimeStamps.FindIndex(ts => ts.ElapsedSeconds == item.ElapsedSeconds);
-            //        break;
-
-            //    case Model.Resolution.Minute:
-            //        index = TimeStamps.FindIndex(ts => ts.ElapsedMinutes == item.ElapsedMinutes);
-            //        break;
-
-            //    case Model.Resolution.Hour:
-            //        index = TimeStamps.FindIndex(ts => ts.ElapsedHours == item.ElapsedHours);
-            //        break;
-
-            //    case Model.Resolution.Day:
-            //        index = TimeStamps.FindIndex(ts => ts.ElapsedDays == item.ElapsedDays);
-            //        break;
-
-            //    default:
-            //        throw new ArgumentOutOfRangeException();
-            //}
-
-            //if (index == -1)
-            //{
-            //    // No index could be found for this item.
-            //    // This could be the case if the reference series exceeded the maximum amount of points, and data has been truncated.
-            //    index = TimeStamps.Count;
-            //}
-
-            //return index;
         }
 
         public TimeStamp GetTimeStamp(int index)
