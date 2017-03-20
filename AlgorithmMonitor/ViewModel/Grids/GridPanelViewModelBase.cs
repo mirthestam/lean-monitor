@@ -9,7 +9,20 @@ namespace Monitor.ViewModel.Grids
     {
         private List<GridSerie> _series;
 
+        private string _chartName;
+
         private GridSerie _selectedSeries;
+
+        public string ChartName
+        {
+            get { return _chartName; }
+            set
+            {
+                _chartName = value;
+                FormatTitle();
+                RaisePropertyChanged();
+            }
+        }
 
         public List<GridSerie> Series
         {
@@ -33,8 +46,14 @@ namespace Monitor.ViewModel.Grids
             set
             {
                 _selectedSeries = value;
+                FormatTitle();
                 RaisePropertyChanged();
             }
-        }      
+        }
+
+        private void FormatTitle()
+        {
+            Title = $"{ChartName} [{SelectedSeries.Name}]";
+        }
     }
 }
