@@ -138,7 +138,7 @@
     <Compile Include="Model\Messages\ShowNewSessionWindowMessage.cs" />
     <Compile Include="Model\Charting\ITimeStampChartPoint.cs" />
     <Compile Include="Model\IResultConverter.cs" />
-    <Compile Include="Model\QuantConnectExt.cs" />
+    <Compile Include="Model\ResultMapper.cs" />
     <Compile Include="Model\ResultConverter.cs" />
     <Compile Include="Model\ResultSerializer.cs" />
     <Compile Include="Model\ResultUpdater.cs" />

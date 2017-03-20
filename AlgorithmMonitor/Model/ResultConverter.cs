@@ -19,7 +19,7 @@ namespace Monitor.Model
             return new Result
             {
                 ResultType = ResultType.Backtest,
-                Charts = new Dictionary<string, Charting.ChartDefinition>(backtestResult.Charts.ToModelChart()),
+                Charts = new Dictionary<string, Charting.ChartDefinition>(backtestResult.Charts.MapToChartDefinitionDictionary()),
                 Orders = new Dictionary<int, Order>(backtestResult.Orders),
                 ProfitLoss = new Dictionary<DateTime, decimal>(backtestResult.ProfitLoss),
                 Statistics = new Dictionary<string, string>(backtestResult.Statistics),
@@ -33,7 +33,7 @@ namespace Monitor.Model
             return new Result
             {
                 ResultType = ResultType.Live,                
-                Charts = new Dictionary<string, Charting.ChartDefinition>(liveResult.Charts.ToModelChart()),
+                Charts = new Dictionary<string, Charting.ChartDefinition>(liveResult.Charts.MapToChartDefinitionDictionary()),
                 Orders = new Dictionary<int, Order>(liveResult.Orders),
                 ProfitLoss = new Dictionary<DateTime, decimal>(liveResult.ProfitLoss),
                 Statistics = new Dictionary<string, string>(liveResult.Statistics),
@@ -47,9 +47,7 @@ namespace Monitor.Model
             if (result.ResultType != ResultType.Backtest) throw new ArgumentException(@"Result is not of type Backtest", nameof(result));
 
             // Total performance is always null in the original data holder
-            //return new BacktestResult(result.Charts, result.Orders, result.ProfitLoss, result.Statistics, result.RuntimeStatistics, result.RollingWindow, null);
-            // TODO: Map back to quant chart
-            return new BacktestResult(null, result.Orders, result.ProfitLoss, result.Statistics, result.RuntimeStatistics, result.RollingWindow);
+            return new BacktestResult(result.Charts.MapToChartDictionary(), result.Orders, result.ProfitLoss, result.Statistics, result.RuntimeStatistics, result.RollingWindow);
         }
 
         public LiveResult ToLiveResult(Result result)
@@ -59,9 +57,7 @@ namespace Monitor.Model
 
             // Holdings is not supported in the current result.
             // ServerStatistics is not supported in the current result.
-            //return new LiveResult(result.Charts, result.Orders, result.ProfitLoss, null, result.Statistics, result.RuntimeStatistics, null);
-            // TODO: Map back to quant chart
-            return new LiveResult(null, result.Orders, result.ProfitLoss, null, result.Statistics, result.RuntimeStatistics);
+            return new LiveResult(result.Charts.MapToChartDictionary(), result.Orders, result.ProfitLoss, null, result.Statistics, result.RuntimeStatistics);
         }
     }
 }
