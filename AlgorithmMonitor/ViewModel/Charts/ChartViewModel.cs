@@ -270,7 +270,10 @@ namespace Monitor.ViewModel.Charts
                                 Low = (double)g.Min(z => z.Y),
                                 High = (double)g.Max(z => z.Y)
                             };
-                        });
+                        }).ToList();
+
+                    // Update existing ohlc points.
+                    UpdateExistingOhlcPoints(existingCandleValues, newValues, Resolution.Day);
 
                     existingCandleValues.AddRange(newValues);
                     break;

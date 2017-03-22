@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using LiveCharts.Configurations;
+using LiveCharts.Geared;
+using Monitor.Model;
 using Monitor.Model.Charting;
 using Monitor.Model.Messages;
 using Monitor.Utils;
@@ -67,6 +70,37 @@ namespace Monitor.ViewModel.Charts
             XFormatter = val => FormatXLabel((int)val);
         }
 
+        public void UpdateExistingOhlcPoints(IList<TimeStampOhlcChartPoint> existingPoints, IList<TimeStampOhlcChartPoint> updatedPoints, Resolution resolution)
+        {
+            // Check whether we are updating existing points
+            if (existingPoints.Count <= 0) return;
+
+            if (resolution != Resolution.Day)
+            {
+                throw new ArgumentOutOfRangeException($"Resolution {resolution} is not supported. Only Day is supported.");
+            }
+
+            // Check whether we have new information for the last ohlc point
+            var lastKnownDay = existingPoints.Last().X.ElapsedDays;
+            while (updatedPoints.Any() && (updatedPoints.First().X.ElapsedDays <= lastKnownDay)) // We assume we always show ohlc in day groups
+            {
+                // Update the last ohlc point with this inforrmation
+                var refval = updatedPoints.First();
+
+                // find the value matching this day
+                var ohlcEquityChartValue = existingPoints.Last();
+
+                // Update ohlc point with highest and lowest, and with the new closing price
+                // Update the normal point with the new closing value
+                ohlcEquityChartValue.High = Math.Max(refval.High, ohlcEquityChartValue.High);
+                ohlcEquityChartValue.Low = Math.Min(refval.Low, ohlcEquityChartValue.Low);
+                ohlcEquityChartValue.Close = refval.Close;
+
+                // Remove this value, as it has been parsed into existing chart points
+                updatedPoints.RemoveAt(0);
+            }
+        }
+
         public int IndexOf(TimeStamp item)
         {
             int index;
@@ -129,6 +163,6 @@ namespace Monitor.ViewModel.Charts
             }
 
             return timeStamp.DateTime.ToString(format);
-        }
+        }        
     }
 }

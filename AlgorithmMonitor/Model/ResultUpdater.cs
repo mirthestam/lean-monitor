@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace Monitor.Model
 {
     public static class ResultUpdater
@@ -39,7 +41,7 @@ namespace Monitor.Model
                         {
                             // Series is already known. Update it with new values
                             var targetSeries = targetChart.Series[sourceSeries.Key];
-                            targetSeries.Values.AddRange(sourceSeries.Value.Values);
+                            targetSeries.Values.AddRange(sourceSeries.Value.Values.Except(targetSeries.Values));
                         }
                         else
                         {

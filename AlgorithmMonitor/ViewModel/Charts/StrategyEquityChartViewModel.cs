@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using LiveCharts.Geared;
 using Monitor.Model;
@@ -117,7 +118,7 @@ namespace Monitor.ViewModel.Charts
                     }).ToList();
 
             DailyPerformanceChartValues.AddRange(values);
-            
+
             _lastUpdates["Daily Performance"] = values.Last().X;
         }
 
@@ -131,7 +132,7 @@ namespace Monitor.ViewModel.Charts
 
             if (!_lastUpdates.ContainsKey("Strategy Equity")) _lastUpdates["Strategy Equity"] = TimeStamp.MinValue;
             var lastUpdate = _lastUpdates["Strategy Equity"];
-            
+
             series = series.Since(lastUpdate);
             if (series.Values.Count == 0) return;
 
@@ -150,6 +151,11 @@ namespace Monitor.ViewModel.Charts
                             High = (double)g.Max(z => z.Y)
                         };
                     }).ToList();
+
+            // Update existing ohlc points.
+            UpdateExistingOhlcPoints(EquityOhlcChartValues, values, Resolution.Day);
+
+            if (values.Count == 0) return; // This can be the case when only the last known day has been updated
 
             EquityOhlcChartValues.AddRange(values);
             TimeStamps.AddRange(values.Select(v => v.X));

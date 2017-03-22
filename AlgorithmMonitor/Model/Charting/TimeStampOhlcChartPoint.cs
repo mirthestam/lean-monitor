@@ -2,7 +2,7 @@ using Monitor.Utils;
 
 namespace Monitor.Model.Charting
 {
-    public struct TimeStampOhlcChartPoint : ITimeStampChartPoint
+    public class TimeStampOhlcChartPoint : ITimeStampChartPoint
     {
         public TimeStamp X { get; set; }
         public double Open { get; set; }

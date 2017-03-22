@@ -169,6 +169,7 @@
     <Compile Include="Model\Messages\GridRequestMessage.cs" />
     <Compile Include="Model\Charting\CartesianMapperBase.cs" />
     <Compile Include="ViewModel\Charts\ChildChartViewModel.cs" />
+    <Compile Include="Model\Charting\TimeStampEqualityComparer.cs" />
     <Compile Include="ViewModel\Grids\GridPanelViewModelBase.cs" />
     <Compile Include="ViewModel\Grids\GridPoint.cs" />
     <Compile Include="ViewModel\Grids\GridSerie.cs" />
