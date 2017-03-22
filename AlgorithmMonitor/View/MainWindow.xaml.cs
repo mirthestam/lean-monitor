@@ -69,5 +69,29 @@ namespace Monitor.View
         {
             OpenLink("https://www.quantconnect.com/docs#Charting");
         }
+
+        private void MainWindow_OnDrop(object sender, DragEventArgs e)
+        {
+            var fileNames = (string[])e.Data.GetData(DataFormats.FileDrop);
+            if (fileNames != null) ViewModel.HandleDroppedFileName(fileNames[0]);
+        }
+
+        private void MainWindow_OnDragOver(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                var fileNames = (string[])e.Data.GetData(DataFormats.FileDrop);
+                if (fileNames != null && fileNames.Length == 1)
+                {
+                    // Drag drop validated.
+                    return;
+                }
+            }
+
+            // Drag drop invalidated.
+            e.Effects = DragDropEffects.None;
+            e.Handled = true;
+
+        }
     }
 }

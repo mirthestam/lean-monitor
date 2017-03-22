@@ -14,6 +14,9 @@
         DataContext="{Binding MainWindow, Source={StaticResource Locator}}"
         Loaded="MainWindow_OnLoaded"
         WindowStartupLocation="CenterOwner"
+        Drop="MainWindow_OnDrop"
+        DragOver="MainWindow_OnDragOver"
+        AllowDrop="true"
         Title="LEAN Algorithm Monitor">
     
     <Window.InputBindings>

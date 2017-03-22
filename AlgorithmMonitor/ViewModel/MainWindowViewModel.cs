@@ -117,6 +117,15 @@ namespace Monitor.ViewModel
             _sessionService.Initialize();
         }
 
+        public void HandleDroppedFileName(string fileName)
+        {
+            _sessionService.OpenFile(new FileSessionParameters
+            {
+                FileName = fileName,
+                Watch = true
+            });
+        }
+
         private void ParseResult(Result messageResult)
         {
             foreach (var chart in messageResult.Charts
