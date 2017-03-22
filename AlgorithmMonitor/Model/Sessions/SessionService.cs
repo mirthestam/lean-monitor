@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using GalaSoft.MvvmLight.Messaging;
-using QuantConnect.Lean.Monitor.Model.Messages;
+using Monitor.Model.Messages;
 
-namespace QuantConnect.Lean.Monitor.Model.Sessions
+namespace Monitor.Model.Sessions
 {
     public class SessionService : ISessionService, ISessionHandler
     {

@@ -3,10 +3,10 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Messaging;
-using QuantConnect.Lean.Monitor.Model;
-using QuantConnect.Lean.Monitor.Model.Messages;
+using Monitor.Model;
+using Monitor.Model.Messages;
 
-namespace QuantConnect.Lean.Monitor.ViewModel.Panels
+namespace Monitor.ViewModel.Panels
 {
     public class ProfitLossPanelViewModel : ViewModelBase
     {
@@ -33,7 +33,7 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Panels
                 ParseResult(message.Result);
             });
 
-            if (this.IsInDesignMode)
+            if (IsInDesignMode)
             {
                 ProfitLoss.Add(new ProfitLossItemViewModel
                 {

@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using LiveCharts.Geared;
-using QuantConnect.Lean.Monitor.Model;
-using QuantConnect.Lean.Monitor.Model.Charting;
-using QuantConnect.Lean.Monitor.Utils;
+using Monitor.Model;
+using Monitor.Model.Charting;
+using Monitor.Utils;
 
-namespace QuantConnect.Lean.Monitor.ViewModel.Charts
+namespace Monitor.ViewModel.Charts
 {
     public class StrategyEquityChartViewModel : ChartViewModelBase, IResultParser
     {
@@ -14,6 +14,8 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
         private GearedValues<TimeStampChartPoint> _equityChartValues = new GearedValues<TimeStampChartPoint>();
         private GearedValues<TimeStampChartPoint> _dailyPerformanceChartValues = new GearedValues<TimeStampChartPoint>();
         private GearedValues<TimeStampChartPoint> _benchmarkChartValues = new GearedValues<TimeStampChartPoint>();
+
+        private Dictionary<string, TimeStamp> _lastUpdates = new Dictionary<string, TimeStamp>();
 
         private bool _isDailyPerformanceSeriesVisible = true;
         private bool _isBenchmarkSeriesVisible = true;
@@ -78,34 +80,31 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
 
         public void ParseResult(Result result)
         {
-            Title = "Strategy Equity";
+            lock (_equityChartValues)
+            {
+                Title = "Strategy Equity";
 
-            ParseEquity(result);
-            ParseBenchmark(result);
-            ParseDailyPerformance(result);
-            
-            // Update the last updated date
-            if (EquityChartValues.Count <= 0) return;
-            LastUpdated = EquityChartValues[EquityChartValues.Count - 1].X;
-        }
-
-        protected override TimeStamp GetXTimeStamp(int index)
-        {
-            // Our X index is based upon the Ohlc chart values.
-            index = Math.Min(index, _equityOhlcChartValues.Count - 1);
-            return _equityOhlcChartValues[index].X;
+                ParseEquity(result);
+                ParseDailyPerformance(result);
+                ParseBenchmark(result);
+            }
         }
 
         private void ParseDailyPerformance(Result result)
         {
-            Chart chart;
-            Series series;
+            ChartDefinition chart;
+            SeriesDefinition series;
 
             if (!result.Charts.TryGetValue("Strategy Equity", out chart)) return;
             if (!chart.Series.TryGetValue("Daily Performance", out series)) return;
-            series = series.Since(LastUpdated);
 
-            var values = series.Values.Select(cp => cp.ToTimeStampChartPoint())
+            if (!_lastUpdates.ContainsKey("Daily Performance")) _lastUpdates["Daily Performance"] = TimeStamp.MinValue;
+            var lastUpdate = _lastUpdates["Daily Performance"];
+
+            series = series.Since(lastUpdate);
+            if (series.Values.Count == 0) return;
+
+            var values = series.Values
                 .OrderBy(cp => cp.X)
                 .GroupBy(cp => cp.X)
                 .Select(
@@ -113,33 +112,39 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
                     {
                         return new TimeStampChartPoint
                         {
-                            X = g.First().X,
+                            X = TimeStamp.FromDays(g.First().X.ElapsedDays),
                             Y = g.Max(a => a.Y)
                         };
-                    });
+                    }).ToList();
 
             DailyPerformanceChartValues.AddRange(values);
+
+            _lastUpdates["Daily Performance"] = values.Last().X;
         }
 
         private void ParseEquity(Result result)
         {
-            Chart chart;
-            Series series;
+            ChartDefinition chart;
+            SeriesDefinition series;
 
             if (!result.Charts.TryGetValue("Strategy Equity", out chart)) return;
             if (!chart.Series.TryGetValue("Equity", out series)) return;
 
-            series = series.Since(LastUpdated);
+            if (!_lastUpdates.ContainsKey("Strategy Equity")) _lastUpdates["Strategy Equity"] = TimeStamp.MinValue;
+            var lastUpdate = _lastUpdates["Strategy Equity"];
 
-            var values = series.Values.Select(cp => cp.ToTimeStampChartPoint())
-                .OrderBy(cp => cp.X.ElapsedDays) 
+            series = series.Since(lastUpdate);
+            if (series.Values.Count == 0) return;
+
+            var values = series.Values
+                .OrderBy(cp => cp.X.ElapsedDays)
                 .GroupBy(cp => cp.X.ElapsedDays)
                 .Select(
                     g =>
                     {
                         return new TimeStampOhlcChartPoint
                         {
-                            X = g.First().X,
+                            X = TimeStamp.FromDays(g.First().X.ElapsedDays), // The FromDays creates a new timestamp ignoring known hours, minutes etc
                             Open = (double)g.First().Y,
                             Close = (double)g.Last().Y,
                             Low = (double)g.Min(z => z.Y),
@@ -147,7 +152,14 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
                         };
                     }).ToList();
 
+            // Update existing ohlc points.
+            UpdateExistingOhlcPoints(EquityOhlcChartValues, values, Resolution.Day);
+
+            if (values.Count == 0) return; // This can be the case when only the last known day has been updated
+
             EquityOhlcChartValues.AddRange(values);
+            TimeStamps.AddRange(values.Select(v => v.X));
+            RebuildTimeStampIndex();
 
             // Update normal chart with only the close values
             EquityChartValues.AddRange(values.Select(v => new TimeStampChartPoint
@@ -162,18 +174,27 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
                 ZoomFrom = 0;
                 ZoomTo = EquityChartValues.Count - 1;
             }
+
+            _lastUpdates["Strategy Equity"] = values.Last().X;
         }
 
         private void ParseBenchmark(Result result)
         {
-            Chart benchmarkChart;
-            Series benchmarkSeries;
+            ChartDefinition benchmarkChart;
+            SeriesDefinition benchmarkSeries;
 
             if (!result.Charts.TryGetValue("Benchmark", out benchmarkChart)) return;
             if (!benchmarkChart.Series.TryGetValue("Benchmark", out benchmarkSeries)) return;
-            benchmarkSeries = benchmarkSeries.Since(LastUpdated);
 
-            var benchmarkValues = benchmarkSeries.Values.Select(cp => cp.ToTimeStampChartPoint()).ToList();
+            if (!_lastUpdates.ContainsKey("Benchmark")) _lastUpdates["Benchmark"] = TimeStamp.MinValue;
+            var lastUpdate = _lastUpdates["Benchmark"];
+
+            benchmarkSeries = benchmarkSeries.Since(lastUpdate);
+
+            var benchmarkValues = benchmarkSeries.Values;
+
+            if (!benchmarkValues.Any()) return;
+
             var relValues = new List<TimeStampChartPoint>();
 
             // This assumes the ParseBenchmark is called after the ParseEquity method.
@@ -182,7 +203,9 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
             relValues.Add(new TimeStampChartPoint(benchmarkValues[0].X, equityOpenValue));
             for (var i = 1; i < benchmarkValues.Count; i++)
             {
-                var x = benchmarkValues[i].X;
+                var originalX = benchmarkValues[i].X;
+                var x = TimeStamp.FromDays(originalX.ElapsedDays);
+
                 decimal y;
 
                 var curBenchmarkValue = benchmarkValues[i].Y;
@@ -199,6 +222,7 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
                 relValues.Add(new TimeStampChartPoint(x, y));
             }
 
+            _lastUpdates["Benchmark"] = relValues.Last().X;
             BenchmarkChartValues.AddRange(relValues);
         }
     }

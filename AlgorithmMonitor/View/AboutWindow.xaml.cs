@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace QuantConnect.Lean.Monitor.View
+namespace Monitor.View
 {
     /// <summary>
     /// Interaction logic for AboutWindow.xaml

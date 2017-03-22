@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace QuantConnect.Lean.Monitor.View.Charts
+namespace Monitor.View.Charts
 {
     /// <summary>
     /// Interaction logic for SeriesExplorerPanel.xaml

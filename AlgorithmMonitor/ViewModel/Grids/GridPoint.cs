@@ -1,4 +1,4 @@
-namespace QuantConnect.Lean.Monitor.ViewModel.Charts
+namespace Monitor.ViewModel.Grids
 {
     public class GridPoint
     {

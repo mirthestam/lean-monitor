@@ -1,6 +1,6 @@
 using System;
 
-namespace QuantConnect.Lean.Monitor.Utils
+namespace Monitor.Utils
 {
     public static class DateTimeExt
     {

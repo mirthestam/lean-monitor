@@ -1,7 +1,9 @@
-namespace QuantConnect.Lean.Monitor.ViewModel.Charts
+using Monitor.Model.Charting;
+
+namespace Monitor.ViewModel.Charts
 {
     public interface IChartParser
     {
-        void ParseChart(Chart chart);
+        void ParseChart(ChartDefinition chart);
     }
 }

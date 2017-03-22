@@ -1,8 +1,8 @@
-using QuantConnect.Lean.Monitor.Utils;
+using Monitor.Utils;
 
-namespace QuantConnect.Lean.Monitor.Model.Charting
+namespace Monitor.Model.Charting
 {
-    public struct TimeStampOhlcChartPoint : ITimeStampChartPoint
+    public class TimeStampOhlcChartPoint : ITimeStampChartPoint
     {
         public TimeStamp X { get; set; }
         public double Open { get; set; }

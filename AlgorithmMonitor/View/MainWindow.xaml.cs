@@ -1,13 +1,11 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Windows;
 using GalaSoft.MvvmLight.Messaging;
-using QuantConnect.Lean.Monitor.Model.Messages;
-using QuantConnect.Lean.Monitor.ViewModel;
-using Xceed.Wpf.AvalonDock.Layout.Serialization;
+using Monitor.Model.Messages;
+using Monitor.ViewModel;
 
-namespace QuantConnect.Lean.Monitor.View
+namespace Monitor.View
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using QuantConnect.Orders;
 using QuantConnect.Statistics;
 
-namespace QuantConnect.Lean.Monitor.Model
+namespace Monitor.Model
 {
     public class Result
     {
-        public Dictionary<string, Chart> Charts = new Dictionary<string, Chart>();
+        public Dictionary<string, Charting.ChartDefinition> Charts = new Dictionary<string, Charting.ChartDefinition>();
+
+        // Todo: make order, and AlgorithmPerformance indepentent of QC namespace
         public Dictionary<int, Order> Orders = new Dictionary<int, Order>();
         public Dictionary<DateTime, decimal> ProfitLoss = new Dictionary<DateTime, decimal>();
         public Dictionary<string, string> Statistics = new Dictionary<string, string>();

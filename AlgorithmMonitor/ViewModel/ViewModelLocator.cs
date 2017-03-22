@@ -17,9 +17,9 @@ using GalaSoft.MvvmLight.Ioc;
 using Lean.AlgorithmMonitor;
 using Lean.AlgorithmMonitor.ViewModel;
 using Microsoft.Practices.ServiceLocation;
-using QuantConnect.Lean.Monitor;
-using QuantConnect.Lean.Monitor.ViewModel;
-using QuantConnect.Lean.Monitor.ViewModel.Panels;
+using Monitor;
+using Monitor.ViewModel;
+using Monitor.ViewModel.Panels;
 using StructureMap;
 
 namespace Lean.AlgorithmMonitor.ViewModel

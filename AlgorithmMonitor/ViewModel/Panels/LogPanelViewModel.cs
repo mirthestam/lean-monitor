@@ -2,10 +2,10 @@
 using System.Collections.ObjectModel;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Messaging;
-using QuantConnect.Lean.Monitor.Model;
-using QuantConnect.Lean.Monitor.Model.Messages;
+using Monitor.Model;
+using Monitor.Model.Messages;
 
-namespace QuantConnect.Lean.Monitor.ViewModel.Panels
+namespace Monitor.ViewModel.Panels
 {
     public class LogPanelViewModel : ViewModelBase
     {

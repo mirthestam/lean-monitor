@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace QuantConnect.Lean.Monitor.ViewModel.Charts
+namespace Monitor.ViewModel.Grids
 {
     /// <summary>
     /// Abstract view model for grid views (i.e. Generic grid, Strategy Equity grid)
@@ -9,7 +9,20 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
     {
         private List<GridSerie> _series;
 
+        private string _chartName;
+
         private GridSerie _selectedSeries;
+
+        public string ChartName
+        {
+            get { return _chartName; }
+            set
+            {
+                _chartName = value;
+                FormatTitle();
+                RaisePropertyChanged();
+            }
+        }
 
         public List<GridSerie> Series
         {
@@ -33,8 +46,14 @@ namespace QuantConnect.Lean.Monitor.ViewModel.Charts
             set
             {
                 _selectedSeries = value;
+                FormatTitle();
                 RaisePropertyChanged();
             }
-        }      
+        }
+
+        private void FormatTitle()
+        {
+            Title = $"{ChartName} [{SelectedSeries.Name}]";
+        }
     }
 }

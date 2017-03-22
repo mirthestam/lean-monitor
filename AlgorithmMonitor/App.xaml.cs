@@ -2,7 +2,7 @@
 using System.Windows;
 using System.Windows.Threading;
 
-namespace QuantConnect.Lean.Monitor
+namespace Monitor
 {
     /// <summary>
     /// Interaction logic for App.xaml
@@ -11,7 +11,7 @@ namespace QuantConnect.Lean.Monitor
     {
         public App()
         {
-            this.Dispatcher.UnhandledException += DispatcherOnUnhandledException;
+            Dispatcher.UnhandledException += DispatcherOnUnhandledException;
         }
 
         private static void DispatcherOnUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs dispatcherUnhandledExceptionEventArgs)

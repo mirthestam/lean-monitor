@@ -1,11 +1,11 @@
-﻿<UserControl x:Class="QuantConnect.Lean.Monitor.View.Charts.StrategyEquityChartPanel"
+﻿<UserControl x:Class="Monitor.View.Charts.StrategyEquityChartPanel"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
              xmlns:geared="clr-namespace:LiveCharts.Geared;assembly=LiveCharts.Geared"
-             xmlns:charts="clr-namespace:QuantConnect.Lean.Monitor.ViewModel.Charts"
+             xmlns:charts="clr-namespace:Monitor.ViewModel.Charts"
              Background="{StaticResource WindowBackgroundBrush}"
             Foreground="{StaticResource ForegroundBrush}"
              mc:Ignorable="d" 
@@ -24,8 +24,9 @@
         </Grid.RowDefinitions>
 
         <StackPanel Margin="4" Orientation="Horizontal">
+            <Button Margin="0,0,4,0" Content="Grid" Command="{Binding ShowGridCommand}" ToolTip="Creates a new tab with a grid for this data"/>
             <ToggleButton Margin="0,0,4,0" IsChecked="{Binding IsDailyPerformanceSeriesVisible}" Content="Daily Perf."/>
-                <ToggleButton IsChecked="{Binding IsBenchmarkSeriesVisible}" Content="Benchmark"/>
+            <ToggleButton IsChecked="{Binding IsBenchmarkSeriesVisible}" Content="Benchmark"/>
         </StackPanel>
 
         <Grid Grid.Row="1">
@@ -46,7 +47,7 @@
                     <geared:GLineSeries Title="Benchmark"
                                     Fill="Transparent"
                                     Stroke="LightBlue"
-                                    Configuration="{Binding ChartPointMapper}"
+                                    Configuration="{Binding ChartPointEvaluator}"
                                     Visibility="{Binding IsBenchmarkSeriesVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
                                     Values="{Binding BenchmarkChartValues}"/>
                     <geared:GOhlcSeries Title="Equity"
@@ -54,7 +55,7 @@
                                     IncreaseBrush="PaleVioletRed"                                        
                                     DecreaseBrush="LightGreen"
                                     StrokeThickness="2"
-                                    Configuration="{Binding OhlcChartPointMapper}"
+                                    Configuration="{Binding OhlcChartPointEvaluator}"
                                     Values="{Binding EquityOhlcChartValues}"/>
                 </lvc:CartesianChart.Series>
                 <lvc:CartesianChart.AxisX>
@@ -79,7 +80,7 @@
                             Visibility="{Binding IsDailyPerformanceSeriesVisible, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <lvc:CartesianChart.Series>
                     <geared:GColumnSeries Title="Daily Performance"
-                                    Configuration="{Binding ChartPointMapper}"
+                                    Configuration="{Binding ChartPointEvaluator}"
                                     Values="{Binding DailyPerformanceChartValues}"/>
                 </lvc:CartesianChart.Series>
                 <lvc:CartesianChart.AxisX>
@@ -105,7 +106,7 @@
                 <lvc:CartesianChart.Series>
                     <geared:GLineSeries Title="Equity"
                                     PointGeometry="{x:Null}"
-                                    Configuration="{Binding ChartPointMapper}"
+                                    Configuration="{Binding ChartPointEvaluator}"
                                     Fill="Transparent"
                                     Values="{Binding EquityChartValues}"/>
                 </lvc:CartesianChart.Series>

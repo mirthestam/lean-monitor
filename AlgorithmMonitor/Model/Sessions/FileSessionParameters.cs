@@ -1,4 +1,4 @@
-namespace QuantConnect.Lean.Monitor.Model.Sessions
+namespace Monitor.Model.Sessions
 {
     /// <summary>
     /// Parameters used for the FileSession

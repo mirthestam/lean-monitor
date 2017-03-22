@@ -1,24 +1,22 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using QuantConnect;
 using QuantConnect.Algorithm;
-using QuantConnect.Brokerages;
 using QuantConnect.Data;
 using QuantConnect.Indicators;
 
 namespace DemoAlgorithm
 {
     /// <summary>
-    /// The Algorithm used to generate the DemoAlgorithm.json
+    /// The Algorithm used to generate the Demo.JSON
     /// </summary>
     public class DemoAlgorithm : QCAlgorithm
     {
         // These are Amsterdam stocks
         private string[] _symbols = { "AALB", "NN", "WKL" };
 
-        private Dictionary<string, RelativeStrengthIndex> _relativeStrengthIndices = new Dictionary<string, RelativeStrengthIndex>();
-        private Dictionary<string, AroonOscillator> _aroonOscillators = new Dictionary<string, AroonOscillator>();
+        private readonly Dictionary<string, RelativeStrengthIndex> _relativeStrengthIndices = new Dictionary<string, RelativeStrengthIndex>();
+        private readonly Dictionary<string, AroonOscillator> _aroonOscillators = new Dictionary<string, AroonOscillator>();
 
         public override void Initialize()
         {
@@ -51,19 +49,29 @@ namespace DemoAlgorithm
             // Change appearance of aroon
             var aroonSeries = new Series(_aroonOscillators[symbol].Name, SeriesType.Line, 1)
             {
-                Color = Color.Coral,
                 ScatterMarkerSymbol = ScatterMarkerSymbol.Diamond
             };
             chart.AddSeries(aroonSeries);
 
             // Change appearance of RSI
-            // Change for GOOG: RSI to a 3rd chart instead of the 2nd as demo
+            // Change for AALB: RSI to a 3rd chart instead of the 2nd as demo
             var rsiSeries = new Series(_relativeStrengthIndices[symbol].Name, SeriesType.Line, symbol == "AALB" ? 2 : 1)
             {
-                Color = Color.Aquamarine,
                 ScatterMarkerSymbol = ScatterMarkerSymbol.Square
             };
             chart.AddSeries(rsiSeries);
+
+            chart.AddSeries(new Series("BUY", SeriesType.Scatter, 0)
+            {
+                Color = Color.DarkSeaGreen,
+                ScatterMarkerSymbol = ScatterMarkerSymbol.Triangle
+            });
+
+            chart.AddSeries(new Series("SELL", SeriesType.Scatter, 0)
+            {
+                Color = Color.IndianRed,
+                ScatterMarkerSymbol = ScatterMarkerSymbol.TriangleDown
+            });
 
             // Add the chart
             AddChart(chart);
@@ -86,13 +94,21 @@ namespace DemoAlgorithm
                     Plot(symbol, symbol, value.Price);
 
                     // Logic is bad for wallet, but does show nice chart data
-                    if (aroon > 60)
+                    if (aroon < -90)
                     {
-                        Buy(symbol, 10);
+                        if (!Portfolio[symbol].Invested)
+                        {
+                            Plot(symbol, "BUY", value.Price);
+                            Buy(symbol, 100);
+                        }
                     }
-                    else if (aroon < 30)
+                    else if (aroon > 90)
                     {
-                        Sell(symbol, 10);
+                        if (Portfolio[symbol].Invested)
+                        {
+                            Plot(symbol, "SELL", value.Price);
+                            Sell(symbol, 100);
+                        }
                     }
                 }
             }

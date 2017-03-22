@@ -5,11 +5,10 @@ using System.Threading;
 using NetMQ;
 using NetMQ.Sockets;
 using Newtonsoft.Json;
-using QuantConnect.Lean.Monitor.Model.Messages;
 using QuantConnect.Orders;
 using QuantConnect.Packets;
 
-namespace QuantConnect.Lean.Monitor.Model.Sessions
+namespace Monitor.Model.Sessions
 {
     public class StreamSession : ISession
     {

@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace QuantConnect.Lean.Monitor.View.Panels
+namespace Monitor.View.Panels
 {
     /// <summary>
     /// Interaction logic for ProfitLossPanel.xaml

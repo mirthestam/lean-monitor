@@ -1,7 +1,7 @@
 using System;
 using GalaSoft.MvvmLight.Messaging;
 
-namespace QuantConnect.Lean.Monitor.Model.Messages
+namespace Monitor.Model.Messages
 {
     public class SessionUpdateMessage : MessageBase
     {

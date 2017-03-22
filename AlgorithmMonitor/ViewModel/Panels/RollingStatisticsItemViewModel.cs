@@ -1,6 +1,6 @@
 using GalaSoft.MvvmLight;
 
-namespace QuantConnect.Lean.Monitor.ViewModel.Panels
+namespace Monitor.ViewModel.Panels
 {
     public class RollingStatisticsItemViewModel : ViewModelBase
     {

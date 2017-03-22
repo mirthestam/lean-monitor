@@ -2,7 +2,7 @@
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 
-namespace QuantConnect.Lean.Monitor.ViewModel
+namespace Monitor.ViewModel
 {
     public class AboutWindowViewModel : ViewModelBase
     {

@@ -7,12 +7,13 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
 using Microsoft.Win32;
-using QuantConnect.Lean.Monitor.Model;
-using QuantConnect.Lean.Monitor.Model.Messages;
-using QuantConnect.Lean.Monitor.Model.Sessions;
-using QuantConnect.Lean.Monitor.ViewModel.Charts;
+using Monitor.Model;
+using Monitor.Model.Messages;
+using Monitor.Model.Sessions;
+using Monitor.ViewModel.Charts;
+using Monitor.ViewModel.Grids;
 
-namespace QuantConnect.Lean.Monitor.ViewModel
+namespace Monitor.ViewModel
 {
     public class MainWindowViewModel : ViewModelBase
     {
@@ -96,7 +97,7 @@ namespace QuantConnect.Lean.Monitor.ViewModel
             {
                 var chartTableViewModel = new GridPanelViewModel
                 {
-                    Key = message.Key,
+                    Key = message.Key
                 };
 
                 // Calcualte the index for this tab
@@ -146,21 +147,6 @@ namespace QuantConnect.Lean.Monitor.ViewModel
                             {
                                 // Normal series. Use the special strategy equity tab
                                 chartDrawViewModel = new StrategyEquityChartViewModel();
-                            }
-
-                            break;
-
-                        case "Benchmark":
-                            if (chart.Value?.Series?.Count > 1)
-                            {
-                                // Apparently the used has added series. this is not supported by the special tab.
-                                // Therefore we use the default view in this case.
-                                chartDrawViewModel = new ChartViewModel();
-                            }
-                            else
-                            {
-                                // use the special benchmark tab
-                                chartDrawViewModel = new BenchmarkChartViewModel();
                             }
 
                             break;
