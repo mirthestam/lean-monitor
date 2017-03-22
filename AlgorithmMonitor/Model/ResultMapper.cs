@@ -48,7 +48,7 @@ namespace Monitor.Model
             return new ChartDefinition
             {
                 Name = sourceChart.Name,                
-                Series = sourceChart.Series.MapToSeriesDefinitionDictionary()
+                Series = sourceChart.Series.MapToSeriesDefinitionDictionary()                
             };
         }
 

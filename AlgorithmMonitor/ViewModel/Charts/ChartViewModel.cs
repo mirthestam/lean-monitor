@@ -20,7 +20,12 @@ namespace Monitor.ViewModel.Charts
     public class ChartViewModel : ChartViewModelBase, IChartParser
     {
         private readonly Dictionary<string, TimeStamp> _lastUpdates = new Dictionary<string, TimeStamp>();
-        private readonly Color _defaultColor = Color.FromArgb(0, 0, 0, 0);
+
+        private readonly List<Color> _defaultColors = new List<Color>
+        {
+            Color.FromArgb(0, 0, 0, 0),
+            Color.FromArgb(255, 0, 0, 0)
+        };
 
         private ObservableCollection<ChildChartViewModel> _children = new ObservableCollection<ChildChartViewModel>();
         private SeriesCollection _scrollSeriesCollection = new SeriesCollection();        
@@ -228,7 +233,7 @@ namespace Monitor.ViewModel.Charts
             series.PointGeometry = GetPointGeometry(sourceSeries.ScatterMarkerSymbol);
             
             // Check whether the series has a color configured
-            if (!sourceSeries.Color.Equals(_defaultColor))
+            if (_defaultColors.All(c => !sourceSeries.Color.Equals(c)))
             {                
                 // No default color present. use it for the stroke
                 var brush = new SolidColorBrush(sourceSeries.Color);
