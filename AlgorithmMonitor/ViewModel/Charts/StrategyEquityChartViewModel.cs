@@ -90,6 +90,12 @@ namespace Monitor.ViewModel.Charts
             }
         }
 
+        protected override void ZoomToFit()
+        {
+            ZoomFrom = 0;
+            ZoomTo = _equityChartValues.Count;
+        }
+
         private void ParseDailyPerformance(Result result)
         {
             ChartDefinition chart;

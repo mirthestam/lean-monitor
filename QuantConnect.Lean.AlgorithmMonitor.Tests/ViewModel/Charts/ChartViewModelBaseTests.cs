@@ -14,6 +14,10 @@ namespace QuantConnect.Lean.AlgorithmMonitor.Tests.ViewModel.Charts
     public class TestChartViewModel : ChartViewModelBase
     {
         public override bool CanClose { get; } = true;
+        protected override void ZoomToFit()
+        {
+            throw new NotImplementedException();
+        }
     }
 
     [TestFixture]

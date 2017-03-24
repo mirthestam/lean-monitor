@@ -229,6 +229,10 @@
     <Compile Include="View\Charts\ChartPanel.xaml.cs">
       <DependentUpon>ChartPanel.xaml</DependentUpon>
     </Compile>
+    <Page Include="Resources\ResourcesDictionary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -339,6 +343,10 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Grid-16.png" />
+    <Resource Include="Resources\Zoom to Extents-16.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

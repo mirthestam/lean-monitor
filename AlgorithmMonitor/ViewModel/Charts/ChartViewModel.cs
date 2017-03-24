@@ -186,6 +186,12 @@ namespace Monitor.ViewModel.Charts
             }
         }
 
+        protected override void ZoomToFit()
+        {
+            ZoomFrom = 0;
+            ZoomTo = ScrollSeriesCollection[0].Values.Count;
+        }
+
         private Series BuildSeries(SeriesDefinition sourceSeries)
         {
             Series series;

@@ -36,6 +36,8 @@ namespace Monitor.ViewModel.Charts
 
         public RelayCommand ShowGridCommand { get; private set; }
 
+        public RelayCommand ZoomFitCommand { get; private set; }
+
         public Model.Resolution Resolution { get; set; } = Model.Resolution.Day;
 
         public int ZoomTo
@@ -67,6 +69,7 @@ namespace Monitor.ViewModel.Charts
         protected ChartViewModelBase()
         {
             ShowGridCommand = new RelayCommand(() => Messenger.Default.Send(new GridRequestMessage(Key)));
+            ZoomFitCommand = new RelayCommand(ZoomToFit);
             XFormatter = val => FormatXLabel((int)val);
         }
 
@@ -127,6 +130,8 @@ namespace Monitor.ViewModel.Charts
                 TimeStampIndexes[ts] = i;
             }
         }
+
+        protected abstract void ZoomToFit();
 
         private string FormatXLabel(int x)
         {

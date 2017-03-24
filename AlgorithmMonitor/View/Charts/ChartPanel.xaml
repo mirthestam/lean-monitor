@@ -17,7 +17,16 @@
         </Grid.RowDefinitions>
 
         <StackPanel Margin="4" Orientation="Horizontal">
-            <Button Margin="0,0,4,0" Content="Grid" Command="{Binding ShowGridCommand}" ToolTip="Creates a new tab with a grid for this data"/>
+            <Button Margin="0,0,2,0" Command="{Binding ShowGridCommand}" ToolTip="Creates a new tab with a grid for this data">
+                <Button.Content>
+                    <Image Style="{DynamicResource GridImage}"/>
+                </Button.Content>
+            </Button>
+            <Button Margin="0,0,2,0" Command="{Binding ZoomFitCommand}">
+                <Button.Content>
+                    <Image Style="{DynamicResource ZoomToFitIamge}"/>
+                </Button.Content>
+            </Button>
         </StackPanel>
 
         <Grid Grid.Row="1">
