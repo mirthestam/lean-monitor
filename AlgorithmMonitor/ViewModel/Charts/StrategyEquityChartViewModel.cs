@@ -177,8 +177,19 @@ namespace Monitor.ViewModel.Charts
             // Update the view window for the chart
             if (EquityChartValues.Count > 0)
             {
-                ZoomFrom = 0;
-                ZoomTo = EquityChartValues.Count - 1;
+                if (ZoomTo == 1)
+                {
+                    // Initially zoom to all data
+                    ZoomFrom = 0;
+                    ZoomTo = EquityChartValues.Count;
+                }
+                else if (!IsPositionLocked)
+                {
+                    // Scroll to latest data
+                    var diff = ZoomTo - ZoomFrom;
+                    ZoomTo = EquityChartValues.Count;
+                    ZoomFrom = ZoomTo - diff;
+                }
             }
 
             _lastUpdates["Strategy Equity"] = values.Last().X;

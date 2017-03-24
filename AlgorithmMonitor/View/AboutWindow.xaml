@@ -63,6 +63,12 @@
                             <Hyperlink CommandParameter="http://wpftoolkit.codeplex.com/wikipage?title=AvalonDock&amp;referringTitle=Home">Extended WPF Toolkit Community Edition</Hyperlink> for the AvalonDock Controls
                         </Paragraph>
                     </ListItem>
+                    <ListItem>
+                        <Paragraph>
+                            <Hyperlink CommandParameter="https://icons8.com/">Icons8</Hyperlink> for the icons
+                        </Paragraph>
+                    </ListItem>
+
                 </List>
                 <Paragraph>among others.</Paragraph>
             </FlowDocument>

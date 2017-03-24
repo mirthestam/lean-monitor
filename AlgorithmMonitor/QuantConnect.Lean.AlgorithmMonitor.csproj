@@ -348,5 +348,8 @@
     <Resource Include="Resources\Grid-16.png" />
     <Resource Include="Resources\Zoom to Extents-16.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Lock-16.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

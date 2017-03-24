@@ -22,11 +22,16 @@
                     <Image Style="{DynamicResource GridImage}"/>
                 </Button.Content>
             </Button>
-            <Button Margin="0,0,2,0" Command="{Binding ZoomFitCommand}">
+            <Button Margin="0,0,2,0" Command="{Binding ZoomFitCommand}" ToolTip="Zooms all data to fit width">
                 <Button.Content>
                     <Image Style="{DynamicResource ZoomToFitIamge}"/>
                 </Button.Content>
             </Button>
+            <ToggleButton Margin="0,0,8,0" IsChecked="{Binding IsPositionLocked}" ToolTip="Enable to lock the position of the chart. Disable to automatically scroll to new updates">
+                <ToggleButton.Content>
+                    <Image Style="{DynamicResource LockImage}"/>
+                </ToggleButton.Content>
+            </ToggleButton>
         </StackPanel>
 
         <Grid Grid.Row="1">

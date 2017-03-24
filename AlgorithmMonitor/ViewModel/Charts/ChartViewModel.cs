@@ -184,6 +184,13 @@ namespace Monitor.ViewModel.Charts
                 // Zoom to the known number of values.
                 ZoomTo = ScrollSeriesCollection[0].Values.Count;
             }
+            else if (!IsPositionLocked)
+            {
+                // Scroll to latest data
+                var diff = ZoomTo - ZoomFrom;
+                ZoomTo = ScrollSeriesCollection[0].Values.Count;
+                ZoomFrom = ZoomTo - diff;
+            }
         }
 
         protected override void ZoomToFit()

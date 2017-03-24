@@ -4,6 +4,7 @@
     
     <BitmapImage x:Key="GridBitmapImage" UriSource="Grid-16.png"/>
     <BitmapImage x:Key="ZoomToFitBitmapImage" UriSource="Zoom to Extents-16.png"/>
+    <BitmapImage x:Key="LockBitmapImage" UriSource="Lock-16.png"/>
 
     <Style TargetType="Image" x:Key="GridImage">
         <Setter Property="Source" Value="{DynamicResource GridBitmapImage}"/>
@@ -12,6 +13,11 @@
 
     <Style TargetType="Image" x:Key="ZoomToFitIamge">
         <Setter Property="Source" Value="{DynamicResource ZoomToFitBitmapImage}"/>
+        <Setter Property="Width" Value="16"/>
+    </Style>
+
+    <Style TargetType="Image" x:Key="LockImage">
+        <Setter Property="Source" Value="{DynamicResource LockBitmapImage}"/>
         <Setter Property="Width" Value="16"/>
     </Style>
 

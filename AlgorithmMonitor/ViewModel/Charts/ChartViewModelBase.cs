@@ -24,6 +24,7 @@ namespace Monitor.ViewModel.Charts
 
         private int _zoomFrom;
         private int _zoomTo = 1;
+        private bool _isPositionLocked;
 
         /// <summary>
         /// Gets the list of TimeStamps. TimeStamps are our primarily X axis upon which all series indexes are mapped
@@ -56,6 +57,16 @@ namespace Monitor.ViewModel.Charts
             set
             {
                 _zoomFrom = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool IsPositionLocked
+        {
+            get { return _isPositionLocked; }
+            set
+            {
+                _isPositionLocked = value;
                 RaisePropertyChanged();
             }
         }
