@@ -143,7 +143,8 @@ namespace Monitor.ViewModel.Charts
                     .Select(sg => sg.Value)
                     .Where(v => v.Values.Count > 0))
                 {
-                    var series = childModel.SeriesCollection[seriesIndex];
+                    //var series = childModel.SeriesCollection[seriesIndex];
+                    var series = childModel.SeriesCollection.First(x => x.Title == quantSeries.Name);
 
                     if (!childModel.LastUpdates.ContainsKey(series.Title)) childModel.LastUpdates[series.Title] = TimeStamp.MinValue;
                     
@@ -174,7 +175,6 @@ namespace Monitor.ViewModel.Charts
             if (scrollSeriesUpdates.Values.Any()) _lastUpdates["Scroll"] = scrollSeriesUpdates.Values.Last().X;
 
             // Update our timestamps based upon the new updates for the scroll series
-
             var newStamps = timeStamps.Distinct().OrderBy(t => t.ElapsedSeconds);
             TimeStamps.AddRange(newStamps);
             RebuildTimeStampIndex();
