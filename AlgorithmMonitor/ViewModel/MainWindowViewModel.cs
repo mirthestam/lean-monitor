@@ -143,30 +143,10 @@ namespace Monitor.ViewModel
                 var chartDrawViewModel = Charts.OfType<ChartViewModelBase>().SingleOrDefault(c => c.Key == chart.Key);
                 if (chartDrawViewModel == null)
                 {
-                    switch (chart.Value.Name)
+                    chartDrawViewModel = new ChartViewModel(_messenger)
                     {
-                        case "Strategy Equity":
-                            if (chart.Value?.Series?.Count > 2)
-                            {
-                                // Apparently the used has added series. this is not supported by the special tab.
-                                // Therefore we use the default view in this case.
-                                chartDrawViewModel = new ChartViewModel();
-                            }
-                            else
-                            {
-                                // Normal series. Use the special strategy equity tab
-                                chartDrawViewModel = new StrategyEquityChartViewModel();
-                            }
-
-                            break;
-
-                        default:
-                            // This is a user added chart
-                            chartDrawViewModel = new ChartViewModel();
-                            break;
-                    }
-
-                    chartDrawViewModel.Key = chart.Key;
+                        Key = chart.Key
+                    };
                     Charts.Add(chartDrawViewModel);
                 }
 

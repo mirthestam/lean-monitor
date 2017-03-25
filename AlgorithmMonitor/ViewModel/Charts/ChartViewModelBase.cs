@@ -77,6 +77,33 @@ namespace Monitor.ViewModel.Charts
             XFormatter = val => FormatXLabel((long)val);
         }
 
+        public long AxisModifier
+        {
+            get
+            {
+                switch (Resolution)
+                {
+                    case Resolution.Second:
+                        return TimeSpan.TicksPerSecond;
+
+                    case Resolution.Minute:
+                        return TimeSpan.TicksPerMinute;
+
+                    case Resolution.Hour:
+                        return TimeSpan.TicksPerHour;
+
+                    case Resolution.Day:
+                        return TimeSpan.TicksPerDay;
+
+                    case Resolution.Ticks:
+                        return 1;
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+        }
+
         public void UpdateExistingOhlcPoints(IList<TimeStampOhlcChartPoint> existingPoints, IList<TimeStampOhlcChartPoint> updatedPoints, Resolution resolution)
         {
             // Check whether we are updating existing points
@@ -109,34 +136,7 @@ namespace Monitor.ViewModel.Charts
         }
 
         protected abstract void ZoomToFit();
-
-        protected long AxisModifier
-        {
-            get
-            {
-                switch (Resolution)
-                {
-                    case Resolution.Second:
-                        return TimeSpan.TicksPerSecond;
-
-                    case Resolution.Minute:
-                        return TimeSpan.TicksPerMinute;
-
-                    case Resolution.Hour:
-                        return TimeSpan.TicksPerHour;
-
-                    case Resolution.Day:
-                        return TimeSpan.TicksPerDay;
-
-                    case Resolution.Ticks:
-                        return 1;
-
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-        }
-
+        
         private string FormatXLabel(long x)
         {
             string format;

@@ -55,10 +55,6 @@
 
             <xcad:DockingManager.Resources>
 
-                <DataTemplate DataType="{x:Type charts:StrategyEquityChartViewModel}">
-                    <charts1:StrategyEquityChartPanel/>
-                </DataTemplate>
-
                 <DataTemplate DataType="{x:Type charts:ChartViewModel}">
                     <charts1:ChartPanel/>
                 </DataTemplate>

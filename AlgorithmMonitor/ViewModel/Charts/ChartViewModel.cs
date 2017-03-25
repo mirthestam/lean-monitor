@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Media;
+using GalaSoft.MvvmLight.Messaging;
 using LiveCharts;
 using LiveCharts.Definitions.Series;
 using LiveCharts.Geared;
@@ -10,6 +11,7 @@ using LiveCharts.Geared.Geometries;
 using LiveCharts.Wpf;
 using Monitor.Model;
 using Monitor.Model.Charting;
+using Monitor.Model.Messages;
 using Monitor.Utils;
 
 namespace Monitor.ViewModel.Charts
@@ -20,7 +22,16 @@ namespace Monitor.ViewModel.Charts
     public class ChartViewModel : ChartViewModelBase, IChartParser
     {        
         private readonly Dictionary<string, TimeStamp> _lastUpdates = new Dictionary<string, TimeStamp>();
+        private readonly IMessenger _messenger;
+
         private TimeStamp _startPoint = TimeStamp.FromDays(0);
+
+        private const int _seriesMaximum = 8000;
+
+        public ChartViewModel(IMessenger messenger)
+        {
+            _messenger = messenger;
+        }
 
         private readonly List<Color> _defaultColors = new List<Color>
         {
@@ -152,6 +163,15 @@ namespace Monitor.ViewModel.Charts
                     UpdateSeries(series, updates);
                     timeStamps.AddRange(updates.Values.Select(u => u.X));
                     if (updates.Values.Any()) childModel.LastUpdates[series.Title] = updates.Values.Last().X;
+
+                    if (updates.Values.Any() && series.Values.Count == _seriesMaximum)
+                    {
+                        // This series is probably truncated by the LEAN engine. Add warning visual elemeent
+                        var lastValue = updates.Values.Last();
+                        childModel.CreateTruncatedVisuaLElement(0, lastValue.X, lastValue.Y);
+                        _messenger.Send(new LogEntryReceivedMessage(DateTime.Now, $"Series { this.Title}.{series.Title} is possibly truncated by the LEAN engine", LogItemType.Monitor));
+                    }
+
                     seriesIndex++;
                 }
             }
@@ -214,14 +234,15 @@ namespace Monitor.ViewModel.Charts
                     series = new GColumnSeries
                     {
                         Configuration = ChartPointEvaluator,
-                        Fill = Brushes.Transparent
                     };
                     break;
 
                 case SeriesType.Candle:
-                    series = new GOhlcSeries
+                    series = new GCandleSeries
                     {
                         Configuration = OhlcChartPointEvaluator,
+                        IncreaseBrush = Brushes.LightCoral,
+                        DecreaseBrush = Brushes.Aquamarine,
                         Fill = Brushes.Transparent
                     };
                     break;
@@ -248,7 +269,17 @@ namespace Monitor.ViewModel.Charts
                 // No default color present. use it for the stroke
                 var brush = new SolidColorBrush(sourceSeries.Color);
                 brush.Freeze();
-                series.Stroke = brush;
+
+                switch (sourceSeries.SeriesType)
+                {
+                    case SeriesType.Candle:
+                        series.Fill = brush;
+                        break;
+
+                    default:
+                        series.Stroke = brush;
+                        break;
+                }                
             }
 
             return series;

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
+using Monitor.Model.Charting.Mutations;
 using NetMQ;
 using NetMQ.Sockets;
 using Newtonsoft.Json;
@@ -146,6 +147,7 @@ namespace Monitor.Model.Sessions
             var backtestResultEventModel = (BacktestResultPacket) packet;
             var backtestResultUpdate = _resultConverter.FromBacktestResult(backtestResultEventModel.Results);
             _result.Add(backtestResultUpdate);
+
             _syncContext.Send(o => _sessionHandler.HandleResult(_result), null);
         }
 
@@ -154,6 +156,7 @@ namespace Monitor.Model.Sessions
             var liveResultEventModel = (LiveResultPacket) packet;
             var liveResultUpdate = _resultConverter.FromLiveResult(liveResultEventModel.Results);
             _result.Add(liveResultUpdate);
+
             _syncContext.Send(o => _sessionHandler.HandleResult(_result), null);
         }
     }
