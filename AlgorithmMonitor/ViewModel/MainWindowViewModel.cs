@@ -156,10 +156,8 @@ namespace Monitor.ViewModel
                 // Others just need a single chart
                 try
                 {
-                    (chartDrawViewModel as IChartParser)?.ParseChart(chart.Value);
-                    (chartDrawViewModel as IResultParser)?.ParseResult(messageResult);
-
-                    (chartTableViewModel as IChartParser)?.ParseChart(chart.Value);
+                    (chartDrawViewModel as IChartView)?.ParseChart(chart.Value);
+                    (chartTableViewModel as IChartView)?.ParseChart(chart.Value);
                 }
                 catch (Exception e)
                 {

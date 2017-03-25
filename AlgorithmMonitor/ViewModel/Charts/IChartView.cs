@@ -2,7 +2,7 @@ using Monitor.Model.Charting;
 
 namespace Monitor.ViewModel.Charts
 {
-    public interface IChartParser
+    public interface IChartView
     {
         void ParseChart(ChartDefinition chart);
     }

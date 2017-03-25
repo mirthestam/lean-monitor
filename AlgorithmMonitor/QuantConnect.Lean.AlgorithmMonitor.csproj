@@ -175,9 +175,7 @@
     <Compile Include="ViewModel\Grids\GridPanelViewModelBase.cs" />
     <Compile Include="ViewModel\Grids\GridPoint.cs" />
     <Compile Include="ViewModel\Grids\GridSerie.cs" />
-    <Compile Include="ViewModel\Charts\IChartParser.cs" />
-    <Compile Include="ViewModel\Charts\IResultParser.cs" />
-    <Compile Include="ViewModel\Charts\StrategyEquityChartViewModel.cs" />
+    <Compile Include="ViewModel\Charts\IChartView.cs" />
     <Compile Include="ViewModel\Charts\ChartViewModelBase.cs" />
     <Compile Include="ViewModel\Grids\GridPanelViewModel.cs" />
     <Compile Include="ViewModel\Charts\ChartViewModel.cs" />

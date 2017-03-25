@@ -19,7 +19,7 @@ namespace Monitor.ViewModel.Charts
     /// <summary>
     /// View model for generic charts
     /// </summary>
-    public class ChartViewModel : ChartViewModelBase, IChartParser
+    public class ChartViewModel : ChartViewModelBase, IChartView
     {        
         private readonly Dictionary<string, TimeStamp> _lastUpdates = new Dictionary<string, TimeStamp>();
         private readonly IMessenger _messenger;
@@ -198,8 +198,28 @@ namespace Monitor.ViewModel.Charts
             if (ZoomTo == 1)
             {
                 // Zoom to the known number of values.
-                ZoomFrom = _startPoint.ElapsedTicks / AxisModifier;
                 ZoomTo = _lastUpdates["Scroll"].ElapsedTicks / AxisModifier;
+
+                long diff;
+                
+                // Determine a default scale
+                switch (Resolution)
+                {
+                    case Resolution.Second:
+                    case Resolution.Minute:
+                    case Resolution.Hour:
+                        diff = (TimeSpan.TicksPerDay * 30) / AxisModifier; // Show a month
+                        break;
+
+                    case Resolution.Day:
+                        diff = (TimeSpan.TicksPerDay * 60) / AxisModifier; // Show approx 2 months
+                        break;
+                    default:
+                        diff = (TimeSpan.TicksPerDay * 60) / AxisModifier;
+                        break;
+                }
+
+                ZoomFrom = ZoomTo - diff;
             }
             else if (!IsPositionLocked)
             {
