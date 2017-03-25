@@ -129,13 +129,6 @@ namespace Monitor.ViewModel.Charts
                             }
                         }
                     });
-
-                    // Build the series
-                    foreach (var quantSeries in sourceSeriesGroup.Select(sg => sg.Value))
-                    {
-                        var series = BuildSeries(quantSeries);
-                        childModel.SeriesCollection.Add(series);
-                    }
                 }
 
                 // Update the series
@@ -145,7 +138,13 @@ namespace Monitor.ViewModel.Charts
                     .Where(v => v.Values.Count > 0))
                 {
                     //var series = childModel.SeriesCollection[seriesIndex];
-                    var series = childModel.SeriesCollection.First(x => x.Title == quantSeries.Name);
+                    var series = childModel.SeriesCollection.FirstOrDefault(x => x.Title == quantSeries.Name);
+
+                    if (series == null)
+                    {
+                        series = BuildSeries(quantSeries);
+                        childModel.SeriesCollection.Add(series);
+                    }
 
                     if (!childModel.LastUpdates.ContainsKey(series.Title)) childModel.LastUpdates[series.Title] = TimeStamp.MinValue;
                     
