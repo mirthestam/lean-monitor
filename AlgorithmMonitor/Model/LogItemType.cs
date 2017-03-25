@@ -3,6 +3,8 @@ namespace Monitor.Model
     public enum LogItemType
     {
         Log,
-        Debug
+        Debug,
+        Error,
+        Monitor
     }
 }
