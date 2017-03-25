@@ -9,25 +9,34 @@ namespace Monitor.Utils
     {
         private TimeSpan _timeSpan;
 
-        public static TimeStamp MinValue => FromDays(0);
+        private const long _epochTicks = 621355968000000000;
+        private const long _minTicks = -621355968000000000;
+        private const long _maxTicks = 3155378975999999999 - _epochTicks;
 
-        public static TimeStamp FromSeconds(double elapsedSeconds)
+        public static TimeStamp MinValue => FromTicks(_minTicks);
+        public static TimeStamp MaxValue => FromTicks(_maxTicks);
+
+        public static TimeStamp FromSeconds(long elapsedSeconds)
         {
             return From(elapsedSeconds, Model.Resolution.Second);
         }
-        public static TimeStamp FromMinutes(double elapsedMinutes)
+        public static TimeStamp FromMinutes(long elapsedMinutes)
         {
             return From(elapsedMinutes, Model.Resolution.Minute);
         }
-        public static TimeStamp FromHours(double elapsedHours)
+        public static TimeStamp FromHours(long elapsedHours)
         {
             return From(elapsedHours, Model.Resolution.Hour);
         }
-        public static TimeStamp FromDays(double elapsedDays)
+        public static TimeStamp FromDays(long elapsedDays)
         {
             return From(elapsedDays, Model.Resolution.Day);
         }
-        public static TimeStamp From(double elapsedUnit, Model.Resolution resolution)
+        public static TimeStamp FromTicks(long elapsedTicks)
+        {
+            return From(elapsedTicks, Model.Resolution.Ticks);
+        }
+        public static TimeStamp From(long elapsedUnit, Model.Resolution resolution)
         {
             var epochDateTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             DateTime dateTime;
@@ -47,6 +56,13 @@ namespace Monitor.Utils
 
                 case Model.Resolution.Second:
                     dateTime = epochDateTime.AddSeconds(elapsedUnit);
+                    break;
+
+                case Model.Resolution.Ticks:
+                    if (elapsedUnit > _maxTicks) throw new ArgumentOutOfRangeException(nameof(elapsedUnit));
+                    if (elapsedUnit < _minTicks) throw new ArgumentOutOfRangeException(nameof(elapsedUnit));
+
+                    dateTime = epochDateTime.AddTicks(elapsedUnit);
                     break;
 
                 default:
@@ -69,31 +85,37 @@ namespace Monitor.Utils
         {
             _timeSpan = timeSpan;
 
-            ElapsedDays = (int) Math.Floor(_timeSpan.TotalDays);
-            ElapsedSeconds = (int)Math.Floor(_timeSpan.TotalSeconds);
-            ElapsedHours = (int)Math.Floor(_timeSpan.TotalHours);
-            ElapsedMinutes = (int)Math.Floor(_timeSpan.TotalMinutes);
+            ElapsedDays = (long)Math.Floor(_timeSpan.TotalDays);
+            ElapsedSeconds = (long)Math.Floor(_timeSpan.TotalSeconds);
+            ElapsedHours = (long)Math.Floor(_timeSpan.TotalHours);
+            ElapsedMinutes = (long)Math.Floor(_timeSpan.TotalMinutes);
+            ElapsedTicks = _timeSpan.Ticks;
         }
 
         /// <summary>
         /// Gets or sets the number of days that have elapsed since Thursday, 1 January 1970
         /// </summary>
-        public int ElapsedDays { get; private set; }
+        public long ElapsedDays { get; private set; }
 
         /// <summary>
         /// Gets or sets the number of seconds that have elapsed since Thursday, 1 January 1970
         /// </summary>
-        public int ElapsedSeconds { get; private set; }
+        public long ElapsedSeconds { get; private set; }
 
         /// <summary>
         /// Gets or sets the number of hours that have elapsed since Thursday, 1 January 1970
         /// </summary>
-        public int ElapsedHours { get; private set; }
+        public long ElapsedHours { get; private set; }
 
         /// <summary>
         /// Gets or sets the number of minutes that have elapsed since Thursday, 1 January 1970
         /// </summary>
-        public int ElapsedMinutes { get; private set; }
+        public long ElapsedMinutes { get; private set; }
+
+        /// <summary>
+        /// Gets or sets the number of minutes that have elapsed since Thursday, 1 January 1970
+        /// </summary>
+        public long ElapsedTicks { get; private set; }
 
         public DateTime DateTime
         {
@@ -116,7 +138,7 @@ namespace Monitor.Utils
 
         public bool Equals(TimeStamp other)
         {
-            return ElapsedSeconds.Equals(other.ElapsedSeconds);
+            return ElapsedTicks.Equals(other.ElapsedTicks);
         }
 
         public override bool Equals(object obj)
@@ -127,7 +149,7 @@ namespace Monitor.Utils
 
         public override int GetHashCode()
         {
-            return ElapsedSeconds.GetHashCode();
+            return ElapsedTicks.GetHashCode();
         }
 
         public override string ToString()

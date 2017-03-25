@@ -65,7 +65,7 @@
                                     Configuration="{Binding ChartPointEvaluator}"
                                     Visibility="{Binding IsBenchmarkSeriesVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
                                     Values="{Binding BenchmarkChartValues}"/>
-                    <geared:GOhlcSeries Title="Equity"
+                    <geared:GCandleSeries Title="Equity"
                                     PointGeometry="{x:Null}"
                                     IncreaseBrush="PaleVioletRed"                                        
                                     DecreaseBrush="LightGreen"

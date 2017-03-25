@@ -18,8 +18,9 @@ namespace Monitor.ViewModel.Charts
     /// View model for generic charts
     /// </summary>
     public class ChartViewModel : ChartViewModelBase, IChartParser
-    {
+    {        
         private readonly Dictionary<string, TimeStamp> _lastUpdates = new Dictionary<string, TimeStamp>();
+        private TimeStamp _startPoint = TimeStamp.FromDays(0);
 
         private readonly List<Color> _defaultColors = new List<Color>
         {
@@ -84,7 +85,7 @@ namespace Monitor.ViewModel.Charts
 
             throw new Exception("Resolution is below second which is not supported.");
         }
-
+        
         public void ParseChart(ChartDefinition sourceChart)
         {
             // Update the title
@@ -165,6 +166,7 @@ namespace Monitor.ViewModel.Charts
             var scrollSeries = (Series) ScrollSeriesCollection.FirstOrDefault();
             if (scrollSeries == null)
             {
+                _startPoint = sourceScrollSeries.Values[0].X;
                 scrollSeries = BuildSeries(sourceScrollSeries);
                 ScrollSeriesCollection.Add(scrollSeries);
             }
@@ -174,29 +176,25 @@ namespace Monitor.ViewModel.Charts
             UpdateSeries(scrollSeries, scrollSeriesUpdates);
             if (scrollSeriesUpdates.Values.Any()) _lastUpdates["Scroll"] = scrollSeriesUpdates.Values.Last().X;
 
-            // Update our timestamps based upon the new updates for the scroll series
-            var newStamps = timeStamps.Distinct().OrderBy(t => t.ElapsedSeconds);
-            TimeStamps.AddRange(newStamps);
-            RebuildTimeStampIndex();
-
             if (ZoomTo == 1)
             {
                 // Zoom to the known number of values.
-                ZoomTo = ScrollSeriesCollection[0].Values.Count;
+                ZoomFrom = _startPoint.ElapsedTicks / AxisModifier;
+                ZoomTo = _lastUpdates["Scroll"].ElapsedTicks / AxisModifier;
             }
             else if (!IsPositionLocked)
             {
                 // Scroll to latest data
                 var diff = ZoomTo - ZoomFrom;
-                ZoomTo = ScrollSeriesCollection[0].Values.Count;
+                ZoomTo = _lastUpdates["Scroll"].ElapsedTicks / AxisModifier;
                 ZoomFrom = ZoomTo - diff;
             }
         }
 
         protected override void ZoomToFit()
         {
-            ZoomFrom = 0;
-            ZoomTo = ScrollSeriesCollection[0].Values.Count;
+            ZoomFrom = _startPoint.ElapsedTicks / AxisModifier;
+            ZoomTo = Math.Max(1, _lastUpdates["Scroll"].ElapsedTicks / AxisModifier);
         }
 
         private Series BuildSeries(SeriesDefinition sourceSeries)

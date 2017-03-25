@@ -92,8 +92,8 @@ namespace Monitor.ViewModel.Charts
 
         protected override void ZoomToFit()
         {
-            ZoomFrom = 0;
-            ZoomTo = _equityChartValues.Count;
+            ZoomFrom = EquityChartValues[0].X.ElapsedTicks / AxisModifier;
+            ZoomTo = EquityChartValues[EquityChartValues.Count - 1].X.ElapsedTicks / AxisModifier;
         }
 
         private void ParseDailyPerformance(Result result)
@@ -164,8 +164,6 @@ namespace Monitor.ViewModel.Charts
             if (values.Count == 0) return; // This can be the case when only the last known day has been updated
 
             EquityOhlcChartValues.AddRange(values);
-            TimeStamps.AddRange(values.Select(v => v.X));
-            RebuildTimeStampIndex();
 
             // Update normal chart with only the close values
             EquityChartValues.AddRange(values.Select(v => new TimeStampChartPoint
@@ -179,15 +177,13 @@ namespace Monitor.ViewModel.Charts
             {
                 if (ZoomTo == 1)
                 {
-                    // Initially zoom to all data
-                    ZoomFrom = 0;
-                    ZoomTo = EquityChartValues.Count;
+                    ZoomToFit();
                 }
                 else if (!IsPositionLocked)
                 {
                     // Scroll to latest data
                     var diff = ZoomTo - ZoomFrom;
-                    ZoomTo = EquityChartValues.Count;
+                    ZoomTo = Math.Max(1, _lastUpdates["Strategy Equity"].ElapsedTicks);
                     ZoomFrom = ZoomTo - diff;
                 }
             }

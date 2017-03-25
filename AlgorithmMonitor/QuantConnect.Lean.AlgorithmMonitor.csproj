@@ -125,9 +125,10 @@
     </ApplicationDefinition>
     <Compile Include="AppRegistry.cs" />
     <None Include="Demo\DemoAlgorithm.cs" />
+    <Compile Include="Model\Charting\CartesianMapperBase.cs" />
     <Compile Include="Model\Charting\ChartDefinition.cs" />
-    <Compile Include="Model\Charting\Geometries.cs" />
     <Compile Include="Model\Charting\FinancialMapperBase.cs" />
+    <Compile Include="Model\Charting\Geometries.cs" />
     <Compile Include="Model\Charting\OhlcTimeStampChartPointMapper.cs" />
     <Compile Include="Model\Charting\TriangleDown.cs" />
     <Compile Include="Model\IResultSerializer.cs" />
@@ -167,15 +168,12 @@
     <Compile Include="Utils\SeriesExt.cs" />
     <Compile Include="Model\Resolution.cs" />
     <Compile Include="Model\Messages\GridRequestMessage.cs" />
-    <Compile Include="Model\Charting\CartesianMapperBase.cs" />
     <Compile Include="ViewModel\Charts\ChildChartViewModel.cs" />
-    <Compile Include="Model\Charting\TimeStampEqualityComparer.cs" />
     <Compile Include="ViewModel\Grids\GridPanelViewModelBase.cs" />
     <Compile Include="ViewModel\Grids\GridPoint.cs" />
     <Compile Include="ViewModel\Grids\GridSerie.cs" />
     <Compile Include="ViewModel\Charts\IChartParser.cs" />
     <Compile Include="ViewModel\Charts\IResultParser.cs" />
-    <Compile Include="Model\Charting\ITimeStampSource.cs" />
     <Compile Include="ViewModel\Charts\StrategyEquityChartViewModel.cs" />
     <Compile Include="ViewModel\Charts\ChartViewModelBase.cs" />
     <Compile Include="ViewModel\Grids\GridPanelViewModel.cs" />

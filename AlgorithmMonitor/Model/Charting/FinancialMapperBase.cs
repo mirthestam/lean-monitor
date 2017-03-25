@@ -4,9 +4,9 @@ namespace Monitor.Model.Charting
 {
     public abstract class FinancialMapperBase<T> : FinancialMapper<T>
     {
-        protected ITimeStampSource Source;
+        protected IResolutionProvider Source;
 
-        protected FinancialMapperBase(ITimeStampSource source)
+        protected FinancialMapperBase(IResolutionProvider source)
         {
             Source = source;
         }
