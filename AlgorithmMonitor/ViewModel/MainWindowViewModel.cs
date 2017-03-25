@@ -143,30 +143,10 @@ namespace Monitor.ViewModel
                 var chartDrawViewModel = Charts.OfType<ChartViewModelBase>().SingleOrDefault(c => c.Key == chart.Key);
                 if (chartDrawViewModel == null)
                 {
-                    switch (chart.Value.Name)
+                    chartDrawViewModel = new ChartViewModel(_messenger)
                     {
-                        case "Strategy Equity":
-                            if (chart.Value?.Series?.Count > 2)
-                            {
-                                // Apparently the used has added series. this is not supported by the special tab.
-                                // Therefore we use the default view in this case.
-                                chartDrawViewModel = new ChartViewModel();
-                            }
-                            else
-                            {
-                                // Normal series. Use the special strategy equity tab
-                                chartDrawViewModel = new StrategyEquityChartViewModel();
-                            }
-
-                            break;
-
-                        default:
-                            // This is a user added chart
-                            chartDrawViewModel = new ChartViewModel();
-                            break;
-                    }
-
-                    chartDrawViewModel.Key = chart.Key;
+                        Key = chart.Key
+                    };
                     Charts.Add(chartDrawViewModel);
                 }
 
@@ -176,10 +156,8 @@ namespace Monitor.ViewModel
                 // Others just need a single chart
                 try
                 {
-                    (chartDrawViewModel as IChartParser)?.ParseChart(chart.Value);
-                    (chartDrawViewModel as IResultParser)?.ParseResult(messageResult);
-
-                    (chartTableViewModel as IChartParser)?.ParseChart(chart.Value);
+                    (chartDrawViewModel as IChartView)?.ParseChart(chart.Value);
+                    (chartTableViewModel as IChartView)?.ParseChart(chart.Value);
                 }
                 catch (Exception e)
                 {

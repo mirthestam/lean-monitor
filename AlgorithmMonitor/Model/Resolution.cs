@@ -8,6 +8,7 @@ namespace Monitor.Model
         Second,
         Minute,
         Hour,
-        Day
+        Day,
+        Ticks
     }
 }

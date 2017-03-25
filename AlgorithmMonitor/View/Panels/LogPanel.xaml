@@ -7,6 +7,19 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-        <DataGrid IsReadOnly="True" GridLinesVisibility="None" ItemsSource="{Binding LogEntries}"></DataGrid>
+        <DataGrid IsReadOnly="True" AutoGenerateColumns="False" GridLinesVisibility="None" ItemsSource="{Binding LogEntries}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Width="100" Header="Type" Binding="{Binding EntryType}"></DataGridTextColumn>
+                <DataGridTextColumn Width="140" Header="Date" Binding="{Binding DateTime}"></DataGridTextColumn>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <!-- Make sure multiline text is trimmed at first line, and tooltip shows the content -->
+                            <TextBlock TextTrimming="WordEllipsis" ToolTip="{Binding Message}" Text="{Binding Message}"></TextBlock>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </UserControl>

@@ -11,6 +11,7 @@
                 <ResourceDictionary Source="Themes\Expression.xaml" />
                 <ResourceDictionary Source="Themes\Expression.AvalonDock.xaml" />
                 <ResourceDictionary Source="Themes\Expression.Charting.xaml" />
+                <ResourceDictionary Source="Resources/ResourcesDictionary.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             <viewModel:ViewModelLocator x:Key="Locator" d:IsDataSource="True" />
     </ResourceDictionary>

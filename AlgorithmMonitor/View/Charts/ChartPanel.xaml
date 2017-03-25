@@ -15,9 +15,23 @@
             <RowDefinition Height="Auto"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
-
+        
         <StackPanel Margin="4" Orientation="Horizontal">
-            <Button Margin="0,0,4,0" Content="Grid" Command="{Binding ShowGridCommand}" ToolTip="Creates a new tab with a grid for this data"/>
+            <Button Margin="0,0,2,0" Command="{Binding ShowGridCommand}" ToolTip="Creates a new tab with a grid for this data">
+                <Button.Content>
+                    <Image Style="{DynamicResource GridImage}"/>
+                </Button.Content>
+            </Button>
+            <Button Margin="0,0,2,0" Command="{Binding ZoomFitCommand}" ToolTip="Zooms all data to fit width">
+                <Button.Content>
+                    <Image Style="{DynamicResource ZoomToFitIamge}"/>
+                </Button.Content>
+            </Button>
+            <ToggleButton Margin="0,0,8,0" IsChecked="{Binding IsPositionLocked}" ToolTip="Enable to lock the position of the chart. Disable to automatically scroll to new updates">
+                <ToggleButton.Content>
+                    <Image Style="{DynamicResource LockImage}"/>
+                </ToggleButton.Content>
+            </ToggleButton>
         </StackPanel>
 
         <Grid Grid.Row="1">
@@ -51,9 +65,10 @@
                             DisableAnimations="True"
                             Zoom="X"                            
                             AxisY="{Binding YAxesCollection}"
-                            Series="{Binding SeriesCollection}"                            
+                            Series="{Binding SeriesCollection}"                 
+                            VisualElements="{Binding VisualElementsCollection}"
                             LegendLocation="None"
-                Hoverable="False">
+                            Hoverable="False">
                                 <wpf:CartesianChart.Resources>
                                     <Style TargetType="{x:Type wpf:CartesianChart}">
                                         <Style.Triggers>
@@ -69,7 +84,7 @@
                                     MaxValue="{Binding Path=Parent.ZoomTo, Mode=TwoWay}"
                                     LabelFormatter="{Binding Parent.XFormatter, Mode=TwoWay}"
                                     ShowLabels="true"              
-                                    Position="RightTop"                                    
+                                    Position="RightTop"                                        
                                     Separator="{x:Static wpf:DefaultAxes.CleanSeparator}">
                                         <wpf:Axis.Resources>
                                             <Style TargetType="{x:Type wpf:Axis}">

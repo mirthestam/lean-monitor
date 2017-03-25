@@ -125,9 +125,13 @@
     </ApplicationDefinition>
     <Compile Include="AppRegistry.cs" />
     <None Include="Demo\DemoAlgorithm.cs" />
+    <Compile Include="Model\Charting\CartesianMapperBase.cs" />
     <Compile Include="Model\Charting\ChartDefinition.cs" />
-    <Compile Include="Model\Charting\Geometries.cs" />
     <Compile Include="Model\Charting\FinancialMapperBase.cs" />
+    <Compile Include="Model\Charting\Geometries.cs" />
+    <Compile Include="Model\Charting\IResolutionProvider.cs" />
+    <Compile Include="Model\Charting\Mutations\BenchmarkResultMutator.cs" />
+    <Compile Include="Model\Charting\Mutations\IResultMutator.cs" />
     <Compile Include="Model\Charting\OhlcTimeStampChartPointMapper.cs" />
     <Compile Include="Model\Charting\TriangleDown.cs" />
     <Compile Include="Model\IResultSerializer.cs" />
@@ -167,16 +171,11 @@
     <Compile Include="Utils\SeriesExt.cs" />
     <Compile Include="Model\Resolution.cs" />
     <Compile Include="Model\Messages\GridRequestMessage.cs" />
-    <Compile Include="Model\Charting\CartesianMapperBase.cs" />
     <Compile Include="ViewModel\Charts\ChildChartViewModel.cs" />
-    <Compile Include="Model\Charting\TimeStampEqualityComparer.cs" />
     <Compile Include="ViewModel\Grids\GridPanelViewModelBase.cs" />
     <Compile Include="ViewModel\Grids\GridPoint.cs" />
     <Compile Include="ViewModel\Grids\GridSerie.cs" />
-    <Compile Include="ViewModel\Charts\IChartParser.cs" />
-    <Compile Include="ViewModel\Charts\IResultParser.cs" />
-    <Compile Include="Model\Charting\ITimeStampSource.cs" />
-    <Compile Include="ViewModel\Charts\StrategyEquityChartViewModel.cs" />
+    <Compile Include="ViewModel\Charts\IChartView.cs" />
     <Compile Include="ViewModel\Charts\ChartViewModelBase.cs" />
     <Compile Include="ViewModel\Grids\GridPanelViewModel.cs" />
     <Compile Include="ViewModel\Charts\ChartViewModel.cs" />
@@ -198,9 +197,6 @@
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Compile Include="View\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="View\Charts\StrategyEquityChartPanel.xaml.cs">
-      <DependentUpon>StrategyEquityChartPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Panels\LogPanel.xaml.cs">
       <DependentUpon>LogPanel.xaml</DependentUpon>
@@ -229,6 +225,10 @@
     <Compile Include="View\Charts\ChartPanel.xaml.cs">
       <DependentUpon>ChartPanel.xaml</DependentUpon>
     </Compile>
+    <Page Include="Resources\ResourcesDictionary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -254,10 +254,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="View\AboutWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="View\Charts\StrategyEquityChartPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -339,6 +335,16 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Grid-16.png" />
+    <Resource Include="Resources\Zoom to Extents-16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Lock-16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Attention-16.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

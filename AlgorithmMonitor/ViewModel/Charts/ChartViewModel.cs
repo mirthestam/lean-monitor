@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Media;
+using GalaSoft.MvvmLight.Messaging;
 using LiveCharts;
 using LiveCharts.Definitions.Series;
 using LiveCharts.Geared;
@@ -10,6 +11,7 @@ using LiveCharts.Geared.Geometries;
 using LiveCharts.Wpf;
 using Monitor.Model;
 using Monitor.Model.Charting;
+using Monitor.Model.Messages;
 using Monitor.Utils;
 
 namespace Monitor.ViewModel.Charts
@@ -17,9 +19,19 @@ namespace Monitor.ViewModel.Charts
     /// <summary>
     /// View model for generic charts
     /// </summary>
-    public class ChartViewModel : ChartViewModelBase, IChartParser
-    {
+    public class ChartViewModel : ChartViewModelBase, IChartView
+    {        
         private readonly Dictionary<string, TimeStamp> _lastUpdates = new Dictionary<string, TimeStamp>();
+        private readonly IMessenger _messenger;
+
+        private TimeStamp _startPoint = TimeStamp.FromDays(0);
+
+        private const int _seriesMaximum = 8000;
+
+        public ChartViewModel(IMessenger messenger)
+        {
+            _messenger = messenger;
+        }
 
         private readonly List<Color> _defaultColors = new List<Color>
         {
@@ -84,7 +96,7 @@ namespace Monitor.ViewModel.Charts
 
             throw new Exception("Resolution is below second which is not supported.");
         }
-
+        
         public void ParseChart(ChartDefinition sourceChart)
         {
             // Update the title
@@ -128,13 +140,6 @@ namespace Monitor.ViewModel.Charts
                             }
                         }
                     });
-
-                    // Build the series
-                    foreach (var quantSeries in sourceSeriesGroup.Select(sg => sg.Value))
-                    {
-                        var series = BuildSeries(quantSeries);
-                        childModel.SeriesCollection.Add(series);
-                    }
                 }
 
                 // Update the series
@@ -143,7 +148,14 @@ namespace Monitor.ViewModel.Charts
                     .Select(sg => sg.Value)
                     .Where(v => v.Values.Count > 0))
                 {
-                    var series = childModel.SeriesCollection[seriesIndex];
+                    //var series = childModel.SeriesCollection[seriesIndex];
+                    var series = childModel.SeriesCollection.FirstOrDefault(x => x.Title == quantSeries.Name);
+
+                    if (series == null)
+                    {
+                        series = BuildSeries(quantSeries);
+                        childModel.SeriesCollection.Add(series);
+                    }
 
                     if (!childModel.LastUpdates.ContainsKey(series.Title)) childModel.LastUpdates[series.Title] = TimeStamp.MinValue;
                     
@@ -151,6 +163,15 @@ namespace Monitor.ViewModel.Charts
                     UpdateSeries(series, updates);
                     timeStamps.AddRange(updates.Values.Select(u => u.X));
                     if (updates.Values.Any()) childModel.LastUpdates[series.Title] = updates.Values.Last().X;
+
+                    if (updates.Values.Any() && series.Values.Count == _seriesMaximum)
+                    {
+                        // This series is probably truncated by the LEAN engine. Add warning visual elemeent
+                        var lastValue = updates.Values.Last();
+                        childModel.CreateTruncatedVisuaLElement(0, lastValue.X, lastValue.Y);
+                        _messenger.Send(new LogEntryReceivedMessage(DateTime.Now, $"Series { this.Title}.{series.Title} is possibly truncated by the LEAN engine", LogItemType.Monitor));
+                    }
+
                     seriesIndex++;
                 }
             }
@@ -164,6 +185,7 @@ namespace Monitor.ViewModel.Charts
             var scrollSeries = (Series) ScrollSeriesCollection.FirstOrDefault();
             if (scrollSeries == null)
             {
+                _startPoint = sourceScrollSeries.Values[0].X;
                 scrollSeries = BuildSeries(sourceScrollSeries);
                 ScrollSeriesCollection.Add(scrollSeries);
             }
@@ -173,17 +195,45 @@ namespace Monitor.ViewModel.Charts
             UpdateSeries(scrollSeries, scrollSeriesUpdates);
             if (scrollSeriesUpdates.Values.Any()) _lastUpdates["Scroll"] = scrollSeriesUpdates.Values.Last().X;
 
-            // Update our timestamps based upon the new updates for the scroll series
-
-            var newStamps = timeStamps.Distinct().OrderBy(t => t.ElapsedSeconds);
-            TimeStamps.AddRange(newStamps);
-            RebuildTimeStampIndex();
-
             if (ZoomTo == 1)
             {
                 // Zoom to the known number of values.
-                ZoomTo = ScrollSeriesCollection[0].Values.Count;
+                ZoomTo = _lastUpdates["Scroll"].ElapsedTicks / AxisModifier;
+
+                long diff;
+                
+                // Determine a default scale
+                switch (Resolution)
+                {
+                    case Resolution.Second:
+                    case Resolution.Minute:
+                    case Resolution.Hour:
+                        diff = (TimeSpan.TicksPerDay * 30) / AxisModifier; // Show a month
+                        break;
+
+                    case Resolution.Day:
+                        diff = (TimeSpan.TicksPerDay * 60) / AxisModifier; // Show approx 2 months
+                        break;
+                    default:
+                        diff = (TimeSpan.TicksPerDay * 60) / AxisModifier;
+                        break;
+                }
+
+                ZoomFrom = ZoomTo - diff;
             }
+            else if (!IsPositionLocked)
+            {
+                // Scroll to latest data
+                var diff = ZoomTo - ZoomFrom;
+                ZoomTo = _lastUpdates["Scroll"].ElapsedTicks / AxisModifier;
+                ZoomFrom = ZoomTo - diff;
+            }
+        }
+
+        protected override void ZoomToFit()
+        {
+            ZoomFrom = _startPoint.ElapsedTicks / AxisModifier;
+            ZoomTo = Math.Max(1, _lastUpdates["Scroll"].ElapsedTicks / AxisModifier);
         }
 
         private Series BuildSeries(SeriesDefinition sourceSeries)
@@ -204,14 +254,15 @@ namespace Monitor.ViewModel.Charts
                     series = new GColumnSeries
                     {
                         Configuration = ChartPointEvaluator,
-                        Fill = Brushes.Transparent
                     };
                     break;
 
                 case SeriesType.Candle:
-                    series = new GOhlcSeries
+                    series = new GCandleSeries
                     {
                         Configuration = OhlcChartPointEvaluator,
+                        IncreaseBrush = Brushes.LightCoral,
+                        DecreaseBrush = Brushes.Aquamarine,
                         Fill = Brushes.Transparent
                     };
                     break;
@@ -238,7 +289,17 @@ namespace Monitor.ViewModel.Charts
                 // No default color present. use it for the stroke
                 var brush = new SolidColorBrush(sourceSeries.Color);
                 brush.Freeze();
-                series.Stroke = brush;
+
+                switch (sourceSeries.SeriesType)
+                {
+                    case SeriesType.Candle:
+                        series.Fill = brush;
+                        break;
+
+                    default:
+                        series.Stroke = brush;
+                        break;
+                }                
             }
 
             return series;

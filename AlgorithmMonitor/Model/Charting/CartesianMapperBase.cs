@@ -4,9 +4,9 @@ namespace Monitor.Model.Charting
 {
     public abstract class CartesianMapperBase<T> : CartesianMapper<T>
     {
-        protected ITimeStampSource Source;
+        protected IResolutionProvider Source;
 
-        protected CartesianMapperBase(ITimeStampSource source)
+        protected CartesianMapperBase(IResolutionProvider source)
         {
             Source = source;
         }

@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight.Messaging;
 using Monitor.Model;
+using Monitor.Model.Charting.Mutations;
 using Monitor.Model.Sessions;
 using StructureMap;
 
@@ -16,6 +17,8 @@ namespace Monitor
             For<ISessionService>().Singleton().Use<SessionService>();
             For<IResultConverter>().Singleton().Use<ResultConverter>();
             For<IResultSerializer>().Singleton().Use<ResultSerializer>();
+
+            For<IResultMutator>().Singleton().Use<BenchmarkResultMutator>(); // Implement pipeline pattern if more mutators will exist in the future.
         }
     }
 }

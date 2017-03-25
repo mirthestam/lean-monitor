@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using GalaSoft.MvvmLight.Messaging;
+using Monitor.Model.Charting.Mutations;
 using Monitor.Model.Messages;
 
 namespace Monitor.Model.Sessions
@@ -10,6 +11,7 @@ namespace Monitor.Model.Sessions
         private readonly IMessenger _messenger;
         private readonly IResultConverter _resultConverter;
         private readonly IResultSerializer _resultSerializer;
+        private readonly IResultMutator _resultMutator;
 
         private ISession _session;
 
@@ -17,11 +19,12 @@ namespace Monitor.Model.Sessions
 
         public bool IsSessionActive => _session != null;
 
-        public SessionService(IMessenger messenger, IResultConverter resultConverter, IResultSerializer resultSerializer)
+        public SessionService(IMessenger messenger, IResultConverter resultConverter, IResultSerializer resultSerializer, IResultMutator resultMutator)
         {
             _messenger = messenger;
             _resultConverter = resultConverter;
             _resultSerializer = resultSerializer;
+            _resultMutator = resultMutator;
         }
 
         public void HandleResult(Result result)
@@ -39,6 +42,9 @@ namespace Monitor.Model.Sessions
             // Update the last result
             LastResult = result;
 
+            // Apply mutations
+            _resultMutator.Mutate(result);
+            
             // Send a message indicating the session has been updated
             _messenger.Send(new SessionUpdateMessage(_session.Name, result));
         }
