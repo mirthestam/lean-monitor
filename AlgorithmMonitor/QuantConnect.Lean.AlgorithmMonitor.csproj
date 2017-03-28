@@ -151,6 +151,9 @@
     <Compile Include="Model\Charting\SeriesDefinition.cs" />
     <Compile Include="Model\Charting\SeriesType.cs" />
     <Compile Include="Model\Sessions\SessionState.cs" />
+    <Compile Include="Model\Statistics\IStatisticsFormatter.cs" />
+    <Compile Include="Model\Statistics\StatisticsFormatter.cs" />
+    <Compile Include="Model\Statistics\StatisticState.cs" />
     <Compile Include="Utils\DateTimeExt.cs" />
     <Compile Include="Model\Sessions\FileSessionParameters.cs" />
     <Compile Include="Model\Sessions\FileSession.cs" />
@@ -284,6 +287,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\Panels\StatisticsPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Panels\StatisticsResourceDictionary.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

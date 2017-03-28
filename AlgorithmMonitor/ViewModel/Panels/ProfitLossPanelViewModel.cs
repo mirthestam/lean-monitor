@@ -54,7 +54,8 @@ namespace Monitor.ViewModel.Panels
             ProfitLoss = new ObservableCollection<ProfitLossItemViewModel>(result.ProfitLoss.OrderBy(o => o.Key).Select(p => new ProfitLossItemViewModel
             {
                 DateTime = p.Key,
-                Profit = p.Value
+                Profit = p.Value,
+                IsNegative = p.Value < 0
             }));
         }
     }

@@ -6,7 +6,18 @@
              mc:Ignorable="d" 
              DataContext="{Binding RuntimeStatisticsPanel, Source={StaticResource Locator}}"
              d:DesignHeight="300" d:DesignWidth="300">
+
+    <UserControl.Resources>
+        <ResourceDictionary Source="StatisticsResourceDictionary.xaml"/>
+    </UserControl.Resources>
+
     <Grid>
-        <DataGrid IsReadOnly="True" GridLinesVisibility="None" ItemsSource="{Binding Statistics}"></DataGrid>
+        <DataGrid IsReadOnly="True" GridLinesVisibility="None" AutoGenerateColumns="False"  ItemsSource="{Binding Statistics}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="{StaticResource NameDataGridLength}"/>
+                <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="{StaticResource ValueDataGridLength}" ElementStyle="{StaticResource StatisticValueTextBlockStyle}">
+                </DataGridTextColumn>
+            </DataGrid.Columns>
+        </DataGrid>
     </Grid>
 </UserControl>

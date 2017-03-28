@@ -4,12 +4,14 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Messaging;
 using Monitor.Model;
 using Monitor.Model.Messages;
+using Monitor.Model.Statistics;
 
 namespace Monitor.ViewModel.Panels
 {
     public class StatisticsPanelViewModel : ViewModelBase
     {
         private readonly IMessenger _messenger;
+        private readonly IStatisticsFormatter _statisticsFormatter;
 
         private ObservableCollection<StatisticViewModel> _statistics = new ObservableCollection<StatisticViewModel>();
 
@@ -23,9 +25,10 @@ namespace Monitor.ViewModel.Panels
             }
         }
 
-        public StatisticsPanelViewModel(IMessenger messenger)
+        public StatisticsPanelViewModel(IMessenger messenger, IStatisticsFormatter statisticsFormatter)
         {
             _messenger = messenger;
+            _statisticsFormatter = statisticsFormatter;
             _messenger.Register<SessionUpdateMessage>(this, message =>
             {
                 ParseResult(message.Result);
@@ -43,7 +46,8 @@ namespace Monitor.ViewModel.Panels
             Statistics = new ObservableCollection<StatisticViewModel>(result.Statistics.Select(s => new StatisticViewModel
             {
                 Name = s.Key,
-                Value = s.Value
+                Value = s.Value,
+                State = _statisticsFormatter.Format(s.Key, s.Value)
             }));
         }
     }

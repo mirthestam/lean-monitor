@@ -2,6 +2,7 @@
 using Monitor.Model;
 using Monitor.Model.Charting.Mutations;
 using Monitor.Model.Sessions;
+using Monitor.Model.Statistics;
 using StructureMap;
 
 namespace Monitor
@@ -18,6 +19,7 @@ namespace Monitor
             For<IResultConverter>().Singleton().Use<ResultConverter>();
             For<IResultSerializer>().Singleton().Use<ResultSerializer>();
 
+            For<IStatisticsFormatter>().Use<StatisticsFormatter>();
             For<IResultMutator>().Singleton().Use<BenchmarkResultMutator>(); // Implement pipeline pattern if more mutators will exist in the future.
         }
     }

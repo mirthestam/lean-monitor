@@ -10,7 +10,17 @@
         <DataGrid IsReadOnly="True" GridLinesVisibility="None" AutoGenerateColumns="False" ItemsSource="{Binding ProfitLoss}">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Date" Binding="{Binding DateTime}"/>
-                <DataGridTextColumn Header="Profit / Loss" Binding="{Binding Profit}"/>
+                <DataGridTextColumn Header="Profit / Loss" Binding="{Binding Profit}">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsNegative}" Value="true">
+                                    <Setter Property="Foreground" Value="LightCoral"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
             </DataGrid.Columns>
         </DataGrid>
     </Grid>
