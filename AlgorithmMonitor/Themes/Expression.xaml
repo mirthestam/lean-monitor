@@ -7,7 +7,7 @@
 
     <!--Converters-->
     <BooleanToVisibilityConverter x:Key="bool2VisibilityConverter"/>
-    
+
     <!--Colors-->
     <Color x:Key="WindowBackgroundColor">#444444</Color>
     <Color x:Key="DarkBackgroundColor">#333333</Color>
@@ -276,7 +276,7 @@
 
     <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource Bar}"/>
 
-   
+
     <!--TabControl-->
     <Style TargetType="{x:Type TabControl}" x:Key="Foo">
         <Style.Resources>
@@ -423,8 +423,8 @@
         </Setter>
     </Style>
 
-    <Style TargetType="{x:Type TabControl}" BasedOn="{StaticResource Foo}"/>    
-    
+    <Style TargetType="{x:Type TabControl}" BasedOn="{StaticResource Foo}"/>
+
     <!-- ScrollBar -->
     <Style TargetType="{x:Type ScrollViewer}">
         <Setter Property="Background" Value="{DynamicResource ScrollViewerBackground}"/>
@@ -2109,7 +2109,7 @@
     </Style>
 
     <!-- StatusBar -->
-    <Style TargetType="{x:Type StatusBar}">
+    <Style TargetType="{x:Type StatusBar}" x:Key="StatusBarStyle">
         <Setter Property="Margin" Value="1 0 3 0"/>
         <Setter Property="Height" Value="18"/>
         <Setter Property="Background" Value="{StaticResource WindowBackgroundBrush}"/>
@@ -2128,6 +2128,8 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <Style TargetType="{x:Type StatusBar}" BasedOn="{StaticResource StatusBarStyle}"/>
 
     <Style TargetType="{x:Type StatusBarItem}">
         <Setter Property="Margin" Value="4 0 4 0"/>

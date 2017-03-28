@@ -8,7 +8,9 @@ namespace Monitor.Model.Sessions
 
         void Initialize();
 
-        void CloseSession();        
+        void ShutdownSession();
+
+        bool IsSessionSubscribed { get; set; }
 
         void OpenStream(StreamSessionParameters parameters);
 

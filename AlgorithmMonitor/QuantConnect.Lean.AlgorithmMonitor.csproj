@@ -138,6 +138,7 @@
     <Compile Include="Model\LogItemType.cs" />
     <Compile Include="Model\Messages\SessionClosedMessage.cs" />
     <Compile Include="Model\Messages\SessionOpenedMessage.cs" />
+    <Compile Include="Model\Messages\SessionStateChangedmessage.cs" />
     <Compile Include="Model\Messages\SessionUpdateMessage.cs" />
     <Compile Include="Model\Messages\ShowNewSessionWindowMessage.cs" />
     <Compile Include="Model\Charting\ITimeStampChartPoint.cs" />
@@ -149,6 +150,7 @@
     <Compile Include="Model\Charting\ScatterMarkerSymbol.cs" />
     <Compile Include="Model\Charting\SeriesDefinition.cs" />
     <Compile Include="Model\Charting\SeriesType.cs" />
+    <Compile Include="Model\Sessions\SessionState.cs" />
     <Compile Include="Utils\DateTimeExt.cs" />
     <Compile Include="Model\Sessions\FileSessionParameters.cs" />
     <Compile Include="Model\Sessions\FileSession.cs" />

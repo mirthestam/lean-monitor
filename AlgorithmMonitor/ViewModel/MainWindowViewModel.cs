@@ -23,11 +23,15 @@ namespace Monitor.ViewModel
         private ObservableCollection<DocumentViewModel> _charts = new ObservableCollection<DocumentViewModel>();
 
         private string _sessionName;
+        private SessionState _sessionState = SessionState.Unsubscribed;
 
         public RelayCommand ExitCommand { get; private set; }
         public RelayCommand OpenSessionCommand { get; private set; }
         public RelayCommand CloseCommand { get; }
         public RelayCommand ExportCommand { get; }
+
+        public RelayCommand ConnectCommand { get; private set; }
+        public RelayCommand DisconnectCommand { get; private set; }
 
         public ObservableCollection<DocumentViewModel> Charts
         {
@@ -50,6 +54,18 @@ namespace Monitor.ViewModel
             }
         }
 
+        public SessionState SessionState
+        {
+            get { return _sessionState; }
+            set
+            {
+                _sessionState = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        public bool IsSessionActive => _sessionService.IsSessionActive;
+
         public MainWindowViewModel(ISessionService resultService, IMessenger messenger)
         {
             _sessionService = resultService;
@@ -61,9 +77,11 @@ namespace Monitor.ViewModel
             }
 
             ExitCommand = new RelayCommand(() => Application.Current.Shutdown());
-            CloseCommand = new RelayCommand(() => _sessionService.CloseSession(), () => _sessionService.IsSessionActive);
+            CloseCommand = new RelayCommand(() => _sessionService.ShutdownSession(), () => IsSessionActive);
             OpenSessionCommand = new RelayCommand(() => _messenger.Send(new ShowNewSessionWindowMessage()));
-            ExportCommand = new RelayCommand(Export, () => _sessionService.IsSessionActive);
+            ExportCommand = new RelayCommand(Export, () => IsSessionActive);
+            ConnectCommand = new RelayCommand(() => _sessionService.IsSessionSubscribed = true, () => _sessionState != SessionState.Subscribed);
+            DisconnectCommand = new RelayCommand(() => _sessionService.IsSessionSubscribed = false, () => _sessionState != SessionState.Unsubscribed);
 
             _messenger.Register<SessionOpenedMessage>(this, message =>
             {
@@ -75,6 +93,13 @@ namespace Monitor.ViewModel
             {
                 Charts.Clear();
                 SessionName = string.Empty;
+                SessionState = SessionState.Unsubscribed;
+                InvalidateCommands();
+            });
+
+            _messenger.Register<SessionStateChangedMessage>(this, message =>
+            {
+                SessionState = message.State;
                 InvalidateCommands();
             });
 
@@ -170,7 +195,7 @@ namespace Monitor.ViewModel
         }
 
         private void Export()
-        {
+        {           
             var exportDialog = new SaveFileDialog
             {
                 FileName = DateTime.Now.ToString("yyyyMMddHHmm") + "_export",
@@ -188,8 +213,11 @@ namespace Monitor.ViewModel
 
         private void InvalidateCommands()
         {
+            RaisePropertyChanged(() => IsSessionActive);
             CloseCommand.RaiseCanExecuteChanged();
             ExportCommand.RaiseCanExecuteChanged();
+            ConnectCommand.RaiseCanExecuteChanged();
+            DisconnectCommand.RaiseCanExecuteChanged();            
         }
     }
 }

@@ -26,6 +26,8 @@ namespace Monitor.Model.Sessions
 
         private readonly string _host;
         private readonly int _port;
+        private SessionState _state = SessionState.Unsubscribed;
+        private readonly bool _closeAfterCompleted;
 
         public string Name => $"{_host}:{_port}";
 
@@ -38,11 +40,12 @@ namespace Monitor.Model.Sessions
 
             _host = parameters.Host;
             _port = parameters.Port;
+            _closeAfterCompleted = parameters.CloseAfterCompleted;
 
             _syncContext = SynchronizationContext.Current;
         }
 
-        public void Open()
+        public void Initialize()
         {
             //Allow proper decoding of orders.
             JsonConvert.DefaultSettings = () => new JsonSerializerSettings
@@ -50,40 +53,37 @@ namespace Monitor.Model.Sessions
                 Converters = {new OrderJsonConverter()}
             };
 
-            // Configure the worker threads
-            _eternalQueueListener.WorkerSupportsCancellation = true;
-            _eternalQueueListener.DoWork += SocketListener;
-            _eternalQueueListener.RunWorkerAsync();
-
-            _queueReader.WorkerSupportsCancellation = true;
-            _queueReader.DoWork += QueueReader;
-            _queueReader.RunWorkerAsync();
+            Subscribe();
         }
 
-        public void Close()
+        public void Shutdown()
         {
-            _eternalQueueListener?.CancelAsync();
-            _queueReader?.CancelAsync();
+            Unsubscribe();
         }
-        
+
         private void QueueReader(object sender, DoWorkEventArgs e)
         {
-            while (!e.Cancel)
+            while (!_queueReader.CancellationPending)
             {
                 // Check whether we can dequeue
                 if (_packetQueue.Count == 0) continue;
                 var p = _packetQueue.Dequeue();
                 HandlePacket(p);
             }
+            _resetEvent.Set();
         }
 
         private void SocketListener(object sender, DoWorkEventArgs e)
         {
             using (var pullSocket = new PullSocket(_host + _port))
             {
-                while (!e.Cancel)
+                while (!_eternalQueueListener.CancellationPending)
                 {
-                    var message = pullSocket.ReceiveMultipartMessage();
+                    NetMQMessage message = new NetMQMessage();
+                    if (!pullSocket.TryReceiveMultipartMessage(TimeSpan.FromMilliseconds(500), ref message))
+                    {
+                        continue;
+                    }
 
                     // There should only be 1 part messages
                     if (message.FrameCount != 1) continue;
@@ -108,6 +108,9 @@ namespace Monitor.Model.Sessions
                             break;
                     }
                 }
+
+                pullSocket.Close();
+                _resetEvent.Set();
             }
         }
 
@@ -149,6 +152,11 @@ namespace Monitor.Model.Sessions
             _result.Add(backtestResultUpdate);
 
             _syncContext.Send(o => _sessionHandler.HandleResult(_result), null);
+
+            if (backtestResultEventModel.Progress == 1 && _closeAfterCompleted)
+            {
+                _syncContext.Send(o => Unsubscribe(), null);
+            }
         }
 
         private void HandleLiveResultPacket(Packet packet)
@@ -158,6 +166,66 @@ namespace Monitor.Model.Sessions
             _result.Add(liveResultUpdate);
 
             _syncContext.Send(o => _sessionHandler.HandleResult(_result), null);
+        }
+
+        public void Subscribe()
+        {
+            try
+            {
+                // Configure the worker threads
+                _eternalQueueListener.WorkerSupportsCancellation = true;
+                _eternalQueueListener.DoWork += SocketListener;
+                _eternalQueueListener.RunWorkerAsync();
+
+                _queueReader.WorkerSupportsCancellation = true;
+                _queueReader.DoWork += QueueReader;
+                _queueReader.RunWorkerAsync();
+
+                State = SessionState.Subscribed;
+            }
+            catch (Exception e)
+            {                
+                throw new Exception("Could not subscribe to the stream", e);
+            }
+        }
+
+        private AutoResetEvent _resetEvent = new AutoResetEvent(false);
+
+        public void Unsubscribe()
+        {
+            try
+            {
+                if (_eternalQueueListener != null)
+                {
+                    _eternalQueueListener.CancelAsync();
+                    _eternalQueueListener.DoWork -= SocketListener;
+                    //_resetEvent.WaitOne();
+                }
+
+                if (_queueReader != null)
+                {
+                    _queueReader.CancelAsync();
+                    _queueReader.DoWork -= QueueReader;
+                    //_resetEvent.WaitOne();
+                }
+
+                State = SessionState.Unsubscribed;
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Could not unsubscribe from the stream", e);
+            }
+            
+        }
+
+        public SessionState State
+        {
+            get { return _state; }
+            private set
+            {
+                _state = value;
+                _sessionHandler.HandleStateChanged(value);
+            }
         }
     }
 }

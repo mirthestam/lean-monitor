@@ -8,6 +8,7 @@
         xmlns:charts1="clr-namespace:Monitor.View.Charts"
         xmlns:grids="clr-namespace:Monitor.ViewModel.Grids"
         xmlns:panels="clr-namespace:Monitor.View.Panels"
+        xmlns:sessions="clr-namespace:Monitor.Model.Sessions"
         mc:Ignorable="d"
         Background="{StaticResource WindowBackgroundBrush}"
         Foreground="{StaticResource ForegroundBrush}"
@@ -28,7 +29,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="24"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="24"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Menu Grid.Row="0" IsMainMenu="True">
@@ -40,6 +41,10 @@
                 <MenuItem Header="_Export..." Command="{Binding ExportCommand}"/>
                 <Separator/>
                 <MenuItem Header="E_xit" Command="{Binding ExitCommand}" InputGestureText="Alt+F4"/>
+            </MenuItem>
+            <MenuItem Header="_Session" IsEnabled="{Binding IsSessionActive}">
+                <MenuItem Header="_Connect" Command="{Binding ConnectCommand}"/>
+                <MenuItem Header="_Disconnect" Command="{Binding DisconnectCommand}"/>
             </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Header="_Charting documentation..." Click="BrowseChartingDocumentationMenuItem_OnClick"/>
@@ -135,7 +140,22 @@
 
         </xcad:DockingManager>
 
-        <StatusBar Grid.Row="2">
+        <StatusBar Grid.Row="2" Height="22" Margin="0,3,0,0">
+            <StatusBar.Resources>
+                <Style TargetType="StatusBar" BasedOn="{StaticResource StatusBarStyle}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding SessionState}" Value="{x:Static sessions:SessionState.Unsubscribed}">
+                            <Setter Property="Background" Value="DodgerBlue"/>
+                        </DataTrigger>                        
+                        <DataTrigger Binding="{Binding SessionState}" Value="{x:Static sessions:SessionState.Subscribed}">
+                            <Setter Property="Background" Value="Chocolate"/>
+                        </DataTrigger>
+                        <DataTrigger Binding="{Binding IsSessionActive}" Value="False">
+                            <Setter Property="Background" Value="DarkOrchid"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </StatusBar.Resources>
             <StatusBarItem>
                 <TextBlock Text="{Binding SessionName}"/>
             </StatusBarItem>

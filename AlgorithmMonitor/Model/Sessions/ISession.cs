@@ -2,9 +2,14 @@ namespace Monitor.Model.Sessions
 {
     public interface ISession
     {
-        void Open();
-        void Close();
+        void Initialize();
+        void Shutdown();
+
+        void Subscribe();
+        void Unsubscribe();
 
         string Name { get; }
+
+        SessionState State { get; }
     }
 }

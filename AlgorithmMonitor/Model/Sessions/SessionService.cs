@@ -55,6 +55,11 @@ namespace Monitor.Model.Sessions
             _messenger.Send(new LogEntryReceivedMessage(DateTime.Now, message, type));
         }
 
+        public void HandleStateChanged(SessionState state)
+        {
+            _messenger.Send(new SessionStateChangedMessage(state));
+        }
+
         public void Initialize()
         {
             // We try to load instructions to load a session from the commandline.
@@ -96,13 +101,13 @@ namespace Monitor.Model.Sessions
             _messenger.Send(new ShowNewSessionWindowMessage());
         }
 
-        public void CloseSession()
+        public void ShutdownSession()
         {
             if (_session == null) throw new Exception("No session exists");
 
             try
             {
-                _session.Close();
+                _session.Shutdown();
             }
             catch (Exception e)
             {
@@ -125,7 +130,7 @@ namespace Monitor.Model.Sessions
             {
                 // Another session is open.
                 // Close the session first before opening this new one
-                CloseSession();
+                ShutdownSession();
             }
 
             // Fix the parameters
@@ -143,7 +148,7 @@ namespace Monitor.Model.Sessions
             {
                 // Another session is open.
                 // Close the session first before opening this new one
-                CloseSession();
+                ShutdownSession();
             }
 
             var session = new FileSession(this, _resultSerializer, parameters);
@@ -155,7 +160,7 @@ namespace Monitor.Model.Sessions
             try
             {
                 _session = session;
-                session.Open();
+                session.Initialize();
             }
             catch (Exception e)
             {
@@ -165,6 +170,22 @@ namespace Monitor.Model.Sessions
             {
                 // Notify the app of the new session
                 _messenger.Send(new SessionOpenedMessage(_session.Name));
+            }
+        }
+
+        public bool IsSessionSubscribed
+        {
+            get { return _session?.State == SessionState.Subscribed; }
+            set {
+                if (_session.State == (value ? SessionState.Subscribed : SessionState.Unsubscribed)) return;
+                if (_session.State == SessionState.Unsubscribed)
+                {
+                    _session.Subscribe();
+                }
+                else
+                {
+                    _session.Unsubscribe();
+                }
             }
         }
     }

@@ -7,7 +7,7 @@ namespace Monitor.Model.Sessions
     public class FileSession : ISession
     {
         private readonly IResultSerializer _resultSerializer;
-        private readonly ISessionHandler _resultHandler;
+        private readonly ISessionHandler _sessionHandler;
         private readonly SynchronizationContext _syncContext;
 
         private readonly bool _watchFile;
@@ -15,6 +15,7 @@ namespace Monitor.Model.Sessions
         public string Name { get; private set; }
 
         private FileSystemWatcher _watcher;
+        private SessionState _state = SessionState.Unsubscribed;
 
         public FileSession(ISessionHandler resultHandler, IResultSerializer resultSerializer, FileSessionParameters parameters)
         {
@@ -25,18 +26,41 @@ namespace Monitor.Model.Sessions
             _syncContext = SynchronizationContext.Current;
 
             _resultSerializer = resultSerializer;
-            _resultHandler = resultHandler;
+            _sessionHandler = resultHandler;
 
             Name = parameters.FileName;
         }
 
-        public void Open()
+        public void Initialize()
         {
             // Initially open the file
             ReadFromFile();
 
             // Return when we do not have to configure the file system watcher
             if (!_watchFile) return;
+
+            // Open a monitoring sessionss
+            Subscribe();
+        }
+
+        public void Shutdown()
+        {
+            Unsubscribe();
+        }
+
+        private void ReadFromFile()
+        {
+            if (!File.Exists(Name)) throw new Exception($"File '{Name}' does not exist");
+
+            var file = File.ReadAllText(Name);
+            var result = _resultSerializer.Deserialize(file);
+
+            _sessionHandler.HandleResult(result);
+        }
+
+        public void Subscribe()
+        {
+            State = SessionState.Subscribed;
 
             if (!Path.IsPathRooted(Name))
             {
@@ -60,8 +84,10 @@ namespace Monitor.Model.Sessions
             };
         }
 
-        public void Close()
+        public void Unsubscribe()
         {
+            State = SessionState.Unsubscribed;
+
             if (_watcher == null)
             {
                 // This file has no watcher session.
@@ -69,16 +95,17 @@ namespace Monitor.Model.Sessions
             }
 
             _watcher.EnableRaisingEvents = false;
+
         }
 
-        private void ReadFromFile()
+        public SessionState State
         {
-            if (!File.Exists(Name)) throw new Exception($"File '{Name}' does not exist");
-
-            var file = File.ReadAllText(Name);
-            var result = _resultSerializer.Deserialize(file);
-
-            _resultHandler.HandleResult(result);
+            get { return _state; }
+            private set
+            {
+                _state = value;
+                _sessionHandler.HandleStateChanged(value);
+            }
         }
     }
 }
