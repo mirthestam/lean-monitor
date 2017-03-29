@@ -31,7 +31,7 @@ namespace Monitor.ViewModel.Panels
             _statisticsFormatter = statisticsFormatter;
             _messenger.Register<SessionUpdateMessage>(this, message =>
             {
-                ParseResult(message.Result);
+                ParseResult(message.ResultContext.Result);
             });
             _messenger.Register<SessionClosedMessage>(this, m => Clear());
         }

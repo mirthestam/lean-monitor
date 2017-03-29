@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Monitor.Model.Api;
 using Monitor.Properties;
 using QuantConnect;
+using QuantConnect.API;
 using QuantConnect.Interfaces;
 
 namespace Monitor.Model.Sessions
@@ -15,7 +16,7 @@ namespace Monitor.Model.Sessions
         private readonly IApiClient _apiClient;
         private readonly ISessionHandler _sessionHandler;
         private readonly ApiSessionParameters _parameters;
-        private readonly Result _result = new Result();
+        private Result _result = new Result();
         private readonly SynchronizationContext _syncContext;
 
         private SessionState _state = SessionState.Unsubscribed;
@@ -24,7 +25,8 @@ namespace Monitor.Model.Sessions
         private CancellationToken _cancellationToken;
         private Task _poller;
 
-        public ApiSession(ISessionHandler sessionHandler, IApiClient apiClient, IResultConverter resultConverter, ApiSessionParameters parameters)
+        public ApiSession(ISessionHandler sessionHandler, IApiClient apiClient, IResultConverter resultConverter,
+            ApiSessionParameters parameters)
         {
             _apiClient = apiClient;
             _sessionHandler = sessionHandler;
@@ -39,7 +41,7 @@ namespace Monitor.Model.Sessions
         }
 
         public void Shutdown()
-        {         
+        {
             Unsubscribe();
         }
 
@@ -58,11 +60,11 @@ namespace Monitor.Model.Sessions
                     if (_cancellationToken.IsCancellationRequested)
                     {
                         _syncContext.Send(o => State = SessionState.Unsubscribed, null);
-                        break;                        
-                    }                    
+                        break;
+                    }
                     FetchLatestResult().Wait();
                 }
-            },_cancellationToken);               
+            }, _cancellationToken);
         }
 
         public void Unsubscribe()
@@ -86,11 +88,20 @@ namespace Monitor.Model.Sessions
 
         private async Task FetchBacktestResult()
         {
-            var resultUpdate = await _apiClient.GetResultAsync(_parameters.ProjectId, _parameters.InstanceId, ResultType.Backtest);
-            
+            var resultUpdate = await _apiClient.GetResultAsync(_parameters.ProjectId, _parameters.InstanceId,
+                ResultType.Backtest);
+
             _result.Add(resultUpdate.Result);
 
-            _syncContext.Send(o => _sessionHandler.HandleResult(_result), null);
+            var context = new ResultContext
+            {
+                Result = _result,
+                Progress = resultUpdate.Progress, // Somehow current API has NULL in this field
+                Project = resultUpdate.Project, // Somehow current API has NULL in this field
+                Name = resultUpdate.Name ?? Name
+            };
+
+            _syncContext.Send(o => _sessionHandler.HandleResult(context), null);
 
             if (resultUpdate.Completed)
             {
@@ -99,7 +110,7 @@ namespace Monitor.Model.Sessions
             }
         }
 
-        public string Name { get; } = "API";
+        public string Name { get; } = Settings.Default.ApiBaseUrl;
 
         public SessionState State
         {
@@ -111,5 +122,6 @@ namespace Monitor.Model.Sessions
             }
         }
 
+        public bool CanSubscribe { get; } = false; // Do not allow to resubscribe manually
     }
 }

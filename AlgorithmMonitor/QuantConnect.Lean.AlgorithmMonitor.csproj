@@ -220,6 +220,7 @@
     <Compile Include="ViewModel\Panels\StatisticsPanelViewModel.cs" />
     <Compile Include="ViewModel\Panels\StatisticViewModel.cs" />
     <Compile Include="ViewModel\ProjectViewModel.cs" />
+    <Compile Include="ViewModel\StatusViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Compile Include="View\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>

@@ -101,8 +101,7 @@ namespace Monitor.Model.Api
                 return new ResultContext
                 {
                     Result = _resultConverter.FromBacktestResult(response.Result),
-                    Progress = response.Progress,
-                    Completed = response.Progress == 1 && response.Completed
+                    Progress = response.Progress
                 };
             });
 

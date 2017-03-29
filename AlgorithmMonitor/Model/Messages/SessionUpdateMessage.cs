@@ -5,16 +5,11 @@ namespace Monitor.Model.Messages
 {
     public class SessionUpdateMessage : MessageBase
     {
-        public SessionUpdateMessage(string name, Result result)
+        public SessionUpdateMessage(ResultContext resultContext)
         {
-            if (string.IsNullOrEmpty(name)) throw new ArgumentNullException(nameof(name));
-            Name = name;
-
-            Result = result ?? throw new ArgumentNullException(nameof(result));
+            ResultContext = resultContext ?? throw new ArgumentNullException(nameof(resultContext));
         }
 
-        public string Name { get; private set; }
-
-        public Result Result { get; private set; }
+        public ResultContext ResultContext { get; private set; }
     }
 }

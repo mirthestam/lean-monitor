@@ -26,6 +26,7 @@ namespace Monitor.Model.Api
             _token = token;
             _userId = userId.ToString();
             Client = new RestClient(endpointAddress);
+            Client.AddDefaultHeader("Cache-Control", "no-cache");
         }
 
         public bool Connected

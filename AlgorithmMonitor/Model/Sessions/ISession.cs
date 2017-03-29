@@ -8,7 +8,7 @@ namespace Monitor.Model.Sessions
         void Subscribe();
         void Unsubscribe();
 
-        string Name { get; }
+        bool CanSubscribe { get; }
 
         SessionState State { get; }
     }

@@ -31,9 +31,9 @@ namespace Monitor.Model.Sessions
             _apiClient = apiClient;
         }
 
-        public void HandleResult(Result result)
+        public void HandleResult(ResultContext resultContext)
         {
-            if (result == null) throw new ArgumentException(nameof(result));
+            if (resultContext == null) throw new ArgumentException(nameof(resultContext));
 
             if (_session == null)
             {
@@ -44,13 +44,13 @@ namespace Monitor.Model.Sessions
             }
 
             // Update the last result
-            LastResult = result;
+            LastResult = resultContext.Result;
 
             // Apply mutations
-            _resultMutator.Mutate(result);
+            _resultMutator.Mutate(resultContext.Result);
             
             // Send a message indicating the session has been updated
-            _messenger.Send(new SessionUpdateMessage(_session.Name, result));
+            _messenger.Send(new SessionUpdateMessage(resultContext));
         }
 
         public void HandleLogMessage(string message, LogItemType type)
@@ -186,7 +186,7 @@ namespace Monitor.Model.Sessions
             finally
             {
                 // Notify the app of the new session
-                _messenger.Send(new SessionOpenedMessage(_session.Name));
+                _messenger.Send(new SessionOpenedMessage());
             }
         }
 
@@ -205,5 +205,7 @@ namespace Monitor.Model.Sessions
                 }
             }
         }
+
+        public bool CanSubscribe => _session?.CanSubscribe == true;
     }
 }

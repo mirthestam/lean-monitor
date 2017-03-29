@@ -55,7 +55,14 @@ namespace Monitor.Model.Sessions
             var file = File.ReadAllText(Name);
             var result = _resultSerializer.Deserialize(file);
 
-            _sessionHandler.HandleResult(result);
+            var context = new ResultContext
+            {
+                Name = Name,
+                Result = result,
+                Progress = 1
+            };
+
+            _sessionHandler.HandleResult(context);
         }
 
         public void Subscribe()
@@ -107,5 +114,7 @@ namespace Monitor.Model.Sessions
                 _sessionHandler.HandleStateChanged(value);
             }
         }
+
+        public bool CanSubscribe { get; } = true;
     }
 }

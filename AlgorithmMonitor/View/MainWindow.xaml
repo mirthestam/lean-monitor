@@ -140,7 +140,7 @@
 
         </xcad:DockingManager>
 
-        <StatusBar Grid.Row="2" Height="22" Margin="0,3,0,0">
+        <StatusBar DataContext="{Binding StatusViewModel}" Grid.Row="2" Height="22" Margin="0,3,0,0">
             <StatusBar.Resources>
                 <Style TargetType="StatusBar" BasedOn="{StaticResource StatusBarStyle}">
                     <Style.Triggers>
@@ -157,7 +157,13 @@
                 </Style>
             </StatusBar.Resources>
             <StatusBarItem>
+                <TextBlock Text="{Binding ProjectName}"/>
+            </StatusBarItem>
+            <StatusBarItem>
                 <TextBlock Text="{Binding SessionName}"/>
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right" Margin="0" Visibility="{Binding IsSessionActive, Converter={StaticResource BoolToVisibilityConverter}}">
+                <ProgressBar Opacity="0.5" Foreground="{StaticResource ButtonBackground}" Width="120" Margin="0" Height="22" Minimum="0" Maximum="1" IsIndeterminate="{Binding IsProgressIndeterminate}" Value="{Binding Progress}"></ProgressBar>
             </StatusBarItem>
         </StatusBar>
 

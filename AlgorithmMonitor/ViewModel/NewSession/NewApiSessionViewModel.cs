@@ -159,7 +159,12 @@ namespace Monitor.ViewModel.NewSession
             }
 
             var instances = await _apiClient.GetBacktestsAsync(SelectedProject.ProjectId);
-            Instances = new ObservableCollection<InstanceViewModel>(instances.Select(i => new InstanceViewModel
+            
+            // We filter out incompleted sessions.
+            // The monitor supports a polling mechanism to fetch data,
+            // however the current QuantConnect API implementation has no up-to-date data, even when the progress and completed flags are updated.
+            // We should remove this filter when this API problem has been fixed.
+            Instances = new ObservableCollection<InstanceViewModel>(instances.Where(i => i.Completed).Select(i => new InstanceViewModel
             {
                 Name = i.Name,
                 Id = i.BacktestId,
@@ -167,6 +172,7 @@ namespace Monitor.ViewModel.NewSession
                 Note = i.Note,
                 Progress = i.Progress
             }));
+
             SelectedInstance = Instances.FirstOrDefault();
         }
     }

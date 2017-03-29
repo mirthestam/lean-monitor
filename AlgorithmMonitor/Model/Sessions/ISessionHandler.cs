@@ -3,7 +3,7 @@ namespace Monitor.Model.Sessions
     public interface ISessionHandler
     {
         void HandleStateChanged(SessionState state);
-        void HandleResult(Result result);
+        void HandleResult(ResultContext resultContext);
         void HandleLogMessage(string message, LogItemType type);
     }
 }
