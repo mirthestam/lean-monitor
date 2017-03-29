@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 using GalaSoft.MvvmLight.Messaging;
+using Monitor.Model.Api;
 using Monitor.Model.Charting.Mutations;
 using Monitor.Model.Messages;
+using QuantConnect.Interfaces;
 
 namespace Monitor.Model.Sessions
 {
@@ -12,6 +14,7 @@ namespace Monitor.Model.Sessions
         private readonly IResultConverter _resultConverter;
         private readonly IResultSerializer _resultSerializer;
         private readonly IResultMutator _resultMutator;
+        private readonly IApiClient _apiClient;
 
         private ISession _session;
 
@@ -19,12 +22,13 @@ namespace Monitor.Model.Sessions
 
         public bool IsSessionActive => _session != null;
 
-        public SessionService(IMessenger messenger, IResultConverter resultConverter, IResultSerializer resultSerializer, IResultMutator resultMutator)
+        public SessionService(IMessenger messenger, IResultConverter resultConverter, IResultSerializer resultSerializer, IResultMutator resultMutator, IApiClient apiClient)
         {
             _messenger = messenger;
             _resultConverter = resultConverter;
             _resultSerializer = resultSerializer;
             _resultMutator = resultMutator;
+            _apiClient = apiClient;
         }
 
         public void HandleResult(Result result)
@@ -152,6 +156,19 @@ namespace Monitor.Model.Sessions
             }
 
             var session = new FileSession(this, _resultSerializer, parameters);
+            OpenSession(session);
+        }
+
+        public void OpenApi(ApiSessionParameters parameters)
+        {
+            if (_session != null)
+            {
+                // Another session is open.
+                // Close the session first before opening this new one
+                ShutdownSession();
+            }
+
+            var session = new ApiSession(this, _apiClient, _resultConverter, parameters);
             OpenSession(session);
         }
 

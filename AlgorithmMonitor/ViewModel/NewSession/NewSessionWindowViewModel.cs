@@ -1,19 +1,20 @@
 ﻿using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
+using Monitor.Model.Api;
 using Monitor.Model.Sessions;
 
-namespace Monitor.ViewModel
+namespace Monitor.ViewModel.NewSession
 {
     public class NewSessionWindowViewModel : ViewModelBase
     {
         // tab indexes are a bit of Mvvm violation. 
         // Could have used a property indicating mode is stream of file.
-        private const int STREAM_TAB = 0;
-        private const int FILE_TAB = 1;
+        private const int API_TAB = 0;
+        private const int STREAM_TAB = 1;
+        private const int FILE_TAB = 2;
 
         private readonly ISessionService _sessionService;
 
-        // TODO: Use provider for default / last used parameters
         private readonly FileSessionParameters _fileSessionParameters = new FileSessionParameters
         {
             FileName = "Demo\\DemoAlgorithm.json",
@@ -26,17 +27,20 @@ namespace Monitor.ViewModel
             Port = 1234
         };
 
-        private int _tabIndex = STREAM_TAB;
+        public NewApiSessionViewModel NewApiSession { get; }
 
-        public NewSessionWindowViewModel(ISessionService sessionService)
+        private int _tabIndex = API_TAB;
+
+        public NewSessionWindowViewModel(ISessionService sessionService, NewApiSessionViewModel newApiSessionViewModel)
         {
             _sessionService = sessionService;
+            NewApiSession = newApiSessionViewModel;
             OpenCommand = new RelayCommand(Open, ValidateOpen);
         }
 
         public RelayCommand OpenCommand { get; private set; }
-            
-        public string Host
+
+        public string StreamHost
         {
             get { return _streamSessionParameters.Host; }
             set
@@ -46,7 +50,7 @@ namespace Monitor.ViewModel
             }
         }
 
-        public string Port
+        public string StreamPort
         {
             get { return _streamSessionParameters.Port.ToString(); }
             set
@@ -69,7 +73,7 @@ namespace Monitor.ViewModel
             }
         }
 
-        public bool Watch
+        public bool FileWatch
         {
             get { return _fileSessionParameters.Watch; }
             set
@@ -98,7 +102,16 @@ namespace Monitor.ViewModel
                     break;
 
                 case FILE_TAB:
-                    _sessionService.OpenFile(_fileSessionParameters);                  
+                    _sessionService.OpenFile(_fileSessionParameters);
+                    break;
+
+                case API_TAB:
+                    _sessionService.OpenApi(new ApiSessionParameters
+                    {
+                        InstanceId = NewApiSession.SelectedInstance.Id,
+                        ProjectId = NewApiSession.SelectedProject.ProjectId,
+                        InstanceType = NewApiSession.SelectedInstance.Type
+                    });
                     break;
             }
         }
@@ -108,13 +121,16 @@ namespace Monitor.ViewModel
             switch (TabIndex)
             {
                 case STREAM_TAB:
-                    if (string.IsNullOrWhiteSpace(Host)) return false;
+                    if (string.IsNullOrWhiteSpace(StreamHost)) return false;
                     int port;
-                    if (!int.TryParse(Port, out port)) return false;
+                    if (!int.TryParse(StreamPort, out port)) return false;
                     break;
 
                 case FILE_TAB:
                     if (string.IsNullOrWhiteSpace(FileName)) return false;
+                    break;
+
+                case API_TAB:
                     break;
             }
 

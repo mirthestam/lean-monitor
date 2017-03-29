@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight.Messaging;
 using Monitor.Model;
+using Monitor.Model.Api;
 using Monitor.Model.Charting.Mutations;
 using Monitor.Model.Sessions;
 using Monitor.Model.Statistics;
@@ -11,16 +12,27 @@ namespace Monitor
     {
         public AppRegistry()
         {
+            Model();
+
             // Messaging
             For<IMessenger>().Use(Messenger.Default);
 
             // Model
-            For<ISessionService>().Singleton().Use<SessionService>();
+        }
+
+        public void Model()
+        {
+            // Results
             For<IResultConverter>().Singleton().Use<ResultConverter>();
             For<IResultSerializer>().Singleton().Use<ResultSerializer>();
-
-            For<IStatisticsFormatter>().Use<StatisticsFormatter>();
             For<IResultMutator>().Singleton().Use<BenchmarkResultMutator>(); // Implement pipeline pattern if more mutators will exist in the future.
+            For<IStatisticsFormatter>().Use<StatisticsFormatter>();
+
+            // Sessions
+            For<ISessionService>().Singleton().Use<SessionService>();
+
+            // Api
+            For<IApiClient>().Singleton().Use<ApiClient>();                        
         }
     }
 }

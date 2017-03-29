@@ -92,6 +92,9 @@
     <Reference Include="QuantConnect.Common">
       <HintPath>..\..\Lean\Launcher\bin\Debug\QuantConnect.Common.dll</HintPath>
     </Reference>
+    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.105.2.3\lib\net452\RestSharp.dll</HintPath>
+    </Reference>
     <Reference Include="StructureMap, Version=4.4.2.472, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\StructureMap.4.4.2\lib\net45\StructureMap.dll</HintPath>
     </Reference>
@@ -125,6 +128,17 @@
     </ApplicationDefinition>
     <Compile Include="AppRegistry.cs" />
     <None Include="Demo\DemoAlgorithm.cs" />
+    <Compile Include="Model\Api\ApiClient.cs" />
+    <Compile Include="Model\Api\ApiConnection.cs" />
+    <Compile Include="Model\Api\Contracts\AuthenticationResponse.cs" />
+    <Compile Include="Model\Api\Contracts\Backtest.cs" />
+    <Compile Include="Model\Api\Contracts\BacktestList.cs" />
+    <Compile Include="Model\Api\Contracts\Project.cs" />
+    <Compile Include="Model\Api\Contracts\ProjectResponse.cs" />
+    <Compile Include="Model\Api\IApiConnection.cs" />
+    <Compile Include="Model\Api\IApiClient.cs" />
+    <Compile Include="Model\Api\Contracts\RestResponse.cs" />
+    <Compile Include="Model\Api\StringExt.cs" />
     <Compile Include="Model\Charting\CartesianMapperBase.cs" />
     <Compile Include="Model\Charting\ChartDefinition.cs" />
     <Compile Include="Model\Charting\FinancialMapperBase.cs" />
@@ -150,10 +164,14 @@
     <Compile Include="Model\Charting\ScatterMarkerSymbol.cs" />
     <Compile Include="Model\Charting\SeriesDefinition.cs" />
     <Compile Include="Model\Charting\SeriesType.cs" />
+    <Compile Include="Model\Sessions\ApiCredentials.cs" />
+    <Compile Include="Model\Sessions\ApiSession.cs" />
+    <Compile Include="Model\Sessions\ApiSessionParameters.cs" />
     <Compile Include="Model\Sessions\SessionState.cs" />
     <Compile Include="Model\Statistics\IStatisticsFormatter.cs" />
     <Compile Include="Model\Statistics\StatisticsFormatter.cs" />
     <Compile Include="Model\Statistics\StatisticState.cs" />
+    <Compile Include="Utils\InverseBooleanConverter.cs" />
     <Compile Include="Utils\DateTimeExt.cs" />
     <Compile Include="Model\Sessions\FileSessionParameters.cs" />
     <Compile Include="Model\Sessions\FileSession.cs" />
@@ -186,6 +204,8 @@
     <Compile Include="ViewModel\Charts\ChartViewModel.cs" />
     <Compile Include="Model\Charting\TimeStampOhlcChartPoint.cs" />
     <Compile Include="Model\Charting\TimeStampChartPointMapper.cs" />
+    <Compile Include="ViewModel\InstanceViewModel.cs" />
+    <Compile Include="ViewModel\NewSession\NewApiSessionViewModel.cs" />
     <Compile Include="ViewModel\Panels\LogPanelItemViewModel.cs" />
     <Compile Include="ViewModel\Panels\LogPanelViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
@@ -196,9 +216,10 @@
     <Compile Include="ViewModel\Panels\RollingStatisticsPanelViewModel.cs" />
     <Compile Include="ViewModel\Panels\RuntimeStatisticsPanelViewModel.cs" />
     <Compile Include="ViewModel\DocumentViewModel.cs" />
-    <Compile Include="ViewModel\NewSessionWindowViewModel.cs" />
+    <Compile Include="ViewModel\NewSession\NewSessionWindowViewModel.cs" />
     <Compile Include="ViewModel\Panels\StatisticsPanelViewModel.cs" />
     <Compile Include="ViewModel\Panels\StatisticViewModel.cs" />
+    <Compile Include="ViewModel\ProjectViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Compile Include="View\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>

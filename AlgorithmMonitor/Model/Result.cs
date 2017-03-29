@@ -5,6 +5,13 @@ using QuantConnect.Statistics;
 
 namespace Monitor.Model
 {
+    public class ResultContext
+    {
+        public decimal Progress { get; set; }
+        public Result Result { get; set; }
+        public bool Completed { get; set; }
+    }
+
     public class Result
     {
         public Dictionary<string, Charting.ChartDefinition> Charts = new Dictionary<string, Charting.ChartDefinition>();

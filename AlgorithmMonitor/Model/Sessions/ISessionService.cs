@@ -15,5 +15,7 @@ namespace Monitor.Model.Sessions
         void OpenStream(StreamSessionParameters parameters);
 
         void OpenFile(FileSessionParameters parameters);
+
+        void OpenApi(ApiSessionParameters parameters);
     }
 }
