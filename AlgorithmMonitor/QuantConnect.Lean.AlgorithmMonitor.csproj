@@ -54,6 +54,9 @@
   <PropertyGroup>
     <StartupObject>Monitor.App</StartupObject>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Resources\Area Chart-64.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AsyncIO, Version=0.1.25.0, Culture=neutral, PublicKeyToken=44a94435bd6f33f8, processorArchitecture=MSIL">
       <HintPath>..\packages\AsyncIO.0.1.26.0\lib\net40\AsyncIO.dll</HintPath>
@@ -397,6 +400,10 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\Attention-16.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Resources\Area Chart-64.ico" />
+    <Resource Include="Resources\Area Chart-64.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
