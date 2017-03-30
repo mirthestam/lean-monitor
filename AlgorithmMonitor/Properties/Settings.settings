@@ -14,5 +14,11 @@
     <Setting Name="ApiBaseUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)">https://www.quantconnect.com/api/v2/</Value>
     </Setting>
+    <Setting Name="StreamHostDefault" Type="System.String" Scope="User">
+      <Value Profile="(Default)">localhost</Value>
+    </Setting>
+    <Setting Name="StreamPortDefault" Type="System.String" Scope="User">
+      <Value Profile="(Default)">1234</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

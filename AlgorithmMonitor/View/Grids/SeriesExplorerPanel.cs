@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace Monitor.View.Charts
+namespace Monitor.View.Grids
 {
     /// <summary>
     /// Interaction logic for SeriesExplorerPanel.xaml

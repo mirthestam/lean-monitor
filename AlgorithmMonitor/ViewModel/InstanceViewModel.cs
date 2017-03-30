@@ -9,5 +9,6 @@ namespace Monitor.ViewModel
         public string Name { get; set; }
         public string Note { get; set; }
         public decimal Progress { get; set; }
+        public bool IsCompleted => Progress == 1;
     }
 }

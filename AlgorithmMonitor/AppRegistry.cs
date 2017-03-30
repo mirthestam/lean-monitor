@@ -4,6 +4,7 @@ using Monitor.Model.Api;
 using Monitor.Model.Charting.Mutations;
 using Monitor.Model.Sessions;
 using Monitor.Model.Statistics;
+using Monitor.ViewModel.NewSession;
 using StructureMap;
 
 namespace Monitor
@@ -32,7 +33,15 @@ namespace Monitor
             For<ISessionService>().Singleton().Use<SessionService>();
 
             // Api
-            For<IApiClient>().Singleton().Use<ApiClient>();                        
+            For<IApiClient>().Singleton().Use<ApiClient>();             
+            
+            // ViewModel
+            Scan(scanner =>
+            {
+                scanner.TheCallingAssembly();
+                scanner.WithDefaultConventions();
+                scanner.AddAllTypesOf<INewSessionViewModel>();
+            });
         }
     }
 }

@@ -70,5 +70,29 @@ namespace Monitor.Properties {
                 this["ApiBaseUrl"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
+        public string StreamHostDefault {
+            get {
+                return ((string)(this["StreamHostDefault"]));
+            }
+            set {
+                this["StreamHostDefault"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1234")]
+        public string StreamPortDefault {
+            get {
+                return ((string)(this["StreamPortDefault"]));
+            }
+            set {
+                this["StreamPortDefault"] = value;
+            }
+        }
     }
 }

@@ -9,6 +9,7 @@
         xmlns:grids="clr-namespace:Monitor.ViewModel.Grids"
         xmlns:panels="clr-namespace:Monitor.View.Panels"
         xmlns:sessions="clr-namespace:Monitor.Model.Sessions"
+        xmlns:grids1="clr-namespace:Monitor.View.Grids"
         mc:Ignorable="d"
         Background="{StaticResource WindowBackgroundBrush}"
         Foreground="{StaticResource ForegroundBrush}"
@@ -65,7 +66,7 @@
                 </DataTemplate>
 
                 <DataTemplate DataType="{x:Type grids:GridPanelViewModel}">
-                    <charts1:GridPanel/>
+                    <grids1:GridPanel/>
                 </DataTemplate>
 
             </xcad:DockingManager.Resources>
@@ -144,15 +145,15 @@
             <StatusBar.Resources>
                 <Style TargetType="StatusBar" BasedOn="{StaticResource StatusBarStyle}">
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding SessionState}" Value="{x:Static sessions:SessionState.Unsubscribed}">
+                        <!--<DataTrigger Binding="{Binding SessionState}" Value="{x:Static sessions:SessionState.Unsubscribed}">
                             <Setter Property="Background" Value="DodgerBlue"/>
-                        </DataTrigger>                        
+                        </DataTrigger>-->                        
                         <DataTrigger Binding="{Binding SessionState}" Value="{x:Static sessions:SessionState.Subscribed}">
                             <Setter Property="Background" Value="Chocolate"/>
                         </DataTrigger>
-                        <DataTrigger Binding="{Binding IsSessionActive}" Value="False">
-                            <Setter Property="Background" Value="DarkOrchid"/>
-                        </DataTrigger>
+                        <!--<DataTrigger Binding="{Binding IsSessionActive}" Value="False">
+                            <Setter Property="Background" Value="{StaticResource }"/>
+                        </DataTrigger>-->
                     </Style.Triggers>
                 </Style>
             </StatusBar.Resources>
@@ -163,7 +164,7 @@
                 <TextBlock Text="{Binding SessionName}"/>
             </StatusBarItem>
             <StatusBarItem HorizontalAlignment="Right" Margin="0" Visibility="{Binding IsSessionActive, Converter={StaticResource BoolToVisibilityConverter}}">
-                <ProgressBar Opacity="0.5" Foreground="{StaticResource ButtonBackground}" Width="120" Margin="0" Height="22" Minimum="0" Maximum="1" IsIndeterminate="{Binding IsProgressIndeterminate}" Value="{Binding Progress}"></ProgressBar>
+                <ProgressBar Opacity="0.2" Foreground="{StaticResource ButtonForeground}" BorderThickness="0" Background="{StaticResource ButtonBackground}" Width="120" Margin="0" Height="22" Minimum="0" Maximum="1" IsIndeterminate="{Binding IsProgressIndeterminate}" Value="{Binding Progress}"></ProgressBar>
             </StatusBarItem>
         </StatusBar>
 

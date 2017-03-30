@@ -127,7 +127,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppRegistry.cs" />
-    <None Include="Demo\DemoAlgorithm.cs" />
     <Compile Include="Model\Api\ApiClient.cs" />
     <Compile Include="Model\Api\ApiConnection.cs" />
     <Compile Include="Model\Api\Contracts\AuthenticationResponse.cs" />
@@ -157,6 +156,7 @@
     <Compile Include="Model\Messages\ShowNewSessionWindowMessage.cs" />
     <Compile Include="Model\Charting\ITimeStampChartPoint.cs" />
     <Compile Include="Model\IResultConverter.cs" />
+    <Compile Include="Model\ResultContext.cs" />
     <Compile Include="Model\ResultMapper.cs" />
     <Compile Include="Model\ResultConverter.cs" />
     <Compile Include="Model\ResultSerializer.cs" />
@@ -205,7 +205,10 @@
     <Compile Include="Model\Charting\TimeStampOhlcChartPoint.cs" />
     <Compile Include="Model\Charting\TimeStampChartPointMapper.cs" />
     <Compile Include="ViewModel\InstanceViewModel.cs" />
+    <Compile Include="ViewModel\NewSession\INewSessionViewModel.cs" />
     <Compile Include="ViewModel\NewSession\NewApiSessionViewModel.cs" />
+    <Compile Include="ViewModel\NewSession\NewFileSessionViewModel.cs" />
+    <Compile Include="ViewModel\NewSession\NewStreamSessionViewModel.cs" />
     <Compile Include="ViewModel\Panels\LogPanelItemViewModel.cs" />
     <Compile Include="ViewModel\Panels\LogPanelViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
@@ -225,10 +228,19 @@
     <Compile Include="View\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\NewSession\NewApiSessionControl.xaml.cs">
+      <DependentUpon>NewApiSessionControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\NewSession\NewFileSessionControl.xaml.cs">
+      <DependentUpon>NewFileSessionControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\NewSession\NewStreamSessionControl.xaml.cs">
+      <DependentUpon>NewStreamSessionControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Panels\LogPanel.xaml.cs">
       <DependentUpon>LogPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\NewSessionWindow.xaml.cs">
+    <Compile Include="View\NewSession\NewSessionWindow.xaml.cs">
       <DependentUpon>NewSessionWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Panels\ProfitLossPanel.xaml.cs">
@@ -240,7 +252,7 @@
     <Compile Include="View\Panels\RuntimeStatisticsPanel.xaml.cs">
       <DependentUpon>RuntimeStatisticsPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\Charts\SeriesExplorerPanel.cs">
+    <Compile Include="View\Grids\SeriesExplorerPanel.cs">
       <DependentUpon>GridPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Panels\StatisticsPanel.xaml.cs">
@@ -284,11 +296,23 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="View\NewSession\NewApiSessionControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\NewSession\NewFileSessionControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\NewSession\NewStreamSessionControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\Panels\LogPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\NewSessionWindow.xaml">
+    <Page Include="View\NewSession\NewSessionWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -304,7 +328,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="View\Charts\GridPanel.xaml">
+    <Page Include="View\Grids\GridPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -343,9 +367,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="Demo\DemoAlgorithm.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

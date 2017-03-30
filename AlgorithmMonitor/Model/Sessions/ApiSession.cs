@@ -56,7 +56,7 @@ namespace Monitor.Model.Sessions
 
                 while (true)
                 {
-                    Thread.Sleep(500);
+                    Thread.Sleep(500); 
                     if (_cancellationToken.IsCancellationRequested)
                     {
                         _syncContext.Send(o => State = SessionState.Unsubscribed, null);

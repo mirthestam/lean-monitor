@@ -1,78 +1,103 @@
+using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Monitor.Model;
 using Monitor.Model.Api;
+using Monitor.Model.Sessions;
 using Monitor.Properties;
 
 namespace Monitor.ViewModel.NewSession
 {
-    public class NewApiSessionViewModel : ViewModelBase
+    public class NewApiSessionViewModel : ViewModelBase, IDataErrorInfo, INewSessionViewModel
     {
         private readonly IApiClient _apiClient;
+        private readonly ISessionService _sessionService;
 
         private ProjectViewModel _selectedProject;
         private InstanceViewModel _selectedInstance;
 
         private ObservableCollection<ProjectViewModel> _projects = new ObservableCollection<ProjectViewModel>();
         private ObservableCollection<InstanceViewModel> _instances = new ObservableCollection<InstanceViewModel>();
+        private string _userId;
+        private string _endpointAddress;
+        private string _accessToken;
 
-        public NewApiSessionViewModel(IApiClient apiClient)
+        public NewApiSessionViewModel(IApiClient apiClient, ISessionService sessionService)
         {
             _apiClient = apiClient;
-            RefreshCommand = new RelayCommand(RefreshProjectsAsync);
-            ConnectCommand = new RelayCommand(Connect);
+            _sessionService = sessionService;
+            ConnectCommand = new RelayCommand(Connect, IsConnectionSettingsValid);
+            OpenCommand = new RelayCommand(Open, CanOpen);
+
+            LoadFromSettings();
 
             //  Try to initially make a connection
-            if (ValidateConnectionSettings())
+            if (IsConnectionSettingsValid())
             {
                 Connect();
             }
         }
 
-        public int UserId
+        private void Open()
         {
-            get { return Settings.Default.ApiUserId; }
+            _sessionService.OpenApi(new ApiSessionParameters
+            {
+                InstanceId = SelectedInstance.Id,
+                ProjectId = SelectedProject.ProjectId,
+                InstanceType = SelectedInstance.Type
+            });
+        }
+
+        private bool CanOpen()
+        {
+            var fieldsToValidate = new[]
+            {
+                nameof(SelectedProject),
+                nameof(SelectedInstance),
+            };
+
+            return fieldsToValidate.All(field => string.IsNullOrEmpty(this[field]));
+        }
+
+        public string UserId
+        {
+            get { return _userId; }
             set
             {
-                if (Settings.Default.ApiUserId == value) return;
-                Settings.Default.ApiUserId = value;
-                Settings.Default.Save();
+                _userId = value;
+                RaisePropertyChanged();
+                ConnectCommand.RaiseCanExecuteChanged();
             }
         }
 
         public string EndpointAddress
         {
-            get { return Settings.Default.ApiBaseUrl; }
+            get { return _endpointAddress; }
             set
             {
-                if (Settings.Default.ApiBaseUrl == value) return;
-                Settings.Default.ApiBaseUrl = value;
-                Settings.Default.Save();
+                _endpointAddress = value;
+                RaisePropertyChanged();
+                ConnectCommand.RaiseCanExecuteChanged();
             }
         }
 
         public string AccessToken
         {
-            get { return Settings.Default.ApiAccessToken; }
+            get { return _accessToken; }
             set
             {
-                if (Settings.Default.ApiAccessToken == value) return;
-                Settings.Default.ApiAccessToken = value;
-                Settings.Default.Save();
+                _accessToken = value;
+                RaisePropertyChanged();
+                ConnectCommand.RaiseCanExecuteChanged();
             }
         }
 
-        private bool ValidateConnectionSettings()
-        {
-            var endpointAddress = !string.IsNullOrWhiteSpace(EndpointAddress);
-            var accessToken = !string.IsNullOrWhiteSpace(AccessToken);
-            return endpointAddress && accessToken;
-        }
+        public RelayCommand ConnectCommand { get; }
 
-        public RelayCommand ConnectCommand { get; private set; }
-        public RelayCommand RefreshCommand { get; private set; }
+        public RelayCommand OpenCommand { get; }
 
         public ObservableCollection<ProjectViewModel> Projects
         {
@@ -86,10 +111,7 @@ namespace Monitor.ViewModel.NewSession
 
         public ObservableCollection<InstanceViewModel> Instances
         {
-            get
-            {
-                return _instances;
-            }
+            get { return _instances; }
             set
             {
                 _instances = value;
@@ -117,15 +139,71 @@ namespace Monitor.ViewModel.NewSession
             {
                 _selectedInstance = value;
                 RaisePropertyChanged();
+                OpenCommand.RaiseCanExecuteChanged();
             }
         }
 
+        public string this[string columnName]
+        {
+            get
+            {
+                string result = string.Empty;
+                switch (columnName)
+                {
+                    case nameof(UserId):
+                        int userId;
+                        if (!int.TryParse(UserId, out userId)) result = "User Id should be a numeric value.";
+                        break;
+
+                    case nameof(EndpointAddress):
+                        if (string.IsNullOrWhiteSpace(EndpointAddress)) result = "Endpoint Address is required.";
+                        Uri uri;
+                        if (!Uri.TryCreate(EndpointAddress, UriKind.Absolute, out uri)) result = "Address is invalid";
+                        break;
+
+                    case nameof(AccessToken):
+                        if (string.IsNullOrWhiteSpace(AccessToken)) result = "Access token is required.";
+                        break;
+
+                    case nameof(SelectedProject):
+                        if (SelectedProject == null) result = "Project is required";
+                        break;
+
+                    case nameof(SelectedInstance):
+                        if (SelectedInstance == null) result = "Instance is required";
+                        else if (!SelectedInstance.IsCompleted)
+                            result = "Due to API restrictions, only completed instances can be opened";
+                        break;
+                }
+
+                return result;
+            }
+        }
+
+        public string Error => null;
+
+        public bool IsConnectionSettingsValid()
+        {
+            var fieldsToValidate = new[]
+            {
+                nameof(UserId),
+                nameof(EndpointAddress),
+                nameof(AccessToken)
+            };
+
+            return fieldsToValidate.All(field => string.IsNullOrEmpty(this[field]));
+        }
+
+        public bool IsConnected => _apiClient.Connected;
+
         private void Connect()
         {
-            _apiClient.Initialize(UserId, AccessToken, EndpointAddress);
+            _apiClient.Initialize(int.Parse(UserId), AccessToken, EndpointAddress);
             RaisePropertyChanged(() => IsConnected);
             if (IsConnected)
             {
+                // Save the connection settings, as this connection is now valid
+                SaveConnectionSettings();
                 RefreshProjectsAsync();
             }
             else
@@ -135,7 +213,21 @@ namespace Monitor.ViewModel.NewSession
             }
         }
 
-        public bool IsConnected => _apiClient.Connected;
+        private void LoadFromSettings()
+        {
+            var settings = Settings.Default;
+            UserId = settings.ApiUserId.ToString();
+            EndpointAddress = settings.ApiBaseUrl;
+            AccessToken = settings.ApiAccessToken;
+        }
+
+        private void SaveConnectionSettings()
+        {
+            var settings = Settings.Default;
+            settings.ApiUserId = int.Parse(UserId);
+            settings.ApiBaseUrl = EndpointAddress;
+            settings.ApiAccessToken = AccessToken;
+        }
 
         private async void RefreshProjectsAsync()
         {
@@ -159,11 +251,7 @@ namespace Monitor.ViewModel.NewSession
             }
 
             var instances = await _apiClient.GetBacktestsAsync(SelectedProject.ProjectId);
-            
-            // We filter out incompleted sessions.
-            // The monitor supports a polling mechanism to fetch data,
-            // however the current QuantConnect API implementation has no up-to-date data, even when the progress and completed flags are updated.
-            // We should remove this filter when this API problem has been fixed.
+
             Instances = new ObservableCollection<InstanceViewModel>(instances.Where(i => i.Completed).Select(i => new InstanceViewModel
             {
                 Name = i.Name,
@@ -175,5 +263,7 @@ namespace Monitor.ViewModel.NewSession
 
             SelectedInstance = Instances.FirstOrDefault();
         }
+
+        public string Header { get; } = "From API";
     }
 }
