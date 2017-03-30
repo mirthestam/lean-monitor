@@ -22,5 +22,77 @@ namespace Monitor.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int ApiUserId {
+            get {
+                return ((int)(this["ApiUserId"]));
+            }
+            set {
+                this["ApiUserId"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ApiAccessToken {
+            get {
+                return ((string)(this["ApiAccessToken"]));
+            }
+            set {
+                this["ApiAccessToken"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("4000")]
+        public int ChartSeriesLimit {
+            get {
+                return ((int)(this["ChartSeriesLimit"]));
+            }
+            set {
+                this["ChartSeriesLimit"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://www.quantconnect.com/api/v2/")]
+        public string ApiBaseUrl {
+            get {
+                return ((string)(this["ApiBaseUrl"]));
+            }
+            set {
+                this["ApiBaseUrl"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
+        public string StreamHostDefault {
+            get {
+                return ((string)(this["StreamHostDefault"]));
+            }
+            set {
+                this["StreamHostDefault"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1234")]
+        public string StreamPortDefault {
+            get {
+                return ((string)(this["StreamPortDefault"]));
+            }
+            set {
+                this["StreamPortDefault"] = value;
+            }
+        }
     }
 }

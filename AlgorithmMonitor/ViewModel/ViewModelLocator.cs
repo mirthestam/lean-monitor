@@ -19,6 +19,7 @@ using Lean.AlgorithmMonitor.ViewModel;
 using Microsoft.Practices.ServiceLocation;
 using Monitor;
 using Monitor.ViewModel;
+using Monitor.ViewModel.NewSession;
 using Monitor.ViewModel.Panels;
 using StructureMap;
 

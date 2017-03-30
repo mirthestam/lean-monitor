@@ -22,7 +22,7 @@ namespace Monitor.View
 
             // TODO: Implement dependency injection for windows
             _messenger = Messenger.Default; 
-            _messenger.Register<ShowNewSessionWindowMessage>(this, message => ShowWindowDialog<NewSessionWindow>());
+            _messenger.Register<ShowNewSessionWindowMessage>(this, message => ShowWindowDialog<NewSession.NewSessionWindow>());
         }
 
         private void MainWindow_OnLoaded(object sender, RoutedEventArgs e)

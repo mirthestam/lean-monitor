@@ -19,7 +19,7 @@ namespace Monitor.ViewModel.Panels
         {
             _messenger = messenger;
             _statisticsFormatter = statisticsFormatter;
-            _messenger.Register<SessionUpdateMessage>(this, message => ParseResult(message.Result));
+            _messenger.Register<SessionUpdateMessage>(this, message => ParseResult(message.ResultContext.Result));
             _messenger.Register<SessionClosedMessage>(this, m => Clear());
         }
 

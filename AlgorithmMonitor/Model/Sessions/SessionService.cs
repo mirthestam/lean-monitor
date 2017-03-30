@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 using GalaSoft.MvvmLight.Messaging;
+using Monitor.Model.Api;
 using Monitor.Model.Charting.Mutations;
 using Monitor.Model.Messages;
+using QuantConnect.Interfaces;
 
 namespace Monitor.Model.Sessions
 {
@@ -12,6 +14,7 @@ namespace Monitor.Model.Sessions
         private readonly IResultConverter _resultConverter;
         private readonly IResultSerializer _resultSerializer;
         private readonly IResultMutator _resultMutator;
+        private readonly IApiClient _apiClient;
 
         private ISession _session;
 
@@ -19,17 +22,18 @@ namespace Monitor.Model.Sessions
 
         public bool IsSessionActive => _session != null;
 
-        public SessionService(IMessenger messenger, IResultConverter resultConverter, IResultSerializer resultSerializer, IResultMutator resultMutator)
+        public SessionService(IMessenger messenger, IResultConverter resultConverter, IResultSerializer resultSerializer, IResultMutator resultMutator, IApiClient apiClient)
         {
             _messenger = messenger;
             _resultConverter = resultConverter;
             _resultSerializer = resultSerializer;
             _resultMutator = resultMutator;
+            _apiClient = apiClient;
         }
 
-        public void HandleResult(Result result)
+        public void HandleResult(ResultContext resultContext)
         {
-            if (result == null) throw new ArgumentException(nameof(result));
+            if (resultContext == null) throw new ArgumentException(nameof(resultContext));
 
             if (_session == null)
             {
@@ -40,13 +44,13 @@ namespace Monitor.Model.Sessions
             }
 
             // Update the last result
-            LastResult = result;
+            LastResult = resultContext.Result;
 
             // Apply mutations
-            _resultMutator.Mutate(result);
+            _resultMutator.Mutate(resultContext.Result);
             
             // Send a message indicating the session has been updated
-            _messenger.Send(new SessionUpdateMessage(_session.Name, result));
+            _messenger.Send(new SessionUpdateMessage(resultContext));
         }
 
         public void HandleLogMessage(string message, LogItemType type)
@@ -155,6 +159,19 @@ namespace Monitor.Model.Sessions
             OpenSession(session);
         }
 
+        public void OpenApi(ApiSessionParameters parameters)
+        {
+            if (_session != null)
+            {
+                // Another session is open.
+                // Close the session first before opening this new one
+                ShutdownSession();
+            }
+
+            var session = new ApiSession(this, _apiClient, _resultConverter, parameters);
+            OpenSession(session);
+        }
+
         private void OpenSession(ISession session)
         {
             try
@@ -169,7 +186,7 @@ namespace Monitor.Model.Sessions
             finally
             {
                 // Notify the app of the new session
-                _messenger.Send(new SessionOpenedMessage(_session.Name));
+                _messenger.Send(new SessionOpenedMessage());
             }
         }
 
@@ -188,5 +205,7 @@ namespace Monitor.Model.Sessions
                 }
             }
         }
+
+        public bool CanSubscribe => _session?.CanSubscribe == true;
     }
 }

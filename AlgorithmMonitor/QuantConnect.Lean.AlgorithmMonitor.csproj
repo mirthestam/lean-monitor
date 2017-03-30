@@ -92,6 +92,9 @@
     <Reference Include="QuantConnect.Common">
       <HintPath>..\..\Lean\Launcher\bin\Debug\QuantConnect.Common.dll</HintPath>
     </Reference>
+    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.105.2.3\lib\net452\RestSharp.dll</HintPath>
+    </Reference>
     <Reference Include="StructureMap, Version=4.4.2.472, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\StructureMap.4.4.2\lib\net45\StructureMap.dll</HintPath>
     </Reference>
@@ -124,7 +127,17 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppRegistry.cs" />
-    <None Include="Demo\DemoAlgorithm.cs" />
+    <Compile Include="Model\Api\ApiClient.cs" />
+    <Compile Include="Model\Api\ApiConnection.cs" />
+    <Compile Include="Model\Api\Contracts\AuthenticationResponse.cs" />
+    <Compile Include="Model\Api\Contracts\Backtest.cs" />
+    <Compile Include="Model\Api\Contracts\BacktestList.cs" />
+    <Compile Include="Model\Api\Contracts\Project.cs" />
+    <Compile Include="Model\Api\Contracts\ProjectResponse.cs" />
+    <Compile Include="Model\Api\IApiConnection.cs" />
+    <Compile Include="Model\Api\IApiClient.cs" />
+    <Compile Include="Model\Api\Contracts\RestResponse.cs" />
+    <Compile Include="Model\Api\StringExt.cs" />
     <Compile Include="Model\Charting\CartesianMapperBase.cs" />
     <Compile Include="Model\Charting\ChartDefinition.cs" />
     <Compile Include="Model\Charting\FinancialMapperBase.cs" />
@@ -143,6 +156,7 @@
     <Compile Include="Model\Messages\ShowNewSessionWindowMessage.cs" />
     <Compile Include="Model\Charting\ITimeStampChartPoint.cs" />
     <Compile Include="Model\IResultConverter.cs" />
+    <Compile Include="Model\ResultContext.cs" />
     <Compile Include="Model\ResultMapper.cs" />
     <Compile Include="Model\ResultConverter.cs" />
     <Compile Include="Model\ResultSerializer.cs" />
@@ -150,10 +164,14 @@
     <Compile Include="Model\Charting\ScatterMarkerSymbol.cs" />
     <Compile Include="Model\Charting\SeriesDefinition.cs" />
     <Compile Include="Model\Charting\SeriesType.cs" />
+    <Compile Include="Model\Sessions\ApiCredentials.cs" />
+    <Compile Include="Model\Sessions\ApiSession.cs" />
+    <Compile Include="Model\Sessions\ApiSessionParameters.cs" />
     <Compile Include="Model\Sessions\SessionState.cs" />
     <Compile Include="Model\Statistics\IStatisticsFormatter.cs" />
     <Compile Include="Model\Statistics\StatisticsFormatter.cs" />
     <Compile Include="Model\Statistics\StatisticState.cs" />
+    <Compile Include="Utils\InverseBooleanConverter.cs" />
     <Compile Include="Utils\DateTimeExt.cs" />
     <Compile Include="Model\Sessions\FileSessionParameters.cs" />
     <Compile Include="Model\Sessions\FileSession.cs" />
@@ -186,6 +204,11 @@
     <Compile Include="ViewModel\Charts\ChartViewModel.cs" />
     <Compile Include="Model\Charting\TimeStampOhlcChartPoint.cs" />
     <Compile Include="Model\Charting\TimeStampChartPointMapper.cs" />
+    <Compile Include="ViewModel\InstanceViewModel.cs" />
+    <Compile Include="ViewModel\NewSession\INewSessionViewModel.cs" />
+    <Compile Include="ViewModel\NewSession\NewApiSessionViewModel.cs" />
+    <Compile Include="ViewModel\NewSession\NewFileSessionViewModel.cs" />
+    <Compile Include="ViewModel\NewSession\NewStreamSessionViewModel.cs" />
     <Compile Include="ViewModel\Panels\LogPanelItemViewModel.cs" />
     <Compile Include="ViewModel\Panels\LogPanelViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
@@ -196,17 +219,28 @@
     <Compile Include="ViewModel\Panels\RollingStatisticsPanelViewModel.cs" />
     <Compile Include="ViewModel\Panels\RuntimeStatisticsPanelViewModel.cs" />
     <Compile Include="ViewModel\DocumentViewModel.cs" />
-    <Compile Include="ViewModel\NewSessionWindowViewModel.cs" />
+    <Compile Include="ViewModel\NewSession\NewSessionWindowViewModel.cs" />
     <Compile Include="ViewModel\Panels\StatisticsPanelViewModel.cs" />
     <Compile Include="ViewModel\Panels\StatisticViewModel.cs" />
+    <Compile Include="ViewModel\ProjectViewModel.cs" />
+    <Compile Include="ViewModel\StatusViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Compile Include="View\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\NewSession\NewApiSessionControl.xaml.cs">
+      <DependentUpon>NewApiSessionControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\NewSession\NewFileSessionControl.xaml.cs">
+      <DependentUpon>NewFileSessionControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\NewSession\NewStreamSessionControl.xaml.cs">
+      <DependentUpon>NewStreamSessionControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\Panels\LogPanel.xaml.cs">
       <DependentUpon>LogPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\NewSessionWindow.xaml.cs">
+    <Compile Include="View\NewSession\NewSessionWindow.xaml.cs">
       <DependentUpon>NewSessionWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Panels\ProfitLossPanel.xaml.cs">
@@ -218,7 +252,7 @@
     <Compile Include="View\Panels\RuntimeStatisticsPanel.xaml.cs">
       <DependentUpon>RuntimeStatisticsPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\Charts\SeriesExplorerPanel.cs">
+    <Compile Include="View\Grids\SeriesExplorerPanel.cs">
       <DependentUpon>GridPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Panels\StatisticsPanel.xaml.cs">
@@ -262,11 +296,23 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="View\NewSession\NewApiSessionControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\NewSession\NewFileSessionControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\NewSession\NewStreamSessionControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\Panels\LogPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\NewSessionWindow.xaml">
+    <Page Include="View\NewSession\NewSessionWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -282,7 +328,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="View\Charts\GridPanel.xaml">
+    <Page Include="View\Grids\GridPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -321,9 +367,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="Demo\DemoAlgorithm.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

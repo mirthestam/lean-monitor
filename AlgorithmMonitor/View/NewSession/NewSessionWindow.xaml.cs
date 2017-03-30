@@ -2,7 +2,7 @@
 using GalaSoft.MvvmLight.Messaging;
 using Monitor.Model.Messages;
 
-namespace Monitor.View
+namespace Monitor.View.NewSession
 {
     /// <summary>
     /// Interaction logic for NewSessionWindow.xaml

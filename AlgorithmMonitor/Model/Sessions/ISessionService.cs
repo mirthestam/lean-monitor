@@ -12,8 +12,12 @@ namespace Monitor.Model.Sessions
 
         bool IsSessionSubscribed { get; set; }
 
+        bool CanSubscribe { get; }
+
         void OpenStream(StreamSessionParameters parameters);
 
         void OpenFile(FileSessionParameters parameters);
+
+        void OpenApi(ApiSessionParameters parameters);
     }
 }

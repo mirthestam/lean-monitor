@@ -12,6 +12,7 @@ using LiveCharts.Wpf;
 using Monitor.Model;
 using Monitor.Model.Charting;
 using Monitor.Model.Messages;
+using Monitor.Properties;
 using Monitor.Utils;
 
 namespace Monitor.ViewModel.Charts
@@ -23,10 +24,9 @@ namespace Monitor.ViewModel.Charts
     {        
         private readonly Dictionary<string, TimeStamp> _lastUpdates = new Dictionary<string, TimeStamp>();
         private readonly IMessenger _messenger;
+        private readonly int _seriesMaximum = Settings.Default.ChartSeriesLimit;
 
-        private TimeStamp _startPoint = TimeStamp.FromDays(0);
-
-        private const int _seriesMaximum = 8000;
+        private TimeStamp _startPoint = TimeStamp.FromDays(0);        
 
         public ChartViewModel(IMessenger messenger)
         {
@@ -94,7 +94,7 @@ namespace Monitor.ViewModel.Charts
             var secondDuplicates = chartPoints.GroupBy(cp => cp.X.ElapsedSeconds).Any(g => g.Count() > 1);
             if (!secondDuplicates) return Resolution.Second;
 
-            throw new Exception("Resolution is below second which is not supported.");
+            return Resolution.Ticks;
         }
         
         public void ParseChart(ChartDefinition sourceChart)
@@ -183,7 +183,7 @@ namespace Monitor.ViewModel.Charts
                 .First(s => s.Index == 0);
 
             var scrollSeries = (Series) ScrollSeriesCollection.FirstOrDefault();
-            if (scrollSeries == null)
+            if (scrollSeries == null && sourceScrollSeries.Values.Any())
             {
                 _startPoint = sourceScrollSeries.Values[0].X;
                 scrollSeries = BuildSeries(sourceScrollSeries);
@@ -192,8 +192,12 @@ namespace Monitor.ViewModel.Charts
 
             if (!_lastUpdates.ContainsKey("Scroll")) _lastUpdates["Scroll"] = TimeStamp.MinValue;            
             var scrollSeriesUpdates = sourceScrollSeries.Since(_lastUpdates["Scroll"]);
-            UpdateSeries(scrollSeries, scrollSeriesUpdates);
-            if (scrollSeriesUpdates.Values.Any()) _lastUpdates["Scroll"] = scrollSeriesUpdates.Values.Last().X;
+
+            if (scrollSeries != null)
+            { 
+                UpdateSeries(scrollSeries, scrollSeriesUpdates);
+                if (scrollSeriesUpdates.Values.Any()) _lastUpdates["Scroll"] = scrollSeriesUpdates.Values.Last().X;
+            }
 
             if (ZoomTo == 1)
             {

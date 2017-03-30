@@ -30,7 +30,7 @@ namespace Monitor.ViewModel.Panels
             _messenger.Register<SessionClosedMessage>(this, m => Clear());
             _messenger.Register<SessionUpdateMessage>(this, message =>
             {
-                ParseResult(message.Result);
+                ParseResult(message.ResultContext.Result);
             });
 
             if (IsInDesignMode)

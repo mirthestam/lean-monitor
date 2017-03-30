@@ -20,10 +20,9 @@ namespace Monitor.ViewModel
         private readonly ISessionService _sessionService;
         private readonly IMessenger _messenger;
 
-        private ObservableCollection<DocumentViewModel> _charts = new ObservableCollection<DocumentViewModel>();
-
-        private string _sessionName;
         private SessionState _sessionState = SessionState.Unsubscribed;
+
+        private ObservableCollection<DocumentViewModel> _charts = new ObservableCollection<DocumentViewModel>();
 
         public RelayCommand ExitCommand { get; private set; }
         public RelayCommand OpenSessionCommand { get; private set; }
@@ -43,16 +42,7 @@ namespace Monitor.ViewModel
             }
         }
 
-        public string SessionName
-        {
-            get { return _sessionName; }
-            set
-            {
-                if (_sessionName == value) return;
-                _sessionName = value;
-                RaisePropertyChanged();
-            }
-        }
+        public bool IsSessionActive => _sessionService.IsSessionActive;
 
         public SessionState SessionState
         {
@@ -64,36 +54,27 @@ namespace Monitor.ViewModel
             }
         }
 
-        public bool IsSessionActive => _sessionService.IsSessionActive;
+        public StatusViewModel StatusViewModel { get; }
 
-        public MainWindowViewModel(ISessionService resultService, IMessenger messenger)
+        public MainWindowViewModel(ISessionService resultService, IMessenger messenger, StatusViewModel statusViewModel)
         {
+            StatusViewModel = statusViewModel;
             _sessionService = resultService;
             _messenger = messenger;
-
-            if (IsInDesignMode)
-            {
-                SessionName = "localhost:1000";
-            }
 
             ExitCommand = new RelayCommand(() => Application.Current.Shutdown());
             CloseCommand = new RelayCommand(() => _sessionService.ShutdownSession(), () => IsSessionActive);
             OpenSessionCommand = new RelayCommand(() => _messenger.Send(new ShowNewSessionWindowMessage()));
             ExportCommand = new RelayCommand(Export, () => IsSessionActive);
-            ConnectCommand = new RelayCommand(() => _sessionService.IsSessionSubscribed = true, () => _sessionState != SessionState.Subscribed);
+            ConnectCommand = new RelayCommand(() => _sessionService.IsSessionSubscribed = true, () => _sessionState != SessionState.Subscribed && _sessionService.CanSubscribe);
             DisconnectCommand = new RelayCommand(() => _sessionService.IsSessionSubscribed = false, () => _sessionState != SessionState.Unsubscribed);
 
-            _messenger.Register<SessionOpenedMessage>(this, message =>
-            {
-                SessionName = message.Name;
-                InvalidateCommands();
-            });
+            _messenger.Register<SessionOpenedMessage>(this, message => InvalidateCommands());
 
             _messenger.Register<SessionClosedMessage>(this, message =>
             {
-                Charts.Clear();
-                SessionName = string.Empty;
                 SessionState = SessionState.Unsubscribed;
+                Charts.Clear();
                 InvalidateCommands();
             });
 
@@ -109,7 +90,7 @@ namespace Monitor.ViewModel
                 {
                     lock (_charts)
                     {
-                        ParseResult(message.Result);
+                        ParseResult(message.ResultContext.Result);
                     }
                 }
                 catch (Exception e)

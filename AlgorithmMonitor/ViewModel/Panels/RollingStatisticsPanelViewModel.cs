@@ -21,7 +21,7 @@ namespace Monitor.ViewModel.Panels
             _messenger = messenger;
             _messenger.Register<SessionUpdateMessage>(this, message =>
             {
-                ParseResult(message.Result);
+                ParseResult(message.ResultContext.Result);
             });
         }
 

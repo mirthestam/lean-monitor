@@ -151,7 +151,13 @@ namespace Monitor.Model.Sessions
             var backtestResultUpdate = _resultConverter.FromBacktestResult(backtestResultEventModel.Results);
             _result.Add(backtestResultUpdate);
 
-            _syncContext.Send(o => _sessionHandler.HandleResult(_result), null);
+            var context = new ResultContext
+            {
+                Name = Name,
+                Result = _result,
+                Progress = backtestResultEventModel.Progress
+            };
+            _syncContext.Send(o => _sessionHandler.HandleResult(context), null);
 
             if (backtestResultEventModel.Progress == 1 && _closeAfterCompleted)
             {
@@ -165,7 +171,13 @@ namespace Monitor.Model.Sessions
             var liveResultUpdate = _resultConverter.FromLiveResult(liveResultEventModel.Results);
             _result.Add(liveResultUpdate);
 
-            _syncContext.Send(o => _sessionHandler.HandleResult(_result), null);
+            var context = new ResultContext
+            {
+                Name = Name,
+                Result = _result
+            };
+
+            _syncContext.Send(o => _sessionHandler.HandleResult(context), null);
         }
 
         public void Subscribe()
@@ -227,5 +239,7 @@ namespace Monitor.Model.Sessions
                 _sessionHandler.HandleStateChanged(value);
             }
         }
+
+        public bool CanSubscribe { get; } = true;
     }
 }
