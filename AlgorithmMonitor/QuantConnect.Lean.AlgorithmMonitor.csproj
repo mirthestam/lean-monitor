@@ -92,6 +92,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Lean\Launcher\bin\Debug\NodaTime.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationFramework.Aero2" />
     <Reference Include="QuantConnect.Common">
       <HintPath>..\..\Lean\Launcher\bin\Debug\QuantConnect.Common.dll</HintPath>
     </Reference>
@@ -268,6 +269,10 @@
       <DependentUpon>ChartPanel.xaml</DependentUpon>
     </Compile>
     <Page Include="Resources\ResourcesDictionary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Expression.Toolbar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
