@@ -12,16 +12,16 @@ namespace Monitor.Model.Charting
                 switch (source.Resolution)
                 {
                     case Resolution.Day:
-                        return m.X.ElapsedTicks / TimeSpan.TicksPerDay;
+                        return m.X.ElapsedDays;
 
                     case Resolution.Hour:
-                        return m.X.ElapsedTicks / TimeSpan.TicksPerHour;
+                        return m.X.ElapsedHours;
 
                     case Resolution.Minute:
-                        return m.X.ElapsedTicks / TimeSpan.TicksPerMinute;
+                        return m.X.ElapsedMinutes;
 
                     case Resolution.Second:
-                        return m.X.ElapsedTicks / TimeSpan.TicksPerSecond;
+                        return m.X.ElapsedSeconds;
 
                     default:
                         return m.X.ElapsedTicks;

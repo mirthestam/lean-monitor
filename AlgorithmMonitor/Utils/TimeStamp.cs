@@ -16,27 +16,34 @@ namespace Monitor.Utils
         public static TimeStamp MinValue => FromTicks(_minTicks);
         public static TimeStamp MaxValue => FromTicks(_maxTicks);
 
-        public static TimeStamp FromSeconds(long elapsedSeconds)
+        public static TimeStamp FromSeconds(double elapsedSeconds)
         {
             return From(elapsedSeconds, Model.Resolution.Second);
         }
-        public static TimeStamp FromMinutes(long elapsedMinutes)
+        public static TimeStamp FromMinutes(double elapsedMinutes)
         {
             return From(elapsedMinutes, Model.Resolution.Minute);
         }
-        public static TimeStamp FromHours(long elapsedHours)
+        public static TimeStamp FromHours(double elapsedHours)
         {
             return From(elapsedHours, Model.Resolution.Hour);
         }
-        public static TimeStamp FromDays(long elapsedDays)
+        public static TimeStamp FromDays(double elapsedDays)
         {
             return From(elapsedDays, Model.Resolution.Day);
         }
         public static TimeStamp FromTicks(long elapsedTicks)
         {
-            return From(elapsedTicks, Model.Resolution.Ticks);
+            var epochDateTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            if (elapsedTicks > _maxTicks) throw new ArgumentOutOfRangeException(nameof(elapsedTicks));
+            if (elapsedTicks < _minTicks) throw new ArgumentOutOfRangeException(nameof(elapsedTicks));
+
+            var dateTime = epochDateTime.AddTicks(elapsedTicks);
+            dateTime = dateTime.ToLocalTime();
+            var timeSpan = dateTime.Subtract(epochDateTime.ToLocalTime());
+            return new TimeStamp(timeSpan);
         }
-        public static TimeStamp From(long elapsedUnit, Model.Resolution resolution)
+        public static TimeStamp From(double elapsedUnit, Model.Resolution resolution)
         {
             var epochDateTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             DateTime dateTime;
@@ -62,7 +69,7 @@ namespace Monitor.Utils
                     if (elapsedUnit > _maxTicks) throw new ArgumentOutOfRangeException(nameof(elapsedUnit));
                     if (elapsedUnit < _minTicks) throw new ArgumentOutOfRangeException(nameof(elapsedUnit));
 
-                    dateTime = epochDateTime.AddTicks(elapsedUnit);
+                    dateTime = epochDateTime.AddTicks((long)elapsedUnit);
                     break;
 
                 default:

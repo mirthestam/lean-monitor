@@ -6,8 +6,7 @@ using System.Windows.Media;
 using GalaSoft.MvvmLight.Messaging;
 using LiveCharts;
 using LiveCharts.Definitions.Series;
-using LiveCharts.Geared;
-using LiveCharts.Geared.Geometries;
+using LiveCharts.Helpers;
 using LiveCharts.Wpf;
 using Monitor.Model;
 using Monitor.Model.Charting;
@@ -40,9 +39,20 @@ namespace Monitor.ViewModel.Charts
         };
 
         private ObservableCollection<ChildChartViewModel> _children = new ObservableCollection<ChildChartViewModel>();
-        private SeriesCollection _scrollSeriesCollection = new SeriesCollection();        
+        private SeriesCollection _scrollSeriesCollection = new SeriesCollection();
+        private DateTime _referenceDateTime = TimeStamp.FromDays(0).DateTime;
 
         public override bool CanClose => false;
+
+        public DateTime ReferenceDateTime
+        {
+            get { return _referenceDateTime; }
+            set
+            {
+                _referenceDateTime = value;
+                RaisePropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the children of this chart
@@ -184,7 +194,7 @@ namespace Monitor.ViewModel.Charts
 
             var scrollSeries = (Series) ScrollSeriesCollection.FirstOrDefault();
             if (scrollSeries == null && sourceScrollSeries.Values.Any())
-            {
+            {                
                 _startPoint = sourceScrollSeries.Values[0].X;
                 scrollSeries = BuildSeries(sourceScrollSeries);
                 ScrollSeriesCollection.Add(scrollSeries);
@@ -204,7 +214,7 @@ namespace Monitor.ViewModel.Charts
                 // Zoom to the known number of values.
                 ZoomTo = _lastUpdates["Scroll"].ElapsedTicks / AxisModifier;
 
-                long diff;
+                double diff;
                 
                 // Determine a default scale
                 switch (Resolution)
@@ -247,7 +257,7 @@ namespace Monitor.ViewModel.Charts
             switch (sourceSeries.SeriesType)
             {
                 case SeriesType.Line:
-                    series = new GLineSeries
+                    series = new LineSeries
                     {
                         Configuration = ChartPointEvaluator,
                         Fill = Brushes.Transparent
@@ -255,14 +265,14 @@ namespace Monitor.ViewModel.Charts
                     break;
 
                 case SeriesType.Bar:
-                    series = new GColumnSeries
+                    series = new ColumnSeries
                     {
                         Configuration = ChartPointEvaluator,
                     };
                     break;
 
                 case SeriesType.Candle:
-                    series = new GCandleSeries
+                    series = new CandleSeries
                     {
                         Configuration = OhlcChartPointEvaluator,
                         IncreaseBrush = Brushes.LightCoral,
@@ -272,12 +282,18 @@ namespace Monitor.ViewModel.Charts
                     break;
 
                 case SeriesType.Scatter:
-                    series = new GScatterSeries
+                    //series = new GScatterSeries
+                    //{
+                    //    Configuration = ChartPointEvaluator,
+                    //    StrokeThickness = 1,
+                    //    GearedPointGeometry = GetGearedPointGeometry(sourceSeries.ScatterMarkerSymbol)
+                    //};
+                    series = new ScatterSeries
                     {
                         Configuration = ChartPointEvaluator,
                         StrokeThickness = 1,
-                        GearedPointGeometry = GetGearedPointGeometry(sourceSeries.ScatterMarkerSymbol)
                     };
+
                     break;
 
                 default:
@@ -322,13 +338,13 @@ namespace Monitor.ViewModel.Charts
                 case SeriesType.Scatter:
                 case SeriesType.Bar:
                 case SeriesType.Line:
-                    var existingCommonValues = (GearedValues<TimeStampChartPoint>) (targetSeries.Values ?? (targetSeries.Values = new GearedValues<TimeStampChartPoint>()));
+                    var existingCommonValues = (ChartValues<TimeStampChartPoint>) (targetSeries.Values ?? (targetSeries.Values = new ChartValues<TimeStampChartPoint>()));
                     existingCommonValues.AddRange(sourceSeries.Values);
                     break;
 
                 case SeriesType.Candle:
                     // Build daily candles
-                    var existingCandleValues = (GearedValues<TimeStampOhlcChartPoint>)(targetSeries.Values ?? (targetSeries.Values = new GearedValues<TimeStampOhlcChartPoint>()));
+                    var existingCandleValues = (ChartValues<TimeStampOhlcChartPoint>)(targetSeries.Values ?? (targetSeries.Values = new ChartValues<TimeStampOhlcChartPoint>()));
                     var newValues = sourceSeries.Values.GroupBy(cp => cp.X.ElapsedDays).Select(
                         g =>
                         {
@@ -353,32 +369,32 @@ namespace Monitor.ViewModel.Charts
             }
         }
 
-        private static GeometryShape GetGearedPointGeometry(ScatterMarkerSymbol symbol)
-        {
-            switch (symbol)
-            {
-                case ScatterMarkerSymbol.None:
-                    return null;
+        //private static GeometryShape GetGearedPointGeometry(ScatterMarkerSymbol symbol)
+        //{
+        //    switch (symbol)
+        //    {
+        //        case ScatterMarkerSymbol.None:
+        //            return null;
                     
-                case ScatterMarkerSymbol.Circle:
-                    return new Circle(); 
+        //        case ScatterMarkerSymbol.Circle:
+        //            return new Circle(); 
                     
-                case ScatterMarkerSymbol.Square:
-                    return new Square();
+        //        case ScatterMarkerSymbol.Square:
+        //            return new Square();
                     
-                case ScatterMarkerSymbol.Diamond:
-                    return new Diamond();
+        //        case ScatterMarkerSymbol.Diamond:
+        //            return new Diamond();
                     
-                case ScatterMarkerSymbol.Triangle:
-                    return new Triangle();
+        //        case ScatterMarkerSymbol.Triangle:
+        //            return new Triangle();
                     
-                case ScatterMarkerSymbol.TriangleDown:
-                    return new TriangleDown();
+        //        case ScatterMarkerSymbol.TriangleDown:
+        //            return new TriangleDown();
                     
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(symbol), symbol, null);
-            }
-        }
+        //        default:
+        //            throw new ArgumentOutOfRangeException(nameof(symbol), symbol, null);
+        //    }
+        //}
 
         private static Geometry GetPointGeometry(ScatterMarkerSymbol symbol)
         {

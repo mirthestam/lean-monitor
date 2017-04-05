@@ -16,13 +16,8 @@ namespace Monitor.ViewModel.Charts
     /// </summary>
     public abstract class ChartViewModelBase : DocumentViewModel, IResolutionProvider
     {
-        private const string SecondLabelFormat = "yyyy-MM-dd HH:mm:ss";
-        private const string MinuteLabelFormat = "yyyy-MM-dd HH:mm";
-        private const string HourLabelFormat = "yyyy-MM-dd HH:00";
-        private const string DayLabelFormat = "yyyy-MM-dd";
-
-        private long _zoomFrom;
-        private long _zoomTo = 1;
+        private double _zoomFrom;
+        private double _zoomTo = 1;
         private bool _isPositionLocked;
 
         private IPointEvaluator<TimeStampOhlcChartPoint> _ohlcChartPointEvaluator;
@@ -34,7 +29,7 @@ namespace Monitor.ViewModel.Charts
 
         public Resolution Resolution { get; set; } = Resolution.Day;
 
-        public long ZoomTo
+        public double ZoomTo
         {
             get { return _zoomTo; }
             set
@@ -44,7 +39,7 @@ namespace Monitor.ViewModel.Charts
             }
         }
 
-        public long ZoomFrom
+        public double ZoomFrom
         {
             get { return _zoomFrom; }
             set
@@ -63,8 +58,6 @@ namespace Monitor.ViewModel.Charts
                 RaisePropertyChanged();
             }
         }
-
-        public Func<double, string> XFormatter { get; set; }
         
         public IPointEvaluator<TimeStampChartPoint> ChartPointEvaluator => _chartPointEvaluator ?? (_chartPointEvaluator = new TimeStampChartPointMapper(this));
 
@@ -74,10 +67,9 @@ namespace Monitor.ViewModel.Charts
         {
             ShowGridCommand = new RelayCommand(() => Messenger.Default.Send(new GridRequestMessage(Key)));
             ZoomFitCommand = new RelayCommand(ZoomToFit);
-            XFormatter = val => FormatXLabel((long)val);
         }
 
-        public long AxisModifier
+        public double AxisModifier
         {
             get
             {
@@ -135,44 +127,6 @@ namespace Monitor.ViewModel.Charts
             }
         }
 
-        protected abstract void ZoomToFit();
-        
-        private string FormatXLabel(long x)
-        {
-            string format;
-            var ticks = x * AxisModifier;
-
-            // Pick a format string based upon the resolution of the data.
-            switch (Resolution)
-            {
-                case Resolution.Second:
-                    format = SecondLabelFormat;
-                    break;
-
-                case Resolution.Minute:
-                    format = MinuteLabelFormat;
-                    break;
-
-                case Resolution.Hour:
-                    format = HourLabelFormat;
-                    break;
-
-                case Resolution.Day:
-                    format = DayLabelFormat;
-                    break;
-
-                case Resolution.Ticks:
-                    format = SecondLabelFormat;
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-            if (ticks < TimeStamp.MinValue.ElapsedTicks) return ">>>";
-            if (ticks > TimeStamp.MaxValue.ElapsedTicks) return "<<<";
-
-            return TimeStamp.FromTicks(ticks).DateTime.ToString(format);
-        }        
+        protected abstract void ZoomToFit();       
     }
 }
