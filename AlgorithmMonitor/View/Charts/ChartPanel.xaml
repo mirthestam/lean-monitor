@@ -118,6 +118,8 @@
                 <wpf:CartesianChart.AxisX>
                     <wpf:DateAxis
                         IsMerged="True"
+                        HeaderForeground="White"
+                        HeaderFontWeight="Normal"
                         Period="{Binding Resolution, Mode=TwoWay, Converter={StaticResource ResolutionConverter}}"
                         InitialDateTime="{Binding ReferenceDateTime, Mode=TwoWay}"                                        
                         />
