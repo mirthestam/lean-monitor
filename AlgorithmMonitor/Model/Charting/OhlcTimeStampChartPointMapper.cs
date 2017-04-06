@@ -12,22 +12,22 @@ namespace Monitor.Model.Charting
             {
                 switch (source.Resolution)
                 {
-                    case Resolution.Day:
-                        return m.X.ElapsedTicks / TimeSpan.TicksPerDay;
-
-                    case Resolution.Hour:
-                        return m.X.ElapsedTicks / TimeSpan.TicksPerHour;
-
-                    case Resolution.Minute:
-                        return m.X.ElapsedTicks / TimeSpan.TicksPerMinute;
-
                     case Resolution.Second:
-                        return m.X.ElapsedTicks / TimeSpan.TicksPerSecond;
-
+                        return m.X.ElapsedSeconds;
+                        
+                    case Resolution.Minute:
+                        return m.X.ElapsedMinutes;
+                        
+                    case Resolution.Hour:
+                        return m.X.ElapsedHours;
+                        
+                    case Resolution.Day:
+                        return m.X.ElapsedDays;
+                    
                     default:
-                        return m.X.ElapsedTicks;
-                }                
-            });
+                        throw new ArgumentOutOfRangeException();
+                }
+            });            
             Open(m => m.Open);
             Close(m => m.Close);
             High(m => m.High);

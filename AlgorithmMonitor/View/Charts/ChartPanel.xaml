@@ -3,9 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:wpf="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
              xmlns:charts="clr-namespace:Monitor.ViewModel.Charts"
-            Foreground="{StaticResource ForegroundBrush}"
+             xmlns:wpf="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+             xmlns:model="clr-namespace:Monitor.Model"
+             Foreground="{StaticResource ForegroundBrush}"
              mc:Ignorable="d"              
              d:DataContext="{d:DesignInstance Type=charts:ChartViewModel,IsDesignTimeCreatable=True}"
              d:DesignHeight="300" d:DesignWidth="300">
@@ -55,7 +56,7 @@
                             Zoom="X"                            
                             AxisY="{Binding YAxesCollection}"
                             Series="{Binding SeriesCollection}"                 
-                            VisualElements="{Binding VisualElementsCollection}"
+                            VisualElements="{Binding VisualElementsCollection}"                            
                             LegendLocation="None"
                             Hoverable="False">
                                 <wpf:CartesianChart.Resources>
@@ -66,28 +67,37 @@
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
+                                    <model:ResolutionConverter x:Key="ResolutionConverter"/>
                                 </wpf:CartesianChart.Resources>
                                 <wpf:CartesianChart.AxisX>
-                                    <wpf:Axis
-                                    MinValue="{Binding Path=Parent.ZoomFrom, Mode=TwoWay}"
-                                    MaxValue="{Binding Path=Parent.ZoomTo, Mode=TwoWay}"
-                                    LabelFormatter="{Binding Parent.XFormatter, Mode=TwoWay}"
-                                    ShowLabels="true"              
-                                    Position="RightTop"                                        
-                                    Separator="{x:Static wpf:DefaultAxes.CleanSeparator}">
-                                        <wpf:Axis.Resources>
-                                            <Style TargetType="{x:Type wpf:Axis}">
+                                    <wpf:DateAxis
+                                        Period="{Binding Parent.Resolution, Mode=TwoWay, Converter={StaticResource ResolutionConverter}}"
+                                        InitialDateTime="{Binding Parent.ReferenceDateTime, Mode=TwoWay}"                                        
+                                        MinValue="{Binding Path=Parent.ZoomFrom, Mode=TwoWay}"
+                                        MaxValue="{Binding Path=Parent.ZoomTo, Mode=TwoWay}"                                       
+                                        HeaderFontWeight="Normal"                                        
+                                        ShowLabels="true"   
+                                        Position="RightTop">
+                                        <wpf:DateAxis.Separator>
+                                            <wpf:Separator/>
+                                        </wpf:DateAxis.Separator>
+                                        <wpf:DateAxis.Resources>
+                                            <Style TargetType="{x:Type wpf:DateAxis}">
                                                 <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ShowLabels}" Value="True">
+                                                        <Setter Property="HeaderForeground" Value="White"/>
+                                                    </DataTrigger>
                                                     <DataTrigger Binding="{Binding ShowLabels}" Value="False">
                                                         <!-- The Axis contains a showlabels property. However when disabling, the chart will be drawn differently. -->
                                                         <!-- By making it inivisible, it still sizes like the other charts -->
                                                         <Setter Property="Foreground" Value="Transparent"/>
+                                                        <Setter Property="HeaderForeground" Value="Transparent"/>
                                                         <Setter Property="Height" Value="0"></Setter>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
-                                        </wpf:Axis.Resources>
-                                    </wpf:Axis>
+                                        </wpf:DateAxis.Resources>
+                                    </wpf:DateAxis>
                                 </wpf:CartesianChart.AxisX>
                             </wpf:CartesianChart>
                         </DataTemplate>
@@ -102,10 +112,17 @@
                             DisableAnimations="True" 
                             Series="{Binding ScrollSeriesCollection}"
                             DataTooltip="{x:Null}">
-
+                <wpf:CartesianChart.Resources>
+                    <model:ResolutionConverter x:Key="ResolutionConverter"/>
+                </wpf:CartesianChart.Resources>
                 <wpf:CartesianChart.AxisX>
-                    <wpf:Axis IsMerged="True"                           
-                          LabelFormatter="{Binding XFormatter}"/>
+                    <wpf:DateAxis
+                        IsMerged="True"
+                        HeaderForeground="White"
+                        HeaderFontWeight="Normal"
+                        Period="{Binding Resolution, Mode=TwoWay, Converter={StaticResource ResolutionConverter}}"
+                        InitialDateTime="{Binding ReferenceDateTime, Mode=TwoWay}"                                        
+                        />
                 </wpf:CartesianChart.AxisX>
                 <wpf:CartesianChart.AxisY>
                     <wpf:Axis ShowLabels="False" />

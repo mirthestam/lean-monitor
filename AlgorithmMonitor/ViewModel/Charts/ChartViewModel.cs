@@ -8,6 +8,7 @@ using LiveCharts;
 using LiveCharts.Definitions.Series;
 using LiveCharts.Geared;
 using LiveCharts.Geared.Geometries;
+using LiveCharts.Helpers;
 using LiveCharts.Wpf;
 using Monitor.Model;
 using Monitor.Model.Charting;
@@ -40,9 +41,20 @@ namespace Monitor.ViewModel.Charts
         };
 
         private ObservableCollection<ChildChartViewModel> _children = new ObservableCollection<ChildChartViewModel>();
-        private SeriesCollection _scrollSeriesCollection = new SeriesCollection();        
+        private SeriesCollection _scrollSeriesCollection = new SeriesCollection();
+        private DateTime _referenceDateTime = TimeStamp.FromDays(0).DateTime;
 
         public override bool CanClose => false;
+
+        public DateTime ReferenceDateTime
+        {
+            get { return _referenceDateTime; }
+            set
+            {
+                _referenceDateTime = value;
+                RaisePropertyChanged();
+            }
+        }
 
         /// <summary>
         /// Gets or sets the children of this chart
@@ -94,7 +106,7 @@ namespace Monitor.ViewModel.Charts
             var secondDuplicates = chartPoints.GroupBy(cp => cp.X.ElapsedSeconds).Any(g => g.Count() > 1);
             if (!secondDuplicates) return Resolution.Second;
 
-            return Resolution.Ticks;
+            return Resolution.Second;
         }
         
         public void ParseChart(ChartDefinition sourceChart)
@@ -184,7 +196,7 @@ namespace Monitor.ViewModel.Charts
 
             var scrollSeries = (Series) ScrollSeriesCollection.FirstOrDefault();
             if (scrollSeries == null && sourceScrollSeries.Values.Any())
-            {
+            {                
                 _startPoint = sourceScrollSeries.Values[0].X;
                 scrollSeries = BuildSeries(sourceScrollSeries);
                 ScrollSeriesCollection.Add(scrollSeries);
@@ -204,7 +216,7 @@ namespace Monitor.ViewModel.Charts
                 // Zoom to the known number of values.
                 ZoomTo = _lastUpdates["Scroll"].ElapsedTicks / AxisModifier;
 
-                long diff;
+                double diff;
                 
                 // Determine a default scale
                 switch (Resolution)
@@ -278,6 +290,7 @@ namespace Monitor.ViewModel.Charts
                         StrokeThickness = 1,
                         GearedPointGeometry = GetGearedPointGeometry(sourceSeries.ScatterMarkerSymbol)
                     };
+
                     break;
 
                 default:
@@ -328,7 +341,7 @@ namespace Monitor.ViewModel.Charts
 
                 case SeriesType.Candle:
                     // Build daily candles
-                    var existingCandleValues = (GearedValues<TimeStampOhlcChartPoint>)(targetSeries.Values ?? (targetSeries.Values = new GearedValues<TimeStampOhlcChartPoint>()));
+                    var existingCandleValues = (ChartValues<TimeStampOhlcChartPoint>)(targetSeries.Values ?? (targetSeries.Values = new ChartValues<TimeStampOhlcChartPoint>()));
                     var newValues = sourceSeries.Values.GroupBy(cp => cp.X.ElapsedDays).Select(
                         g =>
                         {
@@ -359,22 +372,22 @@ namespace Monitor.ViewModel.Charts
             {
                 case ScatterMarkerSymbol.None:
                     return null;
-                    
+
                 case ScatterMarkerSymbol.Circle:
-                    return new Circle(); 
-                    
+                    return new Circle();
+
                 case ScatterMarkerSymbol.Square:
                     return new Square();
-                    
+
                 case ScatterMarkerSymbol.Diamond:
                     return new Diamond();
-                    
+
                 case ScatterMarkerSymbol.Triangle:
                     return new Triangle();
-                    
+
                 case ScatterMarkerSymbol.TriangleDown:
                     return new TriangleDown();
-                    
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(symbol), symbol, null);
             }
