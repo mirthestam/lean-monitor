@@ -39,8 +39,7 @@ namespace Monitor.Utils
             if (elapsedTicks < _minTicks) throw new ArgumentOutOfRangeException(nameof(elapsedTicks));
 
             var dateTime = epochDateTime.AddTicks(elapsedTicks);
-            dateTime = dateTime.ToLocalTime();
-            var timeSpan = dateTime.Subtract(epochDateTime.ToLocalTime());
+            var timeSpan = dateTime.Subtract(epochDateTime);
             return new TimeStamp(timeSpan);
         }
         public static TimeStamp From(double elapsedUnit, Model.Resolution resolution)
@@ -76,8 +75,7 @@ namespace Monitor.Utils
                     throw new ArgumentOutOfRangeException(nameof(resolution));
             }
 
-            dateTime = dateTime.ToLocalTime();
-            var timeSpan = dateTime.Subtract(epochDateTime.ToLocalTime());
+            var timeSpan = dateTime.Subtract(epochDateTime);
             return new TimeStamp(timeSpan);
         }
 
@@ -129,7 +127,7 @@ namespace Monitor.Utils
             get
             {
                 var epochDateTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-                return epochDateTime.Add(_timeSpan).ToLocalTime();
+                return epochDateTime.Add(_timeSpan);
             }
         }
 

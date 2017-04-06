@@ -75,8 +75,8 @@
                                         ReferenceDateTime="{Binding Parent.ReferenceDateTime, Mode=TwoWay}"                                        
                                         MinValue="{Binding Path=Parent.ZoomFrom, Mode=TwoWay}"
                                         MaxValue="{Binding Path=Parent.ZoomTo, Mode=TwoWay}"                                       
-                                        HeaderForeground="DodgerBlue"
-                                        HeaderFontWeight="Bold"
+                                        HeaderForeground="white"
+                                        HeaderFontWeight="Normal"                                        
                                         ShowLabels="true"   
                                         Position="RightTop">
                                         <wpf:Axis.Separator>
@@ -109,9 +109,15 @@
                             DisableAnimations="True" 
                             Series="{Binding ScrollSeriesCollection}"
                             DataTooltip="{x:Null}">
-
+                <wpf:CartesianChart.Resources>
+                    <model:ResolutionConverter x:Key="ResolutionConverter"/>
+                </wpf:CartesianChart.Resources>
                 <wpf:CartesianChart.AxisX>
-                    <wpf:DateAxis IsMerged="True" Resolution="{Binding Resolution}" ReferenceDateTime="{Binding ReferenceDateTime}"/>
+                    <wpf:DateAxis
+                        IsMerged="True"
+                        Resolution="{Binding Resolution, Mode=TwoWay, Converter={StaticResource ResolutionConverter}}"
+                        ReferenceDateTime="{Binding ReferenceDateTime, Mode=TwoWay}"                                        
+                        />
                 </wpf:CartesianChart.AxisX>
                 <wpf:CartesianChart.AxisY>
                     <wpf:Axis ShowLabels="False" />

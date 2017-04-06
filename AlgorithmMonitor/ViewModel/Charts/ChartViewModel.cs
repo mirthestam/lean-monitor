@@ -6,6 +6,8 @@ using System.Windows.Media;
 using GalaSoft.MvvmLight.Messaging;
 using LiveCharts;
 using LiveCharts.Definitions.Series;
+using LiveCharts.Geared;
+using LiveCharts.Geared.Geometries;
 using LiveCharts.Helpers;
 using LiveCharts.Wpf;
 using Monitor.Model;
@@ -257,7 +259,7 @@ namespace Monitor.ViewModel.Charts
             switch (sourceSeries.SeriesType)
             {
                 case SeriesType.Line:
-                    series = new LineSeries
+                    series = new GLineSeries
                     {
                         Configuration = ChartPointEvaluator,
                         Fill = Brushes.Transparent
@@ -265,14 +267,14 @@ namespace Monitor.ViewModel.Charts
                     break;
 
                 case SeriesType.Bar:
-                    series = new ColumnSeries
+                    series = new GColumnSeries
                     {
                         Configuration = ChartPointEvaluator,
                     };
                     break;
 
                 case SeriesType.Candle:
-                    series = new CandleSeries
+                    series = new GCandleSeries
                     {
                         Configuration = OhlcChartPointEvaluator,
                         IncreaseBrush = Brushes.LightCoral,
@@ -282,16 +284,11 @@ namespace Monitor.ViewModel.Charts
                     break;
 
                 case SeriesType.Scatter:
-                    //series = new GScatterSeries
-                    //{
-                    //    Configuration = ChartPointEvaluator,
-                    //    StrokeThickness = 1,
-                    //    GearedPointGeometry = GetGearedPointGeometry(sourceSeries.ScatterMarkerSymbol)
-                    //};
-                    series = new ScatterSeries
+                    series = new GScatterSeries
                     {
                         Configuration = ChartPointEvaluator,
                         StrokeThickness = 1,
+                        GearedPointGeometry = GetGearedPointGeometry(sourceSeries.ScatterMarkerSymbol)
                     };
 
                     break;
@@ -338,7 +335,7 @@ namespace Monitor.ViewModel.Charts
                 case SeriesType.Scatter:
                 case SeriesType.Bar:
                 case SeriesType.Line:
-                    var existingCommonValues = (ChartValues<TimeStampChartPoint>) (targetSeries.Values ?? (targetSeries.Values = new ChartValues<TimeStampChartPoint>()));
+                    var existingCommonValues = (GearedValues<TimeStampChartPoint>) (targetSeries.Values ?? (targetSeries.Values = new GearedValues<TimeStampChartPoint>()));
                     existingCommonValues.AddRange(sourceSeries.Values);
                     break;
 
@@ -369,32 +366,32 @@ namespace Monitor.ViewModel.Charts
             }
         }
 
-        //private static GeometryShape GetGearedPointGeometry(ScatterMarkerSymbol symbol)
-        //{
-        //    switch (symbol)
-        //    {
-        //        case ScatterMarkerSymbol.None:
-        //            return null;
-                    
-        //        case ScatterMarkerSymbol.Circle:
-        //            return new Circle(); 
-                    
-        //        case ScatterMarkerSymbol.Square:
-        //            return new Square();
-                    
-        //        case ScatterMarkerSymbol.Diamond:
-        //            return new Diamond();
-                    
-        //        case ScatterMarkerSymbol.Triangle:
-        //            return new Triangle();
-                    
-        //        case ScatterMarkerSymbol.TriangleDown:
-        //            return new TriangleDown();
-                    
-        //        default:
-        //            throw new ArgumentOutOfRangeException(nameof(symbol), symbol, null);
-        //    }
-        //}
+        private static GeometryShape GetGearedPointGeometry(ScatterMarkerSymbol symbol)
+        {
+            switch (symbol)
+            {
+                case ScatterMarkerSymbol.None:
+                    return null;
+
+                case ScatterMarkerSymbol.Circle:
+                    return new Circle();
+
+                case ScatterMarkerSymbol.Square:
+                    return new Square();
+
+                case ScatterMarkerSymbol.Diamond:
+                    return new Diamond();
+
+                case ScatterMarkerSymbol.Triangle:
+                    return new Triangle();
+
+                case ScatterMarkerSymbol.TriangleDown:
+                    return new TriangleDown();
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(symbol), symbol, null);
+            }
+        }
 
         private static Geometry GetPointGeometry(ScatterMarkerSymbol symbol)
         {
