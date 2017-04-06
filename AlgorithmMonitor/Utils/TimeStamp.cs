@@ -64,13 +64,6 @@ namespace Monitor.Utils
                     dateTime = epochDateTime.AddSeconds(elapsedUnit);
                     break;
 
-                case Model.Resolution.Ticks:
-                    if (elapsedUnit > _maxTicks) throw new ArgumentOutOfRangeException(nameof(elapsedUnit));
-                    if (elapsedUnit < _minTicks) throw new ArgumentOutOfRangeException(nameof(elapsedUnit));
-
-                    dateTime = epochDateTime.AddTicks((long)elapsedUnit);
-                    break;
-
                 default:
                     throw new ArgumentOutOfRangeException(nameof(resolution));
             }

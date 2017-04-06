@@ -13,35 +13,31 @@ namespace Monitor.Model
         Second,
         Minute,
         Hour,
-        Day,
-        Ticks
+        Day
     }
 
-    [ValueConversion(typeof(Resolution), typeof(SeriesResolution))]
+    [ValueConversion(typeof(Resolution), typeof(PeriodUnits))]
     public class ResolutionConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
-            if (targetType != typeof(SeriesResolution))
+            if (targetType != typeof(PeriodUnits))
                 throw new InvalidOperationException("The target must be a SeriesResolution");
 
             switch ((Resolution) value)
             {
                 case Resolution.Second:
-                    return SeriesResolution.Second;
+                    return PeriodUnits.Seconds;
 
                 case Resolution.Minute:
-                    return SeriesResolution.Minute;
+                    return PeriodUnits.Minutes;
 
                 case Resolution.Hour:
-                    return SeriesResolution.Hour;
+                    return PeriodUnits.Hours;
 
                 case Resolution.Day:
-                    return SeriesResolution.Day;
-
-                case Resolution.Ticks:
-                    return SeriesResolution.Ticks;
+                    return PeriodUnits.Days;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(value), value, null);
@@ -54,26 +50,22 @@ namespace Monitor.Model
             if (targetType != typeof(Resolution))
                 throw new InvalidOperationException("The target must be a Resolution");
 
-            switch ((SeriesResolution) value)
+            switch ((PeriodUnits) value)
             {
-                case SeriesResolution.Second:
+                case PeriodUnits.Seconds:
                     return Resolution.Second;
 
-                case SeriesResolution.Minute:
+                case PeriodUnits.Minutes:
                     return Resolution.Minute;
 
-                case SeriesResolution.Hour:
+                case PeriodUnits.Hours:
                     return Resolution.Hour;
 
-                case SeriesResolution.Day:
+                case PeriodUnits.Days:
                     return Resolution.Day;
-
-                case SeriesResolution.Ticks:
-                    return Resolution.Ticks;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(value), value, null);
-
             }
         }
     }

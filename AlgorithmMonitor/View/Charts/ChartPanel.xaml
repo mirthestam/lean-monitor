@@ -71,29 +71,32 @@
                                 </wpf:CartesianChart.Resources>
                                 <wpf:CartesianChart.AxisX>
                                     <wpf:DateAxis
-                                        Resolution="{Binding Parent.Resolution, Mode=TwoWay, Converter={StaticResource ResolutionConverter}}"
-                                        ReferenceDateTime="{Binding Parent.ReferenceDateTime, Mode=TwoWay}"                                        
+                                        Period="{Binding Parent.Resolution, Mode=TwoWay, Converter={StaticResource ResolutionConverter}}"
+                                        InitialDateTime="{Binding Parent.ReferenceDateTime, Mode=TwoWay}"                                        
                                         MinValue="{Binding Path=Parent.ZoomFrom, Mode=TwoWay}"
                                         MaxValue="{Binding Path=Parent.ZoomTo, Mode=TwoWay}"                                       
-                                        HeaderForeground="white"
                                         HeaderFontWeight="Normal"                                        
                                         ShowLabels="true"   
                                         Position="RightTop">
-                                        <wpf:Axis.Separator>
+                                        <wpf:DateAxis.Separator>
                                             <wpf:Separator/>
-                                        </wpf:Axis.Separator>
-                                        <wpf:Axis.Resources>
-                                            <Style TargetType="{x:Type wpf:Axis}">
+                                        </wpf:DateAxis.Separator>
+                                        <wpf:DateAxis.Resources>
+                                            <Style TargetType="{x:Type wpf:DateAxis}">
                                                 <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ShowLabels}" Value="True">
+                                                        <Setter Property="HeaderForeground" Value="White"/>
+                                                    </DataTrigger>
                                                     <DataTrigger Binding="{Binding ShowLabels}" Value="False">
                                                         <!-- The Axis contains a showlabels property. However when disabling, the chart will be drawn differently. -->
                                                         <!-- By making it inivisible, it still sizes like the other charts -->
                                                         <Setter Property="Foreground" Value="Transparent"/>
+                                                        <Setter Property="HeaderForeground" Value="Transparent"/>
                                                         <Setter Property="Height" Value="0"></Setter>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
-                                        </wpf:Axis.Resources>
+                                        </wpf:DateAxis.Resources>
                                     </wpf:DateAxis>
                                 </wpf:CartesianChart.AxisX>
                             </wpf:CartesianChart>
@@ -115,8 +118,8 @@
                 <wpf:CartesianChart.AxisX>
                     <wpf:DateAxis
                         IsMerged="True"
-                        Resolution="{Binding Resolution, Mode=TwoWay, Converter={StaticResource ResolutionConverter}}"
-                        ReferenceDateTime="{Binding ReferenceDateTime, Mode=TwoWay}"                                        
+                        Period="{Binding Resolution, Mode=TwoWay, Converter={StaticResource ResolutionConverter}}"
+                        InitialDateTime="{Binding ReferenceDateTime, Mode=TwoWay}"                                        
                         />
                 </wpf:CartesianChart.AxisX>
                 <wpf:CartesianChart.AxisY>

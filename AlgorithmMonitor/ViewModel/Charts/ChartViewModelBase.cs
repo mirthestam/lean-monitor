@@ -87,9 +87,6 @@ namespace Monitor.ViewModel.Charts
                     case Resolution.Day:
                         return TimeSpan.TicksPerDay;
 
-                    case Resolution.Ticks:
-                        return 1;
-
                     default:
                         throw new ArgumentOutOfRangeException();
                 }

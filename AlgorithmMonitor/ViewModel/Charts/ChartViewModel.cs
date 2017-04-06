@@ -106,7 +106,7 @@ namespace Monitor.ViewModel.Charts
             var secondDuplicates = chartPoints.GroupBy(cp => cp.X.ElapsedSeconds).Any(g => g.Count() > 1);
             if (!secondDuplicates) return Resolution.Second;
 
-            return Resolution.Ticks;
+            return Resolution.Second;
         }
         
         public void ParseChart(ChartDefinition sourceChart)

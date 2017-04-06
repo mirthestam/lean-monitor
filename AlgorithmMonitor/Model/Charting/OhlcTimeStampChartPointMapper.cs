@@ -12,9 +12,6 @@ namespace Monitor.Model.Charting
             {
                 switch (source.Resolution)
                 {
-                    case Resolution.Ticks:
-                        return m.X.ElapsedTicks;
-                        
                     case Resolution.Second:
                         return m.X.ElapsedSeconds;
                         
