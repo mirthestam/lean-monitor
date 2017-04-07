@@ -1,0 +1,106 @@
+﻿<UserControl x:Class="Monitor.View.NewSession.NewApiSessionControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:newSession="clr-namespace:Monitor.ViewModel.NewSession"
+             xmlns:converters="clr-namespace:Monitor.Converters"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance Type=newSession:NewApiSessionViewModel,IsDesignTimeCreatable=False}"
+             d:DesignHeight="400" d:DesignWidth="600">
+
+    <UserControl.Resources>
+        <converters:InverseBooleanConverter x:Key="InverseBooleanConverter"></converters:InverseBooleanConverter>
+    </UserControl.Resources>
+
+    <DockPanel Margin="5">
+        <Expander DockPanel.Dock="Top" Header="API Credentials" IsExpanded="{Binding IsConnected, Converter={StaticResource InverseBooleanConverter}, Mode=OneWay}">
+            <Grid>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="60"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Label Grid.Row="0">Url</Label>
+                <TextBox Margin="0,0,0,4" Grid.Row="0" Grid.Column="1" Text="{Binding EndpointAddress, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+
+                <Label Grid.Row="1">User ID</Label>
+                <TextBox Margin="0,0,0,4" Grid.Row="1" Grid.Column="1" Text="{Binding UserId, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+
+                <Label Grid.Row="2">Token</Label>
+                <TextBox Margin="0,0,0,4" Grid.Row="2" Grid.Column="1" Text="{Binding AccessToken, ValidatesOnDataErrors=True, UpdateSourceTrigger=PropertyChanged}"></TextBox>
+
+                <StackPanel Grid.Row="3" Grid.Column="1" HorizontalAlignment="Left" Orientation="Horizontal">
+                    <Button Margin="5" Padding="2" Content="Reconnect" Command="{Binding ConnectCommand}"></Button>
+                    <Label VerticalContentAlignment="Center" Foreground="{StaticResource ButtonForeground}">
+                        <Label.Style>
+                            <Style TargetType="Label">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsConnected}" Value="true">
+                                        <Setter Property="Content" Value="Connected"></Setter>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding IsConnected}" Value="false">
+                                        <Setter Property="Content" Value="Disconnected"></Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Label.Style>
+                    </Label>
+                </StackPanel>
+
+
+
+            </Grid>
+        </Expander>
+        <Expander Header="Session parameters" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsExpanded="True">
+            <Grid>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="60"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="50*"/>
+                    <RowDefinition Height="30*"/>
+                </Grid.RowDefinitions>
+
+                <Label Grid.Row="0">Project</Label>
+                <DataGrid Margin="0,0,0,4" Grid.Row="0" AutoGenerateColumns="False" IsReadOnly="true" SelectedItem="{Binding SelectedProject}" Grid.Column="1" ItemsSource="{Binding Projects}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Name" Width="*" Binding="{Binding Name}"/>
+                        <DataGridTextColumn Width="100" Header="Created" Binding="{Binding Created, StringFormat=\{0:yy-MM-dd HH:mm\}}"/>
+                        <DataGridTextColumn Width="100" Header="Modified" Binding="{Binding Modified, StringFormat=\{0:yy-MM-dd HH:mm\}}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <Label Grid.Column="0" Grid.Row="1">Instance</Label>
+                <DataGrid Margin="0,0,0,4" Grid.Row="1"  AutoGenerateColumns="False" IsReadOnly="true" SelectedItem="{Binding SelectedInstance, ValidatesOnDataErrors=True}" Grid.Column="1" ItemsSource="{Binding Instances}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Name" Width="10*" Binding="{Binding Name}"/>
+                        <DataGridTemplateColumn Header="Progress" Width="75">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Grid>
+                                        <TextBlock Text="Completed" Visibility="{Binding IsCompleted, Converter={StaticResource BoolToVisibilityConverter}}"></TextBlock>
+                                        <ProgressBar Visibility="{Binding IsCompleted, Converter={StaticResource InverseBoolToVisibilityConverter}}" Foreground="{StaticResource ButtonForeground}" Background="{StaticResource ButtonBackground}" Minimum="0" Maximum="1" Height="12" Value="{Binding Progress}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Note" Width="5*" Binding="{Binding Note}"/>
+                        <DataGridTextColumn Header="Type" Width="100" Binding="{Binding Type}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+            </Grid>
+        </Expander>
+    </DockPanel>
+</UserControl>

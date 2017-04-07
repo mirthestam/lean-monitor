@@ -1,0 +1,19 @@
+﻿<Application
+    x:Class="Monitor.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    StartupUri="View/MainWindow.xaml"
+    xmlns:viewModel="clr-namespace:Lean.AlgorithmMonitor.ViewModel">
+  <Application.Resources>
+    <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes\Expression.xaml" />
+                <ResourceDictionary Source="Themes\Expression.AvalonDock.xaml" />
+                <ResourceDictionary Source="Themes\Expression.Charting.xaml" />
+                <ResourceDictionary Source="Themes\Expression.Toolbar.xaml" />
+                <ResourceDictionary Source="Resources/ResourcesDictionary.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <viewModel:ViewModelLocator x:Key="Locator"/>
+    </ResourceDictionary>
+  </Application.Resources>
+</Application>

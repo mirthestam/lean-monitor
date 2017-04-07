@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26228.9
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantConnect.Lean.AlgorithmMonitor", "AlgorithmMonitor\QuantConnect.Lean.AlgorithmMonitor.csproj", "{0C12991C-5BF1-4ABE-978C-41652C7FA942}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitor", "Monitor\Monitor.csproj", "{0C12991C-5BF1-4ABE-978C-41652C7FA942}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QuantConnect.Lean.AlgorithmMonitor.Tests", "QuantConnect.Lean.AlgorithmMonitor.Tests\QuantConnect.Lean.AlgorithmMonitor.Tests.csproj", "{7A0AECFD-83F5-4C50-9E47-3C7E28E91D6B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitor.Tests", "Monitor.Tests\Monitor.Tests.csproj", "{7A0AECFD-83F5-4C50-9E47-3C7E28E91D6B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Monitor.Model", "Monitor.Model\Monitor.Model.csproj", "{4A341B3B-C422-47D1-8F44-8C6EA39261AC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{7A0AECFD-83F5-4C50-9E47-3C7E28E91D6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A0AECFD-83F5-4C50-9E47-3C7E28E91D6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A0AECFD-83F5-4C50-9E47-3C7E28E91D6B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A341B3B-C422-47D1-8F44-8C6EA39261AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A341B3B-C422-47D1-8F44-8C6EA39261AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A341B3B-C422-47D1-8F44-8C6EA39261AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A341B3B-C422-47D1-8F44-8C6EA39261AC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

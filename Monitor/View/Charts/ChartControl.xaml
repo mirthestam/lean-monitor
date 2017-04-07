@@ -1,0 +1,64 @@
+﻿<UserControl x:Class="Monitor.View.Charts.ChartControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Monitor.View.Charts"
+             xmlns:wpf="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+             xmlns:converters="clr-namespace:Monitor.Converters"
+             xmlns:charts="clr-namespace:Monitor.ViewModel.Charts"
+             d:DataContext="{d:DesignInstance Type=charts:ChartViewModel,IsDesignTimeCreatable=True}"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <wpf:CartesianChart 
+                            DisableAnimations="True"
+                            Zoom="X"                            
+                            AxisY="{Binding YAxesCollection}"
+                            Series="{Binding SeriesCollection}"                 
+                            VisualElements="{Binding VisualElementsCollection}"                            
+                            LegendLocation="None"
+                            Hoverable="False">
+            <wpf:CartesianChart.Resources>
+                <Style TargetType="{x:Type wpf:CartesianChart}">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding ShowLegend}" Value="True">
+                            <Setter Property="LegendLocation" Value="Top"></Setter>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+                <converters:ResolutionConverter x:Key="ResolutionConverter"/>
+            </wpf:CartesianChart.Resources>
+            <wpf:CartesianChart.AxisX>
+                <wpf:DateAxis
+                                        Period="{Binding Parent.Resolution, Mode=OneWay, Converter={StaticResource ResolutionConverter}}"
+                                        InitialDateTime="{Binding Parent.InitialDateTime, Mode=OneWay}"                                        
+                                        MinValue="{Binding Path=Parent.Zoom.ZoomFrom, Mode=TwoWay}"
+                                        MaxValue="{Binding Path=Parent.Zoom.ZoomTo, Mode=TwoWay}"                                       
+                                        HeaderFontWeight="Normal"                                        
+                                        ShowLabels="true"   
+                                        Position="RightTop">
+                    <wpf:DateAxis.Separator>
+                        <wpf:Separator/>
+                    </wpf:DateAxis.Separator>
+                    <wpf:DateAxis.Resources>
+                        <Style TargetType="{x:Type wpf:DateAxis}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ShowLabels}" Value="True">
+                                    <Setter Property="HeaderForeground" Value="White"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding ShowLabels}" Value="False">
+                                    <!-- The Axis contains a showlabels property. However when disabling, the chart will be drawn differently. -->
+                                    <!-- By making it inivisible, it still sizes like the other charts -->
+                                    <Setter Property="Foreground" Value="Transparent"/>
+                                    <Setter Property="HeaderForeground" Value="Transparent"/>
+                                    <Setter Property="Height" Value="0"></Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </wpf:DateAxis.Resources>
+                </wpf:DateAxis>
+            </wpf:CartesianChart.AxisX>
+        </wpf:CartesianChart>
+    </Grid>
+</UserControl>

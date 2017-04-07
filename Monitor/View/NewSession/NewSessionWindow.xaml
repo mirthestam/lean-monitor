@@ -1,0 +1,50 @@
+﻿<Window x:Class="Monitor.View.NewSession.NewSessionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:newSession="clr-namespace:Monitor.ViewModel.NewSession"
+        xmlns:newSession1="clr-namespace:Monitor.View.NewSession"
+        Background="{StaticResource WindowBackgroundBrush}"
+        DataContext="{Binding NewSessionWindow, Source={StaticResource Locator}}"
+        mc:Ignorable="d"
+        Title="Open Session" Height="500" Width="600" WindowStartupLocation="CenterOwner" ResizeMode="CanResize" ShowInTaskbar="False" WindowStyle="ToolWindow">
+    
+    <Window.Resources>
+
+        <DataTemplate DataType="{x:Type newSession:NewFileSessionViewModel}">
+            <newSession1:NewFileSessionControl/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type newSession:NewStreamSessionViewModel}">
+            <newSession1:NewStreamSessionControl/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type newSession:NewApiSessionViewModel}">
+            <newSession1:NewApiSessionControl/>
+        </DataTemplate>
+
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="36"></RowDefinition>
+        </Grid.RowDefinitions>
+        
+        <TabControl Margin="5" ItemsSource="{Binding NewSessionViewModels}" SelectedItem="{Binding SelectedViewModel}">
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Header}"/>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+                        
+        </TabControl>
+
+        <StackPanel Grid.Row="1"  Orientation="Horizontal" HorizontalAlignment="Right">
+        <Button Margin="5" Width="80" IsDefault="True" Content="Open" Command="{Binding SelectedViewModel.OpenCommand}"/>
+        <Button Margin="5" Width="80" IsCancel="True" Content="Cancel" Click="CloseButton_OnClick"></Button>
+        </StackPanel>
+
+    </Grid>
+</Window>
