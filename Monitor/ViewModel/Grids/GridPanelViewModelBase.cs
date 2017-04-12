@@ -5,7 +5,7 @@ namespace Monitor.ViewModel.Grids
     /// <summary>
     /// Abstract view model for grid views (i.e. Generic grid, Strategy Equity grid)
     /// </summary>
-    public abstract class GridPanelViewModelBase : DocumentViewModel
+    public abstract class GridPanelViewModelBase : DocumentPaneViewModel
     {
         private List<GridSerie> _series;
 
@@ -19,7 +19,7 @@ namespace Monitor.ViewModel.Grids
             set
             {
                 _chartName = value;
-                FormatTitle();
+                FormatName();
                 RaisePropertyChanged();
             }
         }
@@ -46,14 +46,14 @@ namespace Monitor.ViewModel.Grids
             set
             {
                 _selectedSeries = value;
-                FormatTitle();
+                FormatName();
                 RaisePropertyChanged();
             }
         }
 
-        private void FormatTitle()
+        private void FormatName()
         {
-            Title = $"{ChartName} [{SelectedSeries.Name}]";
+            Name = $"{ChartName} [{SelectedSeries.Name}]";
         }
     }
 }

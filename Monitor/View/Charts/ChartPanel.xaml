@@ -9,7 +9,7 @@
              xmlns:charts1="clr-namespace:Monitor.View.Charts"
              Foreground="{StaticResource ForegroundBrush}"
              mc:Ignorable="d"              
-             d:DataContext="{d:DesignInstance Type=charts:ChartPanelViewModel,IsDesignTimeCreatable=True}"
+             d:DataContext="{d:DesignInstance Type=charts:ChartPaneViewModel,IsDesignTimeCreatable=True}"
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
         <Grid.RowDefinitions>

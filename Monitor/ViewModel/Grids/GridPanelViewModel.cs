@@ -8,9 +8,11 @@ namespace Monitor.ViewModel.Grids
     /// View model for generic chart grid
     /// </summary>
     public class GridPanelViewModel : GridPanelViewModelBase, IChartParser
-    {        
-        // Allow this tab to be closed. It can be reopened using the chart tab
-        public override bool CanClose => true;
+    {
+        public GridPanelViewModel()
+        {
+            CanClose = true;
+        }
 
         public void ParseChart(ChartDefinition chart)
         {

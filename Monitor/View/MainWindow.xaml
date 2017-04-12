@@ -10,6 +10,10 @@
         xmlns:panels="clr-namespace:Monitor.View.Panels"
         xmlns:grids1="clr-namespace:Monitor.View.Grids"
         xmlns:sessions="clr-namespace:Monitor.Model.Sessions;assembly=Monitor.Model"
+        xmlns:panels1="clr-namespace:Monitor.ViewModel.Panels"
+        xmlns:view="clr-namespace:Monitor.View"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:viewModel="clr-namespace:Monitor.ViewModel"
         mc:Ignorable="d"
         Background="{StaticResource WindowBackgroundBrush}"
         Foreground="{StaticResource ForegroundBrush}"
@@ -20,6 +24,10 @@
         DragOver="MainWindow_OnDragOver"
         AllowDrop="true"
         Title="LEAN Algorithm Monitor">
+    
+    <Window.Resources>
+        <viewModel:LayoutUpdateStrategy x:Key="LayoutUpdateStrategy"/>
+    </Window.Resources>
     
     <Window.InputBindings>
         <KeyBinding Command="{Binding ExitCommand}" Key="F4" Modifiers="Alt"/>
@@ -43,9 +51,23 @@
                 <Separator/>
                 <MenuItem Header="E_xit" Command="{Binding ExitCommand}" InputGestureText="Alt+F4"/>
             </MenuItem>
+            <MenuItem Header="_View">
+                <MenuItem Header="_Statistics" IsChecked="{Binding StatisticsPane.IsVisible, Mode=TwoWay}" IsCheckable="True"/>
+                <MenuItem Header="_Runtime Statistics" IsChecked="{Binding RuntimeStatisticsPane.IsVisible, Mode=TwoWay}" IsCheckable="True"/>
+                <Separator/>
+                <MenuItem Header="_Profit &amp; Loss" IsChecked="{Binding ProfitLossPane.IsVisible, Mode=TwoWay}" IsCheckable="True"/>
+                <MenuItem Header="_Trades" IsChecked="{Binding TradesPane.IsVisible, Mode=TwoWay}" IsCheckable="True"/>
+                <Separator/>
+                <MenuItem Header="_Log" IsChecked="{Binding LogPane.IsVisible, Mode=TwoWay}" IsCheckable="True"/>
+            </MenuItem>
             <MenuItem Header="_Session" IsEnabled="{Binding IsSessionActive}">
                 <MenuItem Header="_Connect" Command="{Binding ConnectCommand}"/>
                 <MenuItem Header="_Disconnect" Command="{Binding DisconnectCommand}"/>
+            </MenuItem>
+            <MenuItem Header="_Window">
+                <MenuItem Header="_Save Window Layout" Command="{Binding SaveLayoutCommand}" CommandParameter="{Binding ElementName=DockingManager}"/>
+                <MenuItem Header="Revert Window Layout" Command="{Binding RestoreLayoutCommand}" CommandParameter="{Binding ElementName=DockingManager}"/>
+                <MenuItem Header="_Reset Window Layout" Command="{Binding ResetLayoutCommand}" CommandParameter="{Binding ElementName=DockingManager}"/>
             </MenuItem>
             <MenuItem Header="_Help">
                 <MenuItem Header="_Charting documentation..." Click="BrowseChartingDocumentationMenuItem_OnClick"/>
@@ -57,11 +79,48 @@
             </MenuItem>
         </Menu>
 
-        <xcad:DockingManager x:Name="DockingManager" Grid.Row="1" DocumentsSource="{Binding Charts}" BorderThickness="0">
+        <xcad:DockingManager
+            x:Name="DockingManager"
+            Grid.Row="1"
+            DocumentsSource="{Binding Documents}"
+            AnchorablesSource="{Binding Tools}"  
+            LayoutUpdateStrategy="{StaticResource LayoutUpdateStrategy}"
+            BorderThickness="0">
+
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="Loaded">
+                    <i:InvokeCommandAction Command="{Binding RestoreLayoutCommand}" CommandParameter="{Binding ElementName=DockingManager}"></i:InvokeCommandAction>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            
+            <xcad:DockingManager.LayoutItemContainerStyleSelector>
+                
+                <view:PaneStyleSelector>
+                    <view:PaneStyleSelector.DocumentStyle>
+                        <Style TargetType="{x:Type xcad:LayoutItem}">
+                            <Setter Property="Title" Value="{Binding Model.Name}"/>
+                            <Setter Property="CanClose" Value="{Binding Model.CanClose}"/>
+                            <Setter Property="IsSelected" Value="{Binding Model.IsSelected, Mode=TwoWay}"/>
+                            <Setter Property="ContentId" Value="{Binding Model.Name}"/>
+                        </Style>
+                    </view:PaneStyleSelector.DocumentStyle>
+                    
+                    <view:PaneStyleSelector.ToolStyle>
+                        <Style TargetType="{x:Type xcad:LayoutAnchorableItem}">
+                            <Setter Property="Title" Value="{Binding Model.Name}"/>
+                            <Setter Property="Visibility" Value="{Binding Model.IsVisible, Mode=TwoWay, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={x:Static Visibility.Hidden}}"/>
+                            <Setter Property="IsSelected" Value="{Binding Model.IsSelected, Mode=TwoWay}"/>
+                            <Setter Property="IsActive" Value="{Binding Model.IsActive, Mode=TwoWay}"/>
+                            <Setter Property="ContentId" Value="{Binding Model.Name}"/>
+                        </Style>
+                    </view:PaneStyleSelector.ToolStyle>
+                </view:PaneStyleSelector>
+                
+            </xcad:DockingManager.LayoutItemContainerStyleSelector>
 
             <xcad:DockingManager.Resources>
 
-                <DataTemplate DataType="{x:Type charts:ChartPanelViewModel}">
+                <DataTemplate DataType="{x:Type charts:ChartPaneViewModel}">
                     <charts1:ChartPanel/>
                 </DataTemplate>
 
@@ -69,68 +128,31 @@
                     <grids1:GridPanel/>
                 </DataTemplate>
 
+                <DataTemplate DataType="{x:Type panels1:LogPanelViewModel}">
+                    <panels:LogPanel/>
+                </DataTemplate>
+
+                <DataTemplate DataType="{x:Type panels1:ProfitLossPanelViewModel}">
+                    <panels:ProfitLossPanel/>
+                </DataTemplate>
+
+                <DataTemplate DataType="{x:Type panels1:RuntimeStatisticsPanelViewModel}">
+                    <panels:RuntimeStatisticsPanel/>
+                </DataTemplate>
+
+                <DataTemplate DataType="{x:Type panels1:StatisticsPanelViewModel}">
+                    <panels:StatisticsPanel/>
+                </DataTemplate>
+
+                <DataTemplate DataType="{x:Type panels1:TradesPanelViewModel}">
+                    <panels:TradesPanel/>
+                </DataTemplate>
+
             </xcad:DockingManager.Resources>
-            
-            <xcad:DockingManager.LayoutItemContainerStyle>
-                <Style TargetType="{x:Type xcad:LayoutItem}">
-                    <Setter Property="Title" Value="{Binding Model.Title}"></Setter>
-                    <Setter Property="CanClose" Value="{Binding Model.CanClose}"></Setter>
-                    <Setter Property="IsSelected" Value="{Binding Model.IsSelected, Mode=TwoWay}"></Setter>
-                </Style>
-            </xcad:DockingManager.LayoutItemContainerStyle>
 
             <xcad:LayoutRoot>
                 <xcad:LayoutPanel Orientation="Vertical">
-
-                    <xcad:LayoutPanel Orientation="Horizontal">
-
-                        <xcad:LayoutAnchorablePaneGroup DockWidth="300" Orientation="Vertical">
-
-                            <xcad:LayoutAnchorablePane DockHeight="200">
-
-                                <xcad:LayoutAnchorable CanClose="False" CanHide="False" Title="Runtime Statistics">
-                                    <panels:RuntimeStatisticsPanel/>
-                                </xcad:LayoutAnchorable>
-
-                            </xcad:LayoutAnchorablePane>
-
-                            <xcad:LayoutAnchorablePane>
-
-                                <xcad:LayoutAnchorable CanClose="False" CanHide="False" Title="Overall Statistics">
-                                    <panels:StatisticsPanel/>
-                                </xcad:LayoutAnchorable>
-
-                            </xcad:LayoutAnchorablePane>
-
-                        </xcad:LayoutAnchorablePaneGroup>
-
-                        <xcad:LayoutDocumentPaneGroup Orientation="Horizontal">
-                            <xcad:LayoutDocumentPane>
-                            </xcad:LayoutDocumentPane>
-                        </xcad:LayoutDocumentPaneGroup>
-
-                    </xcad:LayoutPanel>
-
-                    <xcad:LayoutAnchorablePaneGroup DockHeight="200" Orientation="Horizontal">
-
-                        <xcad:LayoutAnchorablePane>
-
-                            <xcad:LayoutAnchorable CanClose="False" CanHide="False" Title="Trades">
-                                <panels:TradesPanel/>
-                            </xcad:LayoutAnchorable>
-
-                            <xcad:LayoutAnchorable CanClose="False" CanHide="False" Title="Profit &amp; Loss">
-                                <panels:ProfitLossPanel/>
-                            </xcad:LayoutAnchorable>
-
-                            <xcad:LayoutAnchorable CanClose="False" CanHide="False" Title="Log">
-                                <panels:LogPanel/>
-                            </xcad:LayoutAnchorable>
-
-                        </xcad:LayoutAnchorablePane>
-
-                    </xcad:LayoutAnchorablePaneGroup>
-
+                    
                 </xcad:LayoutPanel>
             </xcad:LayoutRoot>
 

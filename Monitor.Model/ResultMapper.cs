@@ -27,7 +27,6 @@ namespace Monitor.Model
         {
             var instantPoint = new InstantChartPoint
             {
-                // QuantConnect are in seconds from Unix Time. (TODO: Does this imply it does not support a smaller resolution ??)
                 X =  Instant.FromUnixTimeSeconds(point.x),
                 Y = point.y
             };
@@ -39,7 +38,7 @@ namespace Monitor.Model
         {
             return new ChartPoint
             {
-                // QuantConnect chartpoints are always in Unix TimeStamp
+                // QuantConnect chartpoints are always in Unix TimeStamp (seconds)
                 x = point.X.ToUnixTimeSeconds(),
                 y = point.Y
             };
