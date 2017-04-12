@@ -1,0 +1,77 @@
+﻿<Window x:Class="Monitor.View.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        Background="{StaticResource WindowBackgroundBrush}"
+        mc:Ignorable="d"        
+        DataContext="{Binding AboutWindow, Source={StaticResource Locator}}"
+        Title="About LEAN Algorithm Monitor" Height="368.896" Width="508.431" WindowStartupLocation="CenterOwner" SizeToContent="Height">
+
+    <Window.Resources>
+
+        <ResourceDictionary>
+
+            <!-- Get the configured foreground color from the expression theme-->
+            <Style TargetType="FlowDocument">
+                <Setter Property="Foreground" Value="{StaticResource ButtonForeground}"/>
+                <Setter Property="FontSize" Value="12"/>
+            </Style>
+
+            <Style TargetType="Hyperlink">
+                <Setter Property="Command" Value="{Binding BrowseCommand}"/>
+                <Setter Property="Foreground" Value="{StaticResource MouseOverButtonBackground}"/>
+            </Style>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <FlowDocumentScrollViewer>
+            <FlowDocument>
+                <Paragraph FontSize="16" FontWeight="Bold">LEAN Algorithm Monitor</Paragraph>
+                <Paragraph>
+                    <Hyperlink CommandParameter="https://github.com/mirthestam/lean-monitor">LEAN Algorithm Monitor</Hyperlink> is an open-source desktop tool to browse Lean engine's backtest progress and results.
+                </Paragraph>
+                <Paragraph>
+                    <Hyperlink CommandParameter="https://github.com/QuantConnect/Lean">Lean Engine</Hyperlink> is an open-source fully managed C# algorithmic trading engine built for desktop and cloud usage. Lean drives the web based backtesting platform
+                    <Hyperlink CommandParameter="https://www.quantconnect.com/">QuantConnect</Hyperlink> .
+                </Paragraph>
+                <Paragraph FontWeight="Bold">Thanks to</Paragraph>
+                <List>
+                    <ListItem>
+                        <Paragraph>
+                            <Hyperlink CommandParameter="https://github.com/DanPristupov/WpfExpressionBlendTheme">Dan Pristupov</Hyperlink> for his Dark Blend Theme for WPF: the foundation for this UI.
+                        </Paragraph>
+                    </ListItem>
+                    <ListItem>
+                        <Paragraph>
+                            <Hyperlink CommandParameter="https://lvcharts.net/">LiveCharts</Hyperlink> for their excellent Open Source charting library
+                        </Paragraph>
+                    </ListItem>
+                    <ListItem>
+                        <Paragraph>
+                            <Hyperlink CommandParameter="http://www.mvvmlight.net/">MVVM Light Toolkit</Hyperlink>
+                        </Paragraph>
+                    </ListItem>
+                    <ListItem>
+                        <Paragraph>
+                            <Hyperlink CommandParameter="https://github.com/structuremap/structuremap">StructureMap</Hyperlink>
+                        </Paragraph>
+                    </ListItem>
+                    <ListItem>
+                        <Paragraph>
+                            <Hyperlink CommandParameter="http://wpftoolkit.codeplex.com/wikipage?title=AvalonDock&amp;referringTitle=Home">Extended WPF Toolkit Community Edition</Hyperlink> for the AvalonDock Controls
+                        </Paragraph>
+                    </ListItem>
+                    <ListItem>
+                        <Paragraph>
+                            <Hyperlink CommandParameter="https://icons8.com/">Icons8</Hyperlink> for the icons
+                        </Paragraph>
+                    </ListItem>
+
+                </List>
+                <Paragraph>among others.</Paragraph>
+            </FlowDocument>
+        </FlowDocumentScrollViewer>
+    </Grid>
+</Window>

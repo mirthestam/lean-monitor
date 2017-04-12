@@ -1,0 +1,24 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Monitor.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="ApiUserId" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">0</Value>
+    </Setting>
+    <Setting Name="ApiAccessToken" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="ChartSeriesLimit" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">4000</Value>
+    </Setting>
+    <Setting Name="ApiBaseUrl" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://www.quantconnect.com/api/v2/</Value>
+    </Setting>
+    <Setting Name="StreamHostDefault" Type="System.String" Scope="User">
+      <Value Profile="(Default)">localhost</Value>
+    </Setting>
+    <Setting Name="StreamPortDefault" Type="System.String" Scope="User">
+      <Value Profile="(Default)">1234</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

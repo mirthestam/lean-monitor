@@ -1,0 +1,153 @@
+﻿<UserControl x:Class="Monitor.View.Charts.ChartPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:charts="clr-namespace:Monitor.ViewModel.Charts"
+             xmlns:wpf="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+             xmlns:converters="clr-namespace:Monitor.Converters"
+             xmlns:charts1="clr-namespace:Monitor.View.Charts"
+             Foreground="{StaticResource ForegroundBrush}"
+             mc:Ignorable="d"              
+             d:DataContext="{d:DesignInstance Type=charts:ChartPaneViewModel,IsDesignTimeCreatable=True}"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"></RowDefinition>
+            <RowDefinition Height="*"></RowDefinition>
+        </Grid.RowDefinitions>
+
+        <ToolBar Style="{DynamicResource ToolBarStyle}">
+            <Button Command="{Binding ShowGridCommand}" Content="Grid" ToolTip="Creates a new tab with a grid for this data"/>
+            <Separator/>
+            <Button Command="{Binding ZoomFitCommand}" Content="Zoom to fit" ToolTip="Zooms all data to fit width"/>
+            <Separator/>
+            <ToggleButton IsChecked="{Binding IsPositionLocked}" Content="Lock" ToolTip="Enable to lock the position of the chart. Disable to automatically scroll to new updates"/>
+        </ToolBar>
+
+        <Grid Grid.Row="1">
+
+            <Grid.RowDefinitions>
+                <!-- Charts -->
+                <RowDefinition Height="*"></RowDefinition>
+
+                <!-- Zoom -->
+                <RowDefinition Height="100"></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <!-- charts -->
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ItemsControl Name="DataSource" ItemsSource="{Binding Charts}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <DockPanel LastChildFill="True"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="ContentPresenter">
+                            <Setter Property="DockPanel.Dock" Value="Bottom"/>
+                            <Setter Property="MinHeight" Value="200"/>
+                            <Setter Property="DataContext" Value="{Binding}"/>
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <charts1:ChartControl DataContext="{Binding}"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+            
+            <!-- Overview chart -->
+            <wpf:CartesianChart Grid.Row="1" 
+                            ScrollMode="X"
+                            ScrollHorizontalFrom="{Binding Zoom.ZoomFrom, Mode=TwoWay}"
+                            ScrollHorizontalTo="{Binding Zoom.ZoomTo, Mode=TwoWay}"
+                            DisableAnimations="True" 
+                            Series="{Binding ScrollSeriesCollection}"
+                            DataTooltip="{x:Null}">
+                <wpf:CartesianChart.Resources>
+                    <converters:ResolutionConverter x:Key="ResolutionConverter"/>
+                </wpf:CartesianChart.Resources>
+                <wpf:CartesianChart.AxisX>
+                    <wpf:DateAxis
+                        IsMerged="True"
+                        HeaderForeground="White"
+                        HeaderFontWeight="Normal"
+                        Period="{Binding Resolution, Mode=OneWay, Converter={StaticResource ResolutionConverter}}"
+                        InitialDateTime="{Binding InitialDateTime, Mode=OneWay}"                                        
+                        />
+                </wpf:CartesianChart.AxisX>
+                <wpf:CartesianChart.AxisY>
+                    <wpf:Axis ShowLabels="False" />
+                </wpf:CartesianChart.AxisY>
+            </wpf:CartesianChart>
+
+        </Grid>
+
+    </Grid>
+
+</UserControl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
