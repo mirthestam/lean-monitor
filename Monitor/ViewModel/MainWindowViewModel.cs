@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -6,23 +7,27 @@ using System.Windows;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Messaging;
+using Lean.AlgorithmMonitor.ViewModel;
 using Microsoft.Win32;
 using Monitor.Model;
 using Monitor.Model.Messages;
 using Monitor.Model.Sessions;
 using Monitor.ViewModel.Charts;
 using Monitor.ViewModel.Grids;
+using Monitor.ViewModel.Panels;
+using Xceed.Wpf.AvalonDock;
 
 namespace Monitor.ViewModel
 {
     public class MainWindowViewModel : ViewModelBase
     {
         private readonly ISessionService _sessionService;
+        private readonly ILayoutManager _layoutManager;
         private readonly IMessenger _messenger;
 
         private SessionState _sessionState = SessionState.Unsubscribed;
 
-        private ObservableCollection<DocumentViewModel> _charts = new ObservableCollection<DocumentViewModel>();
+        private ObservableCollection<DocumentPaneViewModel> _documents = new ObservableCollection<DocumentPaneViewModel>();
 
         public RelayCommand ExitCommand { get; private set; }
         public RelayCommand OpenSessionCommand { get; private set; }
@@ -32,15 +37,37 @@ namespace Monitor.ViewModel
         public RelayCommand ConnectCommand { get; }
         public RelayCommand DisconnectCommand { get; }
 
-        public ObservableCollection<DocumentViewModel> Charts
+        public RelayCommand<DockingManager> SaveLayoutCommand { get; }
+        public RelayCommand<DockingManager> ResetLayoutCommand { get; }
+        public RelayCommand<DockingManager> RestoreLayoutCommand { get; }
+
+        public ObservableCollection<DocumentPaneViewModel> Documents
         {
-            get { return _charts; }
+            get { return _documents; }
             set
             {
-                _charts = value;
+                _documents = value;
                 RaisePropertyChanged();
             }
         }
+
+        public IEnumerable<ToolPaneViewModel> Tools
+        {
+            get
+            {
+                yield return LogPane;
+                yield return StatisticsPane;
+                yield return RuntimeStatisticsPane;
+                yield return TradesPane;
+                yield return ProfitLossPane;
+            }
+        }
+
+        public LogPanelViewModel LogPane { get; set; }
+        public StatisticsPanelViewModel StatisticsPane { get; set; }
+        public RuntimeStatisticsPanelViewModel RuntimeStatisticsPane { get; set; }
+        public TradesPanelViewModel TradesPane { get; set; }
+        public ProfitLossPanelViewModel ProfitLossPane { get; set; }
 
         public bool IsSessionActive => _sessionService.IsSessionActive;
 
@@ -56,11 +83,19 @@ namespace Monitor.ViewModel
 
         public StatusViewModel StatusViewModel { get; }
 
-        public MainWindowViewModel(ISessionService resultService, IMessenger messenger, StatusViewModel statusViewModel)
+        public MainWindowViewModel(ISessionService resultService, IMessenger messenger, ILayoutManager layoutManager, StatusViewModel statusViewModel)
         {
             StatusViewModel = statusViewModel;
             _sessionService = resultService;
+            _layoutManager = layoutManager;
             _messenger = messenger;
+
+            // TODO: These viewmodels should be injected
+            LogPane = ViewModelLocator.LogPanel;
+            StatisticsPane = ViewModelLocator.StatisticsPanel;
+            RuntimeStatisticsPane = ViewModelLocator.RuntimeStatisticsPanel;
+            ProfitLossPane = ViewModelLocator.ProfitLossPanel;
+            TradesPane = ViewModelLocator.TradesPanel;
 
             ExitCommand = new RelayCommand(() => Application.Current.Shutdown());
             CloseCommand = new RelayCommand(() => _sessionService.ShutdownSession(), () => IsSessionActive);
@@ -69,12 +104,16 @@ namespace Monitor.ViewModel
             ConnectCommand = new RelayCommand(() => _sessionService.IsSessionSubscribed = true, () => _sessionState != SessionState.Subscribed && _sessionService.CanSubscribe);
             DisconnectCommand = new RelayCommand(() => _sessionService.IsSessionSubscribed = false, () => _sessionState != SessionState.Unsubscribed);
 
+            SaveLayoutCommand = new RelayCommand<DockingManager>(manager => _layoutManager.SaveLayout(manager));
+            RestoreLayoutCommand = new RelayCommand<DockingManager>(manager => _layoutManager.LoadLayout(manager));
+            ResetLayoutCommand = new RelayCommand<DockingManager>(manager => _layoutManager.ResetLayout(manager));
+
             _messenger.Register<SessionOpenedMessage>(this, message => InvalidateCommands());
 
             _messenger.Register<SessionClosedMessage>(this, message =>
             {
                 SessionState = SessionState.Unsubscribed;
-                Charts.Clear();
+                Documents.Clear();
                 InvalidateCommands();
             });
 
@@ -88,7 +127,7 @@ namespace Monitor.ViewModel
             {
                 try
                 {
-                    lock (_charts)
+                    lock (_documents)
                     {
                         ParseResult(message.ResultContext.Result);
                     }
@@ -107,8 +146,8 @@ namespace Monitor.ViewModel
                 };
 
                 // Calcualte the index for this tab
-                var index = Charts.IndexOf(Charts.First(c => c.Key == message.Key));
-                Charts.Insert(index, chartTableViewModel);
+                var index = Documents.IndexOf(Documents.First(c => c.Key == message.Key));
+                Documents.Insert(index, chartTableViewModel);
 
                 chartTableViewModel.IsSelected = true;
 
@@ -146,17 +185,17 @@ namespace Monitor.ViewModel
                     // In example, a StockPlot:SYMBOL chart for which no subscription exists.
                 }
 
-                var chartDrawViewModel = Charts.OfType<ChartPanelViewModel>().SingleOrDefault(c => c.Key == chart.Key);
+                var chartDrawViewModel = Documents.OfType<ChartPaneViewModel>().SingleOrDefault(c => c.Key == chart.Key);
                 if (chartDrawViewModel == null)
                 {
-                    chartDrawViewModel = new ChartPanelViewModel(_messenger)
+                    chartDrawViewModel = new ChartPaneViewModel(_messenger)
                     {
                         Key = chart.Key
                     };
-                    Charts.Add(chartDrawViewModel);
+                    Documents.Add(chartDrawViewModel);
                 }
 
-                var chartTableViewModel = Charts.OfType<GridPanelViewModelBase>().SingleOrDefault(c => c.Key == chart.Key);
+                var chartTableViewModel = Documents.OfType<GridPanelViewModelBase>().SingleOrDefault(c => c.Key == chart.Key);
 
                 // Some viewmodels need the full result.
                 // Others just need a single chart
@@ -172,7 +211,7 @@ namespace Monitor.ViewModel
                 }
             }
 
-            RaisePropertyChanged(() => Charts);
+            RaisePropertyChanged(() => Documents);
         }
 
         private void Export()

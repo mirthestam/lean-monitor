@@ -8,7 +8,7 @@ using QuantConnect.Orders;
 
 namespace Monitor.ViewModel.Panels
 {
-    public class TradesPanelViewModel : ViewModelBase
+    public class TradesPanelViewModel : ToolPaneViewModel
     {
         private readonly IMessenger _messenger;
 
@@ -26,6 +26,8 @@ namespace Monitor.ViewModel.Panels
 
         public TradesPanelViewModel(IMessenger messenger)
         {
+            Name = "Trades";
+
             _messenger = messenger;
             _messenger.Register<SessionUpdateMessage>(this, message =>
             {

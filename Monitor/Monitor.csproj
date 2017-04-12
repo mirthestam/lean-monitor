@@ -149,12 +149,16 @@
     <Compile Include="ViewModel\Grids\GridSerie.cs" />
     <Compile Include="ViewModel\Charts\IChartView.cs" />
     <Compile Include="ViewModel\Grids\GridPanelViewModel.cs" />
-    <Compile Include="ViewModel\Charts\ChartPanelViewModel.cs" />
-    <Compile Include="ViewModel\InstanceViewModel.cs" />
+    <Compile Include="ViewModel\Charts\ChartPaneViewModel.cs" />
+    <Compile Include="ViewModel\ILayoutManager.cs" />
+    <Compile Include="ViewModel\LayoutSerializer.cs" />
+    <Compile Include="ViewModel\LayoutUpdateStrategy.cs" />
     <Compile Include="ViewModel\NewSession\INewSessionViewModel.cs" />
+    <Compile Include="ViewModel\NewSession\InstanceViewModel.cs" />
     <Compile Include="ViewModel\NewSession\NewApiSessionViewModel.cs" />
     <Compile Include="ViewModel\NewSession\NewFileSessionViewModel.cs" />
     <Compile Include="ViewModel\NewSession\NewStreamSessionViewModel.cs" />
+    <Compile Include="ViewModel\NewSession\ProjectViewModel.cs" />
     <Compile Include="ViewModel\Panels\LogPanelItemViewModel.cs" />
     <Compile Include="ViewModel\Panels\LogPanelViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
@@ -162,11 +166,10 @@
     <Compile Include="ViewModel\Panels\ProfitLossPanelViewModel.cs" />
     <Compile Include="ViewModel\Panels\ProfitLossItemViewModel.cs" />
     <Compile Include="ViewModel\Panels\RuntimeStatisticsPanelViewModel.cs" />
-    <Compile Include="ViewModel\DocumentViewModel.cs" />
     <Compile Include="ViewModel\NewSession\NewSessionWindowViewModel.cs" />
     <Compile Include="ViewModel\Panels\StatisticsPanelViewModel.cs" />
     <Compile Include="ViewModel\Panels\StatisticViewModel.cs" />
-    <Compile Include="ViewModel\ProjectViewModel.cs" />
+    <Compile Include="ViewModel\PaneViewModel.cs" />
     <Compile Include="ViewModel\StatusViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Compile Include="View\AboutWindow.xaml.cs">
@@ -175,6 +178,7 @@
     <Compile Include="View\Charts\ChartControl.xaml.cs">
       <DependentUpon>ChartControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\PaneStyleSelector.cs" />
     <Compile Include="View\NewSession\NewApiSessionControl.xaml.cs">
       <DependentUpon>NewApiSessionControl.xaml</DependentUpon>
     </Compile>
@@ -355,6 +359,11 @@
       <Project>{4a341b3b-c422-47d1-8f44-8c6ea39261ac}</Project>
       <Name>Monitor.Model</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Layout.default.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

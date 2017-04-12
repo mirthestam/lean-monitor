@@ -8,7 +8,7 @@ using Monitor.Model.Statistics;
 
 namespace Monitor.ViewModel.Panels
 {
-    public class RuntimeStatisticsPanelViewModel : ViewModelBase
+    public class RuntimeStatisticsPanelViewModel : ToolPaneViewModel
     {
         private readonly IMessenger _messenger;
         private readonly IStatisticsFormatter _statisticsFormatter;
@@ -17,6 +17,8 @@ namespace Monitor.ViewModel.Panels
 
         public RuntimeStatisticsPanelViewModel(IMessenger messenger, IStatisticsFormatter statisticsFormatter)
         {
+            Name = "Runtime Statistics";
+
             _messenger = messenger;
             _statisticsFormatter = statisticsFormatter;
             _messenger.Register<SessionUpdateMessage>(this, message => ParseResult(message.ResultContext.Result));

@@ -287,7 +287,7 @@
         </ItemsControl>
     </ControlTemplate>
     <ControlTemplate x:Key="AnchorTemplate" TargetType="{x:Type avalonDockControls:LayoutAnchorControl}">
-        <Border BorderThickness="1" BorderBrush="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"
+        <Border BorderThickness="1" Background="{StaticResource ButtonBackground}" BorderBrush="{StaticResource ButtonBorder}"
             Margin="2" Padding="2">
             <ContentPresenter Content="{Binding Model, RelativeSource={RelativeSource TemplatedParent}}"
                         ContentTemplate="{Binding AnchorableHeaderTemplate, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type avalonDock:DockingManager}, Mode=FindAncestor}}"
@@ -638,7 +638,7 @@
         </Setter>
     </Style>
     <Style TargetType="{x:Type avalonDockControls:LayoutDocumentFloatingWindowControl}">
-        <Setter Property="Control.Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+        <Setter Property="Control.Background" Value="{StaticResource WindowBackgroundBrush}"/>
         <Setter Property="Control.BorderBrush"
             Value="{DynamicResource {x:Static SystemColors.ControlDarkBrushKey}}"/>
         <Setter Property="Control.BorderThickness" Value="3"/>
@@ -799,10 +799,10 @@
     </Style>
     <Style TargetType="{x:Type avalonDockControls:LayoutAutoHideWindowControl}">
         <Setter Property="avalonDockControls:LayoutAutoHideWindowControl.Background"
-            Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+            Value="{StaticResource WindowBackgroundBrush}"/>
     </Style>
     <Style TargetType="{x:Type avalonDockControls:NavigatorWindow}">
-        <Setter Property="Control.Background" Value="{DynamicResource {x:Static SystemColors.ControlBrushKey}}"/>
+        <Setter Property="Control.Background" Value="{StaticResource WindowBackgroundBrush}"/>
         <Setter Property="Window.SizeToContent" Value="WidthAndHeight"/>
         <Setter Property="Window.ResizeMode" Value="NoResize"/>
         <Setter Property="WindowChrome.WindowChrome">

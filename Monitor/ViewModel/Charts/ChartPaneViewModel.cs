@@ -21,7 +21,7 @@ namespace Monitor.ViewModel.Charts
     /// <summary>
     /// View model for generic charts
     /// </summary>
-    public class ChartPanelViewModel : DocumentViewModel, IChartView
+    public class ChartPaneViewModel : DocumentPaneViewModel, IChartView
     {
         private readonly IMessenger _messenger;
         private readonly SeriesChartComponent _chartParser;
@@ -54,8 +54,6 @@ namespace Monitor.ViewModel.Charts
         public RelayCommand ZoomFitCommand { get; private set; }
 
         public ZoomChartComponent Zoom { get; set; }
-
-        public override bool CanClose => false;
 
         /// <summary>
         /// Gets the DateTime representing the first X value
@@ -118,10 +116,10 @@ namespace Monitor.ViewModel.Charts
             }
         }
 
-        public ChartPanelViewModel(IMessenger messenger)
+        public ChartPaneViewModel(IMessenger messenger)
         {
             _messenger = messenger;
-
+            
             // Create our child components
             _chartParser = new SeriesChartComponent(this);
             Zoom = new ZoomChartComponent(this);
@@ -134,7 +132,7 @@ namespace Monitor.ViewModel.Charts
         public void ParseChart(ChartDefinition sourceChart)
         {
             // Update the title
-            Title = sourceChart.Name;
+            Name = sourceChart.Name;
 
             // Validate the chart
             if (sourceChart.Series.Count == 0) return;
@@ -198,7 +196,7 @@ namespace Monitor.ViewModel.Charts
                         // This series is probably truncated by the LEAN engine. Add warning visual elemeent
                         var lastValue = updates.Values.Last();
                         childModel.CreateTruncatedVisuaLElement(0, lastValue.X, lastValue.Y);
-                        _messenger.Send(new LogEntryReceivedMessage(DateTime.Now, $"Series { Title}.{series.Title} is possibly truncated by the LEAN engine", LogItemType.Monitor));
+                        _messenger.Send(new LogEntryReceivedMessage(DateTime.Now, $"Series { Name}.{series.Title} is possibly truncated by the LEAN engine", LogItemType.Monitor));
                     }
                 }
             }

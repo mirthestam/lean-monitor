@@ -7,7 +7,7 @@ using Monitor.Model.Messages;
 
 namespace Monitor.ViewModel.Panels
 {
-    public class LogPanelViewModel : ViewModelBase
+    public class LogPanelViewModel : ToolPaneViewModel
     {
         private readonly IMessenger _messenger;
 
@@ -15,6 +15,8 @@ namespace Monitor.ViewModel.Panels
 
         public LogPanelViewModel(IMessenger messenger)
         {
+            Name = "Log";
+
             _messenger = messenger;
             _messenger.Register<LogEntryReceivedMessage>(this, ParseResult);
             _messenger.Register<SessionClosedMessage>(this, m => Clear());

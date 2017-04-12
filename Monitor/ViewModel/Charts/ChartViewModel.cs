@@ -19,15 +19,15 @@ namespace Monitor.ViewModel.Charts
 
         public Dictionary<string, Instant> LastUpdates { get; } = new Dictionary<string, Instant>();
 
-        public ChartViewModel(int index, ChartPanelViewModel chart)
+        public ChartViewModel(int index, ChartPaneViewModel chart)
         {
             _index = index;
             _parent = chart;
         }
 
-        private ChartPanelViewModel _parent;
+        private ChartPaneViewModel _parent;
 
-        public ChartPanelViewModel Parent
+        public ChartPaneViewModel Parent
         {
             get { return _parent; }
             set

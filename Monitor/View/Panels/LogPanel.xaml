@@ -3,7 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             DataContext="{Binding LogPanel, Source={StaticResource Locator}}"
+             xmlns:panels="clr-namespace:Monitor.View.Panels"
+             d:DataContext="{d:DesignInstance Type=panels:LogPanel,IsDesignTimeCreatable=True}"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>

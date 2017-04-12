@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LayoutRoot>
+  <RootPanel Orientation="Horizontal">
+    <LayoutAnchorablePaneGroup Orientation="Vertical" DockWidth="223" DockHeight="224.5" FloatingWidth="575" FloatingHeight="689" FloatingLeft="-1846" FloatingTop="478">
+      <LayoutAnchorablePane DockWidth="223" DockHeight="0.601601701302288*" FloatingWidth="575" FloatingHeight="689" FloatingLeft="-1792" FloatingTop="483">
+        <LayoutAnchorable AutoHideMinWidth="100" AutoHideMinHeight="100" Title="Runtime Statistics" IsSelected="True" ContentId="Runtime Statistics" FloatingLeft="-1792" FloatingTop="483" FloatingWidth="575" FloatingHeight="689" CanClose="False" LastActivationTimeStamp="04/12/2017 16:44:07" PreviousContainerId="4f684ce6-4a82-4d97-9af0-546a2c4a03b6" PreviousContainerIndex="1" />
+      </LayoutAnchorablePane>
+      <LayoutAnchorablePane Id="4f684ce6-4a82-4d97-9af0-546a2c4a03b6" DockHeight="1.5556513086831*" FloatingWidth="575" FloatingHeight="689" FloatingLeft="-1846" FloatingTop="478">
+        <LayoutAnchorable AutoHideMinWidth="100" AutoHideMinHeight="100" Title="Statistics" IsSelected="True" ContentId="Statistics" FloatingLeft="-1846" FloatingTop="478" FloatingWidth="575" FloatingHeight="689" CanClose="False" LastActivationTimeStamp="04/12/2017 16:43:00" />
+      </LayoutAnchorablePane>
+    </LayoutAnchorablePaneGroup>
+    <LayoutPanel Orientation="Vertical">
+      <LayoutPanel Orientation="Horizontal">
+        <LayoutDocumentPane/>
+      </LayoutPanel>
+      <LayoutAnchorablePaneGroup Orientation="Horizontal" DockHeight="184.5" FloatingWidth="575" FloatingHeight="689" FloatingLeft="-1156" FloatingTop="806">
+        <LayoutAnchorablePane Id="58f1ec50-95d1-4a47-9b0f-73f89461f54e" DockWidth="1.06543967280164*" DockHeight="184.5" FloatingWidth="575" FloatingHeight="689" FloatingLeft="-1136" FloatingTop="782">
+          <LayoutAnchorable AutoHideMinWidth="100" AutoHideMinHeight="100" Title="Log" ContentId="Log" FloatingLeft="653" FloatingTop="785" FloatingWidth="575" FloatingHeight="689" CanClose="False" LastActivationTimeStamp="04/12/2017 16:44:39" PreviousContainerId="4b599dcd-c66e-4b0a-b3ec-cfebdda85ad5" PreviousContainerIndex="0" />
+          <LayoutAnchorable AutoHideMinWidth="100" AutoHideMinHeight="100" Title="Trades" IsSelected="True" ContentId="Trades" FloatingLeft="-786" FloatingTop="781" FloatingWidth="575" FloatingHeight="689" CanClose="False" LastActivationTimeStamp="04/12/2017 16:45:54" />
+        </LayoutAnchorablePane>
+      </LayoutAnchorablePaneGroup>
+    </LayoutPanel>
+    <LayoutAnchorablePane Id="4b599dcd-c66e-4b0a-b3ec-cfebdda85ad5" DockWidth="253" DockHeight="184.5" FloatingWidth="575" FloatingHeight="689" FloatingLeft="1305" FloatingTop="546">
+      <LayoutAnchorable AutoHideWidth="149" AutoHideMinWidth="100" AutoHideMinHeight="100" Title="Profit &amp; Loss" IsSelected="True" ContentId="Profit &amp; Loss" FloatingLeft="1305" FloatingTop="546" FloatingWidth="575" FloatingHeight="689" CanClose="False" LastActivationTimeStamp="04/12/2017 16:44:33" />
+    </LayoutAnchorablePane>
+  </RootPanel>
+  <TopSide />
+  <RightSide />
+  <LeftSide />
+  <BottomSide />
+  <FloatingWindows />
+  <Hidden />
+</LayoutRoot>

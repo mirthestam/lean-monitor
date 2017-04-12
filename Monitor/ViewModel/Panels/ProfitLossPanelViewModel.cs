@@ -8,7 +8,7 @@ using Monitor.Model.Messages;
 
 namespace Monitor.ViewModel.Panels
 {
-    public class ProfitLossPanelViewModel : ViewModelBase
+    public class ProfitLossPanelViewModel : ToolPaneViewModel
     {
         private readonly IMessenger _messenger;
 
@@ -26,6 +26,8 @@ namespace Monitor.ViewModel.Panels
 
         public ProfitLossPanelViewModel(IMessenger messenger)
         {
+            Name = "Profit & Loss";
+
             _messenger = messenger;
             _messenger.Register<SessionClosedMessage>(this, m => Clear());
             _messenger.Register<SessionUpdateMessage>(this, message =>

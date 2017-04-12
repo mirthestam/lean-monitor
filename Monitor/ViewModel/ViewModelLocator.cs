@@ -22,6 +22,7 @@ using Monitor.ViewModel;
 using Monitor.ViewModel.NewSession;
 using Monitor.ViewModel.Panels;
 using StructureMap;
+using System.Collections.Generic;
 
 namespace Lean.AlgorithmMonitor.ViewModel
 {
@@ -42,8 +43,13 @@ namespace Lean.AlgorithmMonitor.ViewModel
         public static RuntimeStatisticsPanelViewModel RuntimeStatisticsPanel => GetViewModel<RuntimeStatisticsPanelViewModel>();
         public static TradesPanelViewModel TradesPanel => GetViewModel<TradesPanelViewModel>();
         public static ProfitLossPanelViewModel ProfitLossPanel => GetViewModel<ProfitLossPanelViewModel>();
-        public static LogPanelViewModel LogPanel => GetViewModel<LogPanelViewModel>();
-        
+        public static LogPanelViewModel LogPanel => GetViewModel<LogPanelViewModel>();       
+
+        private static T GetToolViewModel<T>() where T : ToolPaneViewModel
+        {
+            return _container.GetInstance<T>();
+        }
+
         private static T GetViewModel<T>()
         {
             // Get all viewmodels as unique instances

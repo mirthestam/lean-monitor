@@ -3,6 +3,7 @@ using Monitor.Model;
 using Monitor.Model.Api;
 using Monitor.Model.Sessions;
 using Monitor.Model.Statistics;
+using Monitor.ViewModel;
 using Monitor.ViewModel.NewSession;
 using StructureMap;
 
@@ -35,6 +36,7 @@ namespace Monitor
             For<IApiClient>().Singleton().Use<ApiClient>();             
             
             // ViewModel
+            For<ILayoutManager>().Use<LayoutManager>();
             Scan(scanner =>
             {
                 scanner.TheCallingAssembly();
