@@ -6,6 +6,8 @@ using NUnit.Framework;
 
 namespace QuantConnect.Lean.AlgorithmMonitor.Tests.Model
 {
+    using Result = Monitor.Model.Result;
+
     [TestFixture]
     public class ResultUpdaterTests
     {
